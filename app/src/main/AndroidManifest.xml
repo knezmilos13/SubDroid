@@ -4,10 +4,11 @@
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="false"
-        android:name=".util.Aplikacija"
+        android:name=".App"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/SubDroid.Theme" >
@@ -89,5 +90,11 @@
             android:name=".help.HelpAboutAkt"
             android:label="@string/help_about" >
         </activity>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="b8bb2405861a552bb44085774ecc194833070ea9" />
+
     </application>
+
 </manifest>

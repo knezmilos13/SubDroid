@@ -1,7 +1,7 @@
 package knez.assdroid.podesavanja;
 
 import knez.assdroid.R;
-import knez.assdroid.util.Aplikacija;
+import knez.assdroid.App;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
@@ -15,21 +15,21 @@ public class PodesavanjaEditorUtil {
 	
 	/** Vraca znak koji ce se koristiti umesto tagova {}, tj. kada su "minimizirani" */
 	public static String getMinimizedCharTag() {
-		Context apkont = Aplikacija.dajKontekst();
+		Context apkont = App.dajKontekst();
 		return PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_MINIMIZED_TAG_CHAR, 
 			apkont.getResources().getString(R.string.podesavanja_editor_default_zamena_taga));
 	}
 	
 	/** Vraca vrednost opacity-ja za minimiziran interfejs */
 	public static int getMinimizedTransparentnost() {
-		Context apkont = Aplikacija.dajKontekst();
+		Context apkont = App.dajKontekst();
 		return PreferenceManager.getDefaultSharedPreferences(apkont).getInt(EDITOR_KONTROLE_MIN_TRANSP, 
 			apkont.getResources().getInteger(R.integer.editor_kontrole_min_transp_default));
 	}
 	
 	/** Vraca velicinu fonta za tekst (u pikselima) */
 	public static int getTextFontSize() {
-		Context apkont = Aplikacija.dajKontekst();
+		Context apkont = App.dajKontekst();
 		String sVelicina = PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_FONT_TEXT, null);
 		
 		int velicina;
@@ -43,7 +43,7 @@ public class PodesavanjaEditorUtil {
 	
 	/** Vraca velicinu fonta za ostalo, sto nije tekst prevoda (u pikselima) */
 	public static int getOstaloFontSize() {
-		Context apkont = Aplikacija.dajKontekst();
+		Context apkont = App.dajKontekst();
 		String sVelicina = PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_FONT_OSTALO, null);
 		
 		int velicina;

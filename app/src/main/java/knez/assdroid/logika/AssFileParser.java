@@ -13,7 +13,7 @@ import java.util.List;
 
 import knez.assdroid.R;
 import knez.assdroid.util.Alatke;
-import knez.assdroid.util.Aplikacija;
+import knez.assdroid.App;
 
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -302,7 +302,7 @@ public class AssFileParser implements Parser {
 
 	private void javiZavrsenoParsiranje() {
 		if(mapaProblema.size() != 0) {
-			Resources r = Aplikacija.dajKontekst().getResources();
+			Resources r = App.dajKontekst().getResources();
 			if(mapaProblema.get(PROB_FORMAT_PREVODA) != null) {
 				warnString = r.getString(R.string.parsiranje_fail_nema_prevod_format_linije);
 			}

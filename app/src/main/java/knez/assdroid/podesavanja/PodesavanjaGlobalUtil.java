@@ -1,7 +1,7 @@
 package knez.assdroid.podesavanja;
 
 import knez.assdroid.R;
-import knez.assdroid.util.Aplikacija;
+import knez.assdroid.App;
 import android.content.Context;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
@@ -13,7 +13,7 @@ public class PodesavanjaGlobalUtil {
 
 	/** Da li u fullscreenu treba da se sakrije title bar */
 	public static boolean isHideTitleBar() {
-		Context apkont = Aplikacija.dajKontekst();
+		Context apkont = App.dajKontekst();
 		Resources r = apkont.getResources();
 		String podesavanje = PreferenceManager.getDefaultSharedPreferences(apkont)
 				.getString(GLOBAL_FULLSCREEN_TIP, r.getString(R.string.podesavanja_global_fullscreen_tip_default));
@@ -23,7 +23,7 @@ public class PodesavanjaGlobalUtil {
 	
 	/** Da li u fullscreenu treba da se sakrije status bar */
 	public static boolean isHideStatusBar() {
-		Context apkont = Aplikacija.dajKontekst();
+		Context apkont = App.dajKontekst();
 		Resources r = apkont.getResources();
 		String podesavanje = PreferenceManager.getDefaultSharedPreferences(apkont)
 				.getString(GLOBAL_FULLSCREEN_TIP, r.getString(R.string.podesavanja_global_fullscreen_tip_default));
@@ -33,7 +33,7 @@ public class PodesavanjaGlobalUtil {
 	
 	/** Vraca trenutno podesavanje nacina funkcionisanja fullscreen-a */
 	public static String getFullscreenTip() {
-		Context apkont = Aplikacija.dajKontekst();
+		Context apkont = App.dajKontekst();
 		return PreferenceManager.getDefaultSharedPreferences(apkont)
 				.getString(GLOBAL_FULLSCREEN_TIP, 
 						apkont.getResources().getString(R.string.podesavanja_global_fullscreen_tip_default));

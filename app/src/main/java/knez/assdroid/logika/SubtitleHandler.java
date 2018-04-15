@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import knez.assdroid.logika.Parser.ParserCallback;
-import knez.assdroid.util.Aplikacija;
+import knez.assdroid.App;
 import knez.assdroid.util.Loger;
 
 import android.content.SharedPreferences;
@@ -32,7 +32,7 @@ public class SubtitleHandler implements ParserCallback {
 
 	private static SubtitleHandler instanca;
 	private SubtitleHandler() {
-		baza = new ProvajderBaze(Aplikacija.dajKontekst()).getWritableDatabase();
+		baza = new ProvajderBaze(App.dajKontekst()).getWritableDatabase();
 	}	
 	public static SubtitleHandler dajInstancu() {
 		if(instanca == null) {
@@ -47,7 +47,7 @@ public class SubtitleHandler implements ParserCallback {
 		putanja = "";
 		imePrevoda = "";
 		prevodMenjan = true;
-		SharedPreferences.Editor edit = Aplikacija.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
+		SharedPreferences.Editor edit = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
 		edit.putString(PREF_ZADNJA_PUTANJA, putanja);
 		edit.putString(PREF_ZADNJI_FAJL, imePrevoda);
 		edit.putBoolean(PREF_MENJAN, prevodMenjan);
@@ -55,7 +55,7 @@ public class SubtitleHandler implements ParserCallback {
 	}
 
 	public void ucitajAkoPostojiOdPre() {
-		SharedPreferences shp = Aplikacija.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0);
+		SharedPreferences shp = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0);
 		putanja = shp.getString(PREF_ZADNJA_PUTANJA, "");
 		imePrevoda = shp.getString(PREF_ZADNJI_FAJL, "");
 		prevodMenjan = shp.getBoolean(PREF_MENJAN, false);
@@ -74,7 +74,7 @@ public class SubtitleHandler implements ParserCallback {
 	public void setPrevodMenjan(boolean jelda) {
 		if(prevodMenjan == jelda) return;
 		prevodMenjan = jelda;
-		SharedPreferences.Editor edit = Aplikacija.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
+		SharedPreferences.Editor edit = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
 		edit.putBoolean(PREF_MENJAN, prevodMenjan);
 		edit.apply();
 	}
@@ -89,7 +89,7 @@ public class SubtitleHandler implements ParserCallback {
 			String parcad[] = putanja.split(File.separator);
 			imePrevoda = parcad[parcad.length - 1];
 			prevodMenjan = false;
-			SharedPreferences.Editor edit = Aplikacija.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
+			SharedPreferences.Editor edit = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
 			edit.putString(PREF_ZADNJA_PUTANJA, putanja);
 			edit.putString(PREF_ZADNJI_FAJL, imePrevoda);
 			edit.putBoolean(PREF_MENJAN, prevodMenjan);

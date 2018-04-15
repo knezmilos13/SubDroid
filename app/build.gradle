@@ -1,11 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
-
-    def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
-    def buildTime = new GregorianCalendar().format("MM-dd-yyyy' 'h:mm:ss a z")
 
     defaultConfig {
         applicationId "knez.assdroid"
@@ -15,13 +13,25 @@ android {
         versionName "0.4.6-zoro"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "GIT_SHA", "\"$gitSha\""
-        buildConfigField "String", "BUILD_TIME", "\"$buildTime\""
+        buildConfigField 'String', 'GIT_SHA', "\"${gitSha()}\""
+        buildConfigField 'long', 'GIT_TIMESTAMP', "${gitTimestamp()}L"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [appName: "knez.assdroid.App"]
+
+            buildConfigField "boolean", "DEBUG_LOG_CURRENT_THREAD", "false"
+            buildConfigField "boolean", "DEBUG_LOG_FRAGMENT_STATE", "false"
+            buildConfigField "boolean", "STRICT_MODE", "false"
+        }
+        debug {
+            manifestPlaceholders = [appName: "knez.assdroid.DebugApp"]
+
+            buildConfigField "boolean", "DEBUG_LOG_CURRENT_THREAD", "true"
+            buildConfigField "boolean", "DEBUG_LOG_FRAGMENT_STATE", "true"
+            buildConfigField "boolean", "STRICT_MODE", "true"
         }
     }
     compileOptions {
@@ -41,4 +51,50 @@ dependencies {
     implementation 'yogesh.firzen:FilesLister:1.0.1.g'
     implementation 'yogesh.firzen:MukkiyaSevaigal:1.0.6'
     implementation 'org.apache.commons:commons-io:1.3.2'
+    implementation 'com.jakewharton.timber:timber:4.6.0'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    implementation 'info.android15.solid:collections:3.0.1'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    implementation 'com.google.dagger:dagger:2.11'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
+    compile 'com.google.dagger:dagger-android:2.11'
+    compile 'com.google.dagger:dagger-android-support:2.11'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
+
+    androidTestAnnotationProcessor 'com.google.dagger:dagger-compiler:2.11'
+    androidTestAnnotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
+        transitive = true;
+    }
+}
+
+
+
+
+def gitSha() {
+    def p = 'git rev-parse --short HEAD'.execute([], project.rootDir)
+    p.waitFor()
+    if (p.exitValue() != 0) {
+        throw new RuntimeException(p.errorStream.text)
+    }
+
+    return p.text.trim()
+}
+
+def gitTimestamp() {
+    def p = 'git log -n 1 --format=%at'.execute([], rootDir)
+    p.waitFor()
+    if (p.exitValue() != 0) {
+        throw new RuntimeException(p.errorStream.text)
+    }
+
+    return p.text.trim()
 }
