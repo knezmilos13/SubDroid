@@ -1,7 +1,5 @@
-package com.bgpixel.template;
+package knez.assdroid;
 
-import knez.assdroid.App;
-import knez.assdroid.BuildConfig;
 import knez.assdroid.util.logging.ActivityLifecycleLogger;
 import knez.assdroid.util.logging.DebugTree;
 import timber.log.Timber;
