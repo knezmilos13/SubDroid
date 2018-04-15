@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="pozadina_interfejsa">#ff000000</color>
+    <color name="gray">#ffff0000</color>
+    
+    <color name="global_providna">#00000000</color>
+    
+    <color name="kontrole_linija">#ffffffff</color>
+    
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="atributi_kontrole">
+        <attr name="ikonica_minimize" format="reference" />
+        <attr name="ikonica_maximize" format="reference" />
+        <attr name="zeljena_sirina_dugmica" format="dimension" />
+        <attr name="zeljena_visina_dugmica" format="dimension" />
+        
+        <attr name="pozadina_dugmici" format="reference" />
+        <attr name="pozadina_sekcije" format="reference" />
+        <attr name="pozadina_minimized" format="reference" />
+        
+        <attr name="pozadina_dugmici_desno" format="reference" />
+        <attr name="pozadina_sekcije_desno" format="reference" />
+        
+        <attr name="pozadina_dugmici_levo" format="reference" />
+        <attr name="pozadina_sekcije_levo" format="reference" />
+        <attr name="pozadina_minimized_levo" format="reference" />
+        
+        <attr name="pozadina_dugmici_gore" format="reference" />
+        <attr name="pozadina_sekcije_gore" format="reference" />
+        <attr name="pozadina_minimized_gore" format="reference" />
+        
+        <attr name="pozicija_portrait">
+            <enum name="dole" value="1" />
+            <enum name="gore" value="2" />
+        </attr>
+        <attr name="pozicija_landscape">
+            <enum name="levo" value="3" />
+            <enum name="desno" value="4" />
+            <enum name="auto" value="5" />
+        </attr>
+    </declare-styleable>
+
+</resources>

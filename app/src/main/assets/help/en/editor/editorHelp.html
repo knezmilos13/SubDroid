@@ -1,0 +1,134 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<style>
+			@font-face {
+				font-family: roboto;
+				src: url(../../Roboto-Regular.ttf);
+			}
+
+			body {
+				font-family: roboto;
+			} 
+			
+			.slika {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Help - Editing screen</h1>
+		
+		<p>Editing screen is SubDroid's starting point through which you can load .ass files, review them, and perform certain modifications either directly or by switching over to the Translation screen by selecting a line which you want to edit. The starting screen is shown on picture 1.</p>
+		
+		<div class="slika">
+			<img src="img001.png" /><br/>
+			Picture 1. SubDroid's starting screen - Editing screen
+		</div>
+		
+		<p>Editing screen contains three main sections:
+		<ul>
+			<li><b>Title bar</b> - displays the name of currently opened subtitle file, and the button for displaying the main menu.</li>
+			<li><b>Central area</b> - displays subtitle lines (empty at first)</li>
+			<li><b>Main controls</b> - used to display/hide several sections with various subtitling tools.</li>
+		</ul>
+		</p>
+		
+		<h2>1. Title bar</h2>
+		<p>Displays the name of the currently opened subtitle file, as well as the button for showing the main menu. If a new subtitle file was created, the title bar will display "untitled" until saved. If some changes were made on a subtitle file, a star (*) will appear next to its name until the changes are saved.</p>
+		
+		<p>On the right side is the button for displaying the main menu. Available options are shown on Picture 2.</p>
+		
+		<div class="slika">
+			<img src="img002.png" /><br/>
+			Picture 2. Starting screen with main menu open
+		</div>
+		
+		<p>Main menu contains following functions:
+		<ul>
+			<li><b>Create new subtitle</b> - removes current subtitle and creates a new file. NOTE: this option is currently not functional and the only thing it does is to remove the previous subtitle from application.</li>
+			<li><b>Load subtitle</b> - displays a file browser for loading an existing subtitle file.</li>
+			<li><b>Save</b> - saves all changes to the subtitle file. Until this option is selected, no changes will be made to the original file. However, all changes are stored in a local database and will not be lost after existing (or crashing) the application.</li>
+			<li><b>Settings</b> - displays settings</li>
+			<li><b>Help</b> - displays help</li>
+		</ul>
+		</p>
+		
+		<h2>2. Central area</h2>
+		<p>The cetnral area displays subtitle lines. This area is empty at first and is filled in only when a subtitle file is loaded by using the "Load subtitle" option. One example of this screen is shown on Picture 3. This screen contains subtitle lines. Each line has certain basic information shown, depending on the application settings. Line number and subtitle text are always shown. Subtitle lines that are marked as comments are dark-purple colored. By clicking any line, the Translation screen is started, allowing the change of the selected line.</p>
+		
+		<div class="slika">
+			<img src="img003.png" /><br/>
+			Picture 3. Starting screen with a loaded subtitle file; line #59 is a comment.
+		</div>
+		
+		<h2>3. Main controls</h2>
+		<p>Main controls (picture 4) are used to show/hide several sections with different options and tools. Every button opens a single section, except for the last one that is used to minimize the main controls (if you need more screen space). Only the first section is currently functional, allowing view modifications and subtitle line filtering.</p>
+		
+		<div class="slika">
+			<img src="img004.png" /><br/>
+			<br/>
+			<img src="img005.png" /><br/>
+			Picture 4. Maximized and minimized controls.
+		</div>
+		
+		<h3>3.1. Section for view settings and subtitle filtering</h3>
+		
+		<div class="slika">
+			<img src="img006.png" /><br/>
+			Picture 5. Section for view settings and subtitle filtering.
+		</div>
+		
+		<p>This section contains the following options:
+			<li><b>Button for showing/hiding subtitle timings</b> - shows/hides subtitle timinigs.</li>
+			<div class="slika">
+				<img src="img007.png" /><br/>
+				<br/>
+				<img src="img008.png" /><br/>
+				Picture 6. Shown / hidden subtitle timings.
+			</div>
+			<br/>
+			
+			<li><b>Button for showing/hiding styles&amp;roles</b> - shows/hides subtitle styles and roles.</li>
+			<div class="slika">
+				<img src="img009.png" /><br/>
+				<br/>
+				<img src="img010.png" /><br/>
+				Picture 7. Shown / hidden styles and roles.
+			</div>
+			<br/>
+			
+			<li><b>Button for showing/hiding special tags</b> - shows/hides special tags written into subtitle lines. Hidden tags are replaced with a special character, by default "田".</li>
+			<div class="slika">
+				<img src="img011.png" /><br/>
+				<br/>
+				<img src="img012.png" /><br/>
+				Picture 8. Hidden / shown special tags.
+			</div>
+			<br/>
+			
+			<li><b>Fullscreen button</b> - fullscreen provides more screen space (convenient for smaller screens).</li>
+			<div class="slika">
+				<img src="img013.png" /> 
+				<img src="img014.png" /><br/>
+				Picture 9. Standard display / Fullscreen.
+			</div>
+			<br/>
+			
+			<li><b>Filtering section</b> - enables subtitle filtering using user inputted text. Upon inputting text and clicking the filter button, only those subtitle lines that contain given text will remain on screen. Filtering can additionaly be configured using the button next to the filter button (picture 11)</li>
+			<div class="slika">
+				<img src="img015.png" /> <br/>
+				Picture 10. Subtitle filtering.
+			</div>
+			<br/>
+			<div class="slika">
+				<img src="img016.png" /> <br/>
+				Picture 11. Filtering settings.
+			</div>
+			<br/>
+		</p>
+		
+		
+	</body>
+</html>

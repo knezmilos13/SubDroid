@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="podesavanje_velicine_fonta">
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>18</item>
+        <item>20</item>
+        <item>22</item>
+        <item>25</item>
+        <item>30</item>
+    </string-array>
+    
+    <string-array name="podesavanje_global_fullscreen_tip_elementi">
+        <item>@string/podesavanja_global_fullscreen_tip_status_bar</item>
+        <item>@string/podesavanja_global_fullscreen_tip_title_bar</item>
+        <item>@string/podesavanja_global_fullscreen_tip_both</item>
+    </string-array>
+
+</resources>

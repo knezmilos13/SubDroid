@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item>
+        <shape android:shape="rectangle" >
+            <solid android:color="@color/pozadina_interfejsa" />
+        </shape>
+    </item>
+    <item android:top="3dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/kontrole_linija" />
+        </shape>
+    </item>
+    <item android:top="6dp">
+        <shape android:shape="rectangle" >
+            <solid android:color="@color/pozadina_interfejsa" />
+
+            <padding
+                android:bottom="0dp"
+                android:left="0dp"
+                android:right="0dp"
+                android:top="10dp" />
+        </shape>
+    </item>
+
+</layer-list>

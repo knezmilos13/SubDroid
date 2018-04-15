@@ -1,0 +1,134 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<style>
+			@font-face {
+				font-family: roboto;
+				src: url(../../Roboto-Regular.ttf);
+			}
+
+			body {
+				font-family: roboto;
+			} 
+			
+			.slika {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Help - ekran za editovanje</h1>
+		
+		<p>Ekran za editovanje predstavlja početni ekran aplikacije preko kojeg je moguće učitati .ass datoteku, pregledati je, i vršiti neke izmene na njoj bilo direktno, bilo izborom linije prevoda i pokretanjem ekrana za prevođenje. Izgled početnog ekrana po startovanju aplikacije je dat na slici 1.</p>
+		
+		<div class="slika">
+			<img src="img001.png" /><br/>
+			Slika 1. Početni ekran aplikacije - ekran za editovanje
+		</div>
+		
+		<p>Na ekranu za editovanje se nalaze tri glavna dela:
+		<ul>
+			<li><b>Naslovna linija</b> - prikazuje ime trenutno otvorenog prevoda, kao i dugme za prikaz glavnog menija.</li>
+			<li><b>Centralni deo</b> - prikazuje linije prevoda (na početku prazan)</li>
+			<li><b>Glavne kontrole</b> - služe za prikaz/skrivanje nekoliko odeljaka sa različitim opcijama/alatima za rad sa prevodom.</li>
+		</ul>
+		</p>
+		
+		<h2>1. Naslovna linija</h2>
+		<p>Prikazuje ime trenutno otvorenog prevoda, kao i dugme za prikaz glavnog menija. Ukoliko je kreiran novi prevod, ime će biti "untitled" do trenutka prvog snimanja prevoda. Ukoliko su na prevodu vršene neke izmene, pored imena prevoda će se pojaviti zvezdica (*). Po snimanju izmena, zvezdica nestaje.</p>
+		
+		<p>U desnom delu se nalazi dugme za otvaranje menija. Raspoložive stavke menija su prikazane na slici 2.</p>
+		
+		<div class="slika">
+			<img src="img002.png" /><br/>
+			Slika 2. Otvoren meni na početnom ekranu
+		</div>
+		
+		<p>Stavke menija imaju sledeće funkcije:
+		<ul>
+			<li><b>Create new subtitle</b> - uklanja tekući prevod sa ekrana i otvara novi fajl. NAPOMENA: ova opcija trenutno nije funkcionalna i samo čisti tekuće otvoren prevod sa ekrana.</li>
+			<li><b>Load subtitle</b> - otvara ekran za učitavanje postojećeg prevoda. Prevod će se verovatno nalaziti na SD kartici ili delu memorije koji izigrava SD karticu kod uređaja koji istu nemaju (npr. Nexus 5). SD kartici se može (tipično) pristupiti preko prve opcije na ekranu za učitavanje prevoda, ili otvaranjem foldera sdcard ili mnt/sdcard.</li>
+			<li><b>Save</b> - snima načinjene izmene u fajl prevoda. Dokle god se ne izabere ova opcija, originalni fajl neće biti izmenjen; sve izmene se čuvaju samo unutar same aplikacije.</li>
+			<li><b>Settings</b> - otvara odeljak sa podešavanjima</li>
+			<li><b>Help</b> - otvara help odeljak</li>
+		</ul>
+		</p>
+		
+		<h2>2. Centralni deo</h2>
+		<p>Centralni deo prikazuje linije prevoda. Ovaj deo je prazan na početku i popunjava se tek kada se učita neki prevod korišćenjem opcije Load subtitle. Jedan primer izgleda ekrana za editovanje je dat na slici 3. Na ekranu su prikazani redovi prevoda. Svaki red prevoda ima date neke osnovne informacije. Ove informacije zavise od podešavanja načinjenih u delu sa glavnim kontrolama, što je opisano ispod. Bez obzira na podešavanja, uvek će biti prikazan broj linije prevoda i tekst prevoda; takođe, redovi prevoda koji su označeni kao komentari će biti obojeni tamno-ljubičastom bojom. Klikom na bilo koju liniju prevoda, pokrenuće se ekran za prevođenje koji će omogućiti izmenu izabrane linije (kao i drugih linija).</p>
+		
+		<div class="slika">
+			<img src="img003.png" /><br/>
+			Slika 3. Početni ekran aplikacije sa učitanim prevodom; linija #59 je komentar.
+		</div>
+		
+		<h2>3. Glavne kontrole</h2>
+		<p>Glavne kontrole (slika 4) služe za prikaz/skrivanje nekoliko odeljaka sa različitim opcijama/alatima za rad sa prevodom. Svako dugme otvara jedan odeljak, osim poslednjeg, koje služi za "minimizaciju" odeljka sa kontrolama. Ova opcija je korisna ukoliko se želi bolji pregled centralnog dela sa prevodom. Od glavnih kontrola, trenutno je funkcionalna jedino prva koja dozvoljava prilagođavanje prikaza prevoda i filtriranje (pretragu) redova.</p>
+		
+		<div class="slika">
+			<img src="img004.png" /><br/>
+			<br/>
+			<img src="img005.png" /><br/>
+			Slika 4. Glavne kontrole u maksimiziranom i minimiziranom stanju.
+		</div>
+		
+		<h3>3.1. Odeljak za prilagođavanje prikaza / filtriranje</h3>
+		
+		<div class="slika">
+			<img src="img006.png" /><br/>
+			Slika 5. Odeljak za prilagođavanje prikaza / filtriranje.
+		</div>
+		
+		<p>Sadrži sledeće opcije:
+			<li><b>Dugme za prikaz/skrivanje vremena</b> - prikazuje/skriva trajanje linija prevoda.</li>
+			<div class="slika">
+				<img src="img007.png" /><br/>
+				<br/>
+				<img src="img008.png" /><br/>
+				Slika 6. Prikazana / skrivena trajanja linija.
+			</div>
+			<br/>
+			
+			<li><b>Dugme za prikaz/skrivanje stila/uloge</b> - prikazuje/skriva stil primenjen na liniju prevoda i ulogu (ko izgovara liniju).</li>
+			<div class="slika">
+				<img src="img009.png" /><br/>
+				<br/>
+				<img src="img010.png" /><br/>
+				Slika 7. Prikazan / skriven stil i uloga.
+			</div>
+			<br/>
+			
+			<li><b>Dugme za prikaz/skrivanje specijalnih tagova</b> - prikazuje/skriva specijalne tagove iz unutar linija prevoda. Skriveni tagovi bivaju zamenjeni jednim specijalnim znakom, po defaultu "田".</li>
+			<div class="slika">
+				<img src="img011.png" /><br/>
+				<br/>
+				<img src="img012.png" /><br/>
+				Slika 8. Skriveni / prikazani specijalni tagovi.
+			</div>
+			<br/>
+			
+			<li><b>Dugme za prelazak u fullscreen režim</b> - fullscreem režim obezbeđuje malo veću povšinu ekrana, te pregled više linija prevoda (pogodno za manje ekrane).</li>
+			<div class="slika">
+				<img src="img013.png" /> 
+				<img src="img014.png" /><br/>
+				Slika 9. Običan prikaz / fullscreen prikaz.
+			</div>
+			<br/>
+			
+			<li><b>Odeljak za filtriranje</b> - omogućava filtriranje redova prevoda po nekom tekstu. Po unosu teksta, na centralnom ekranu će ostati samo oni redovi koji sadrže zadati tekst. Filtriranje se može dodatno podesiti klikom na dugme sa ikonicom zupčanika (slika 11)</li>
+			<div class="slika">
+				<img src="img015.png" /> <br/>
+				Slika 10. Filtriranje redova prevoda.
+			</div>
+			<br/>
+			<div class="slika">
+				<img src="img016.png" /> <br/>
+				Slika 11. Podešavanje filtriranja.
+			</div>
+			<br/>
+		</p>
+		
+		
+	</body>
+</html>

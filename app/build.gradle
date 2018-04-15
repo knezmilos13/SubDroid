@@ -1,0 +1,39 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
+
+    def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
+    def buildTime = new GregorianCalendar().format("MM-dd-yyyy' 'h:mm:ss a z")
+
+    defaultConfig {
+        applicationId "knez.assdroid"
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 12
+        versionName "0.4.6-zoro"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "GIT_SHA", "\"$gitSha\""
+        buildConfigField "String", "BUILD_TIME", "\"$buildTime\""
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
