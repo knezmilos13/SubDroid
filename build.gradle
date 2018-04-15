@@ -19,7 +19,12 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {url "https://dl.bintray.com/firzenyogesh/maven"}
     }
+}
+
+ext {
+    supportLibVersion = "27.0.2"
 }
 
 task clean(type: Delete) {

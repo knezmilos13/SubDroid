@@ -10,10 +10,9 @@
         android:name=".util.Aplikacija"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Standardna" >
+        android:theme="@style/SubDroid.Theme" >
         <activity
             android:name=".EditorAktivnost"
-            android:theme="@style/Theme.Standardna"
             android:windowSoftInputMode="stateUnchanged" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,54 +54,40 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.lamerman.FileDialog"
-            android:label="@string/standard_ucitaj_fajl"
-            android:theme="@style/Theme.Standardna" >
-        </activity>
-        <activity
             android:name="PrevodilacAktivnost"
-            android:theme="@style/Theme.Standardna"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
             android:name=".podesavanja.KategorijePodesavanjaAktivnost"
-            android:label="@string/podesavanja_kategorije_naslov"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/podesavanja_kategorije_naslov" >
         </activity>
         <activity
             android:name=".podesavanja.PodesavanjaGlobalAktivnost"
-            android:label="@string/podesavanja_globalna_naslov"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/podesavanja_globalna_naslov" >
         </activity>
         <activity
             android:name=".podesavanja.PodesavanjaEditorAktivnost"
-            android:label="@string/podesavanja_editor_naslov"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/podesavanja_editor_naslov" >
         </activity>
         <activity
             android:name=".podesavanja.PodesavanjaPrevodilacAktivnost"
-            android:label="@string/podesavanja_prevodilac_naslov"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/podesavanja_prevodilac_naslov" >
         </activity>
         <activity
             android:name=".help.KategorijeHelpaAktivnost"
-            android:label="@string/help_kategorije_naslov"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/help_kategorije_naslov" >
         </activity>
         <activity
             android:name=".help.HelpEditorAkt"
-            android:label="@string/help_editor"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/help_editor" >
         </activity>
         <activity
             android:name=".help.HelpPrevodilacAkt"
-            android:label="@string/help_translator"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/help_translator" >
         </activity>
         <activity
             android:name=".help.HelpAboutAkt"
-            android:label="@string/help_about"
-            android:theme="@style/Theme.Standardna" >
+            android:label="@string/help_about" >
         </activity>
     </application>
 </manifest>

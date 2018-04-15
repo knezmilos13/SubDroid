@@ -3,9 +3,7 @@ package knez.assdroid;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
-
-import com.lamerman.FileDialog;
-import com.lamerman.FileDialogOptions;
+import java.util.regex.Pattern;
 
 import knez.assdroid.KontroleView.KontroleStateListener;
 import knez.assdroid.PanelView.PanelViewListener;
@@ -17,6 +15,9 @@ import knez.assdroid.podesavanja.PodesavanjaEditorUtil;
 import knez.assdroid.podesavanja.PodesavanjaGlobalUtil;
 import knez.assdroid.util.FormatValidator;
 import knez.assdroid.util.Loger;
+import yogesh.firzen.filelister.FileListerDialog;
+import yogesh.firzen.filelister.OnFileSelectedListener;
+
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -25,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +36,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.RelativeLayout.LayoutParams;
 
-public class EditorAktivnost extends ListActivity implements KontroleStateListener, PanelViewListener {
+public class EditorAktivnost extends AppCompatActivity implements KontroleStateListener, PanelViewListener {
 
 	private static final int RQ_CODE_FILE_DIALOG = 1;
 	private static final int RQ_CODE_PREVODILAC_AKTIVNOST = 2;
@@ -79,7 +81,7 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 		osveziNaslov();		
 
 		osveziListu();
-		setListAdapter(prevodAdapter);
+//		setListAdapter(prevodAdapter); // TODO
 	}
 
 	private void pokupiPoglede() {
@@ -240,7 +242,7 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 		int pozicija = prevodAdapter.dajPozicijuZaLineNumber(zadnjiMenjanLine);
 		if(pozicija == -1) return;
 
-		getListView().setSelection(pozicija >= 1? pozicija-1 : pozicija);		
+//		getListView().setSelection(pozicija >= 1? pozicija-1 : pozicija); // TODO
 	}
 
 	/** Siri listu da zauzme ceo prostor ekrana (zovi kad minimiziras kontrole). */
@@ -249,7 +251,7 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 		LayoutParams parametriL = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		LayoutParams parametriZ = new LayoutParams(0, 0);
 		zauzimacProstora.setLayoutParams(parametriZ);
-		getListView().setLayoutParams(parametriL);
+//		getListView().setLayoutParams(parametriL); // TODO
 	}
 
 	private int zadnjaDimenzija = -1, zadnjaRotacija = -1;
@@ -287,7 +289,7 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 			break;
 		}
 		zauzimacProstora.setLayoutParams(parametriZ);
-		getListView().setLayoutParams(parametriL);
+//		getListView().setLayoutParams(parametriL); // TODO
 	}
 
 	/**
@@ -297,15 +299,15 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 	 * @param fullscreenOn - Ako je TRUE, prelazi u fullscreen i obrnuto.
 	 */
 	private void primeniFullscreen(boolean fullscreenOn) {
-		ActionBar actionBar = getActionBar();
-		if(fullscreenOn && PodesavanjaGlobalUtil.isHideTitleBar()) actionBar.hide();
-		else actionBar.show();
-
-		View decorView = getWindow().getDecorView();
-		if(fullscreenOn && PodesavanjaGlobalUtil.isHideStatusBar())
-			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-		else
-			decorView.setSystemUiVisibility(0);
+//		ActionBar actionBar = getActionBar();
+//		if(fullscreenOn && PodesavanjaGlobalUtil.isHideTitleBar()) actionBar.hide();
+//		else actionBar.show();
+//
+//		View decorView = getWindow().getDecorView();
+//		if(fullscreenOn && PodesavanjaGlobalUtil.isHideStatusBar())
+//			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+//		else
+//			decorView.setSystemUiVisibility(0);
 	}
 	
 	private void izfiltrirajListu(String tekst, boolean filterMatchCase, boolean highlight) {
@@ -352,12 +354,22 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 	// --------------------------------------------------------------------------------------- Startovanje aktivnosti
 
 	private void prikaziIzborPrevoda() {
-		Intent namera = new Intent(this.getBaseContext(), FileDialog.class);
+//		Intent namera = new Intent(this.getBaseContext(), FileDialog.class);
 		//TODO 
 		// proveri jel ima SD card
 		// ako nema, prikazi poruku
 		// proveri zadnji folder u kom je otvarano nesto, ako ga nema otvori mnt/sdcard
-		startActivityForResult(namera, RQ_CODE_FILE_DIALOG);
+//		startActivityForResult(namera, RQ_CODE_FILE_DIALOG);
+        FileListerDialog fileListerDialog = FileListerDialog.createFileListerDialog(this);
+        fileListerDialog.setOnFileSelectedListener(new OnFileSelectedListener() {
+            @Override
+            public void onFileSelected(File file, String path) {
+                //your code here
+            }
+        });
+        fileListerDialog.setFileFilter(FileListerDialog.FILE_FILTER.ALL_FILES);
+        fileListerDialog.show();
+//        fileListerDialog.setDefaultDir(path);
 	}
 
 	private void prikaziPodesavanja() {
@@ -395,17 +407,17 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 	}
 
 	private void onZatvorenFajlDijalog(int resultCode, Intent data) {
-		if(resultCode == RESULT_OK) {
-			if(!data.hasExtra(FileDialogOptions.RESULT_FILE))
-				return;
-
-			String izabranaPutanja = data.getStringExtra(FileDialogOptions.RESULT_FILE);
-			if(!FormatValidator.formatPrihvatljiv(izabranaPutanja)) {
-				return;
-			}
-
-			ucitajPrevod(Uri.fromFile(new File(izabranaPutanja)));
-		}
+//		if(resultCode == RESULT_OK) {
+//			if(!data.hasExtra(FileDialogOptions.RESULT_FILE))
+//				return;
+//
+//			String izabranaPutanja = data.getStringExtra(FileDialogOptions.RESULT_FILE);
+//			if(!FormatValidator.formatPrihvatljiv(izabranaPutanja)) {
+//				return;
+//			}
+//
+//			ucitajPrevod(Uri.fromFile(new File(izabranaPutanja)));
+//		}
 	}
 
 	private void onZatvorenPrevodilac(int resultCode, Intent data) {
@@ -428,33 +440,34 @@ public class EditorAktivnost extends ListActivity implements KontroleStateListen
 		}
 	}
 
-	// ----------------------------------------------------------------------------------------------------- Eventovi
+
+	// --------------------------------------------------------------------------------- USER EVENTS
 
 	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.meni_standard_create:
-			kreirajNoviPrevod();
-			break;
-		case R.id.meni_standard_load:
-			prikaziIzborPrevoda();
-			break;
-		case R.id.meni_standard_podesavanja:
-			prikaziPodesavanja();
-			break;
-		case R.id.meni_standard_save:
-			snimiPrevod();
-			break;
-		case R.id.meni_standard_help:
-			prikaziHelp();
-			break;
-		default:
-			return false;
+			case R.id.meni_standard_create:
+				kreirajNoviPrevod();
+				break;
+			case R.id.meni_standard_load:
+				prikaziIzborPrevoda();
+				break;
+			case R.id.meni_standard_podesavanja:
+				prikaziPodesavanja();
+				break;
+			case R.id.meni_standard_save:
+				snimiPrevod();
+				break;
+			case R.id.meni_standard_help:
+				prikaziHelp();
+				break;
+			default:
+				return false;
 		}
 		return true;
 	}
 
-	@Override
+//	@Override // TODO
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		boolean maknuo = prevodAdapter.getCursor().moveToPosition(position); 
 		if(!maknuo) return;
