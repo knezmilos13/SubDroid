@@ -66,7 +66,7 @@
     <string name="help_kategorije_naslov">Help</string>
     <string name="help_about">About</string>
     <string name="help_about_naslov">About</string>
-    <string name="help_about_link"><a href="http://bitbucket.org/knezmilos/subdroid">http://bitbucket.org/knezmilos/subdroid</a></string>
+    <string name="help_about_link"><a href="https://github.com/knezmilos13/SubDroid">https://github.com/knezmilos13/SubDroid</a></string>
     <string name="help_editor">Editor</string>
     <string name="help_editor_naslov">Editor Help</string>
     <string name="help_translator">Translator</string>
