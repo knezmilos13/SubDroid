@@ -5,6 +5,9 @@ import android.os.StrictMode;
 
 import com.crashlytics.android.Crashlytics;
 import com.jakewharton.threetenabp.AndroidThreeTen;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
+import com.joanzapata.iconify.fonts.MaterialModule;
 import com.squareup.leakcanary.LeakCanary;
 
 import io.fabric.sdk.android.Fabric;
@@ -29,6 +32,8 @@ public class App extends Application {
 
 		appComponent = buildDaggerComponent();
 
+		Iconify.with(new FontAwesomeModule())
+				.with(new MaterialModule());
 
 		AndroidThreeTen.init(this);
 

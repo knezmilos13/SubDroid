@@ -1,7 +1,21 @@
 <resources>
 
     <string name="app_name">SubDroid</string>
-    <string name="app_version_name">Ver. 0.4.6 - Zoro</string>
+    <string name="app_version_name">Ver. 1.0.0 - Zoro</string>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
+
+    <string name="editor_subtitle_list_no_file_loaded">No subtitle file loaded</string>
+    <string name="editor_subtitle_list_no_results_for_query">No matching lines for query</string>
+    <string name="editor_subtitle_list_no_lines_in_file">No lines in subtitle file</string>
+    <string name="editor_subtitle_search_hint">Search in subtitle file</string>
+
+
+
+
+
+    <!-- TODO ukloniti -->
 
     <string name="standard_exit">Exit</string>
     <string name="standard_podesavanja">Settings</string>

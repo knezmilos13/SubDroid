@@ -33,4 +33,12 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="BgpEditTextAttributes">        
+        <attr name="hasXIcon" format="boolean"/>
+        <attr name="showMessageIcon" format="boolean"/>
+        <attr name="editable" format="boolean"/>
+        <attr name="hint" format="string"/>
+        <attr name="noFullScreen" format="boolean"/>
+    </declare-styleable>
+
 </resources>

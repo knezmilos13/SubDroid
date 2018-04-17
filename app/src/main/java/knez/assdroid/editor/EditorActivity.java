@@ -1,20 +1,13 @@
 package knez.assdroid.editor;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
-import knez.assdroid.EditorControlsView;
-import knez.assdroid.EditorControlsView.KontroleStateListener;
-import knez.assdroid.PanelView;
-import knez.assdroid.PanelView.PanelViewListener;
 import knez.assdroid.PrevodilacAktivnost;
 import knez.assdroid.R;
 import knez.assdroid.common.adapter.IdentifiableAdapter;
@@ -22,17 +15,12 @@ import knez.assdroid.editor.adapter.SubtitleLineAdapterPack;
 import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.help.KategorijeHelpaAktivnost;
-import knez.assdroid.logika.RedPrevoda;
 import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
-import knez.assdroid.podesavanja.PodesavanjaEditorUtil;
-import knez.assdroid.util.Loger;
+import knez.assdroid.util.gui.BgpEditText;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,28 +29,36 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.RelativeLayout.LayoutParams;
 
 public class EditorActivity extends AppCompatActivity
-        implements EditorMVP.ViewInterface, KontroleStateListener, PanelViewListener, SubtitleLineLayoutItem.Callback {
+        implements EditorMVP.ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
 
-	private static final int RQ_CODE_FILE_DIALOG = 1;
-	private static final int RQ_CODE_PREVODILAC_AKTIVNOST = 2;
-	private static final int RQ_CODE_PODESAVANJA = 3;
-	private static final String SAVE_PANEL_VIEW_STANJE = "stanje_panel_view";
+    private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
+    private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
+    private static final int REQUEST_CODE_SETTINGS = 501;
 
-    @BindView(R.id.subtitle_list_recycler) protected RecyclerView itemRecycler;
-    @BindView(R.id.editor_controls_view) protected EditorControlsView editorControlsView;
-    @BindView(R.id.editor_zauzimac) protected View zauzimacProstora; // TODO wtf je ovo
-
-	private PanelView panelView;
+    @BindView(R.id.editor_subtitle_list) protected RecyclerView itemListView;
+    @BindView(R.id.editor_search_view) protected BgpEditText searchView;
+    @BindView(R.id.editor_center_text) protected TextView centerTextView;
 
     private EditorMVP.PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
+
+    // TODO: da probas start/stop umesto create/destroy?
+    // TODO: po pokretanju aplikacije ucitati zadnje sve kako je bilo
+    // TODO: po okretanju aplikacije sve da je kako je bilo
+    // TODO:
+    // osposobi editor activity sa 0 featurea, samo da moze da se pokrene
+    // zatim da moze da ucita titlove
+    // pa da otvori sledeci ekran? mozda?
+    // i da tamo edituje i vrati
+    // pa tek onda razmisljaj kako ces ona podesavanja silna sta da se vidi i tako to
+    // to sve mozes i u neki drawer sa leve strane, najlakse tako
+    // 2. subtitle line settings objekat snimaj u bundle i ucitavaj
+    // 3. taj objekat daj prezenteru pre attacha
+    // 4. taj objekat ubacujes u subtitle line VSO-jeve, taman neces imati sto puta iste atribute u njima
 
 
     // --------------------------------------------------------------------------- LIFECYCLE & SETUP
@@ -77,77 +73,30 @@ public class EditorActivity extends AppCompatActivity
 
         presenter = App.getAppComponent().getEditorPresenter();
         presenter.onAttach(this);
-
-
-
-        // TODO:
-        // 1. implementiraj subtitle line vso i layout item
-        // osposobi editor activity sa 0 featurea, samo da moze da se pokrene
-        // zatim da moze da ucita titlove
-        // pa da otvori sledeci ekran? mozda?
-        // i da tamo edituje i vrati
-        // pa tek onda razmisljaj kako ces ona podesavanja silna sta da se vidi i tako to
-        // to sve mozes i u neki drawer sa leve strane, najlakse tako
-
-        // 2. subtitle line settings objekat snimaj u bundle i ucitavaj
-        // 3. taj objekat daj prezenteru pre attacha
-        // 4. taj objekat ubacujes u subtitle line VSO-jeve, taman neces imati sto puta iste atribute u njima
-
-
-
-        // TODO: verovatno uri do fajla?
-//		if(savedInstanceState == null) {
-//			Uri data = getIntent().getData();
-//			if (data == null) {
-//				subHandler.ucitajAkoPostojiOdPre();
-//			} else {
-//				subHandler.ucitajPrevod(data);
-//			}
-//		}
-
-        panelView.primeniStanje(savedInstanceState == null?
-                null : savedInstanceState.getBundle(SAVE_PANEL_VIEW_STANJE));
-
-//		primeniPerzistentnaPodesavanjaNaAdapter();
-//		primeniPerzistentnaPodesavanjaNaKontrole();
-//		osveziNaslov();
-//
-//		osveziListu();
 	}
 
-    private void setUpInterface() {
-        setUpEditorControls();
-        setUpAdapter();
-        setUpList();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        searchView.setListener(this);
     }
 
-    /** Kreira panele i ubacuje ih u kontrole u dnu ekrana. */
-	private void setUpEditorControls() {
-        editorControlsView.setKontroleStateListener(this);
+    @Override
+    protected void onPause() {
+        searchView.setListener(null);
+        super.onPause();
+    }
 
-        panelView = new PanelView(this, this);
-		
-		TextView lol2 = new TextView(this);
-		lol2.setText("Second part");
-		lol2.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+    @Override
+    protected void onDestroy() {
+        presenter.onDetach();
+        presenter = null;
+        super.onDestroy();
+    }
 
-		TextView lol3 = new TextView(this);
-		lol3.setText("Thrid section");
-		lol3.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-
-		TextView lol4 = new TextView(this);
-		lol4.setText("Foruth department");
-		lol4.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-
-		TextView lol5 = new TextView(this);
-		lol5.setText("Fifth unit");
-		lol5.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-		editorControlsView.namestiPanele(Arrays.asList(getResources().getDrawable(R.drawable.kontrole_search),
-				getResources().getDrawable(R.drawable.kontrole_tajming),
-				getResources().getDrawable(R.drawable.kontrole_stil),
-				getResources().getDrawable(R.drawable.kontrole_text),
-				getResources().getDrawable(R.drawable.kontrole_edit)),
-				Arrays.asList(panelView.glavniLejaut, lol2, lol3, lol4, lol5));
+    private void setUpInterface() {
+        setUpAdapter();
+        setUpList();
     }
 
     private void setUpAdapter() {
@@ -159,8 +108,8 @@ public class EditorActivity extends AppCompatActivity
     private void setUpList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
 
-        itemRecycler.setLayoutManager(linearLayoutManager);
-        itemRecycler.setAdapter(subtitleLinesAdapter);
+        itemListView.setLayoutManager(linearLayoutManager);
+        itemListView.setAdapter(subtitleLinesAdapter);
     }
 
     @Override
@@ -168,7 +117,6 @@ public class EditorActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.activity_pocetna_aktivnost, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
 
 
 	// --------------------------------------------------------------------------------- USER EVENTS
@@ -180,22 +128,57 @@ public class EditorActivity extends AppCompatActivity
 //				kreirajNoviPrevod(); // TODO
 				break;
 			case R.id.meni_standard_load:
-				prikaziIzborPrevoda();
+				showFileSelector();
 				break;
 			case R.id.meni_standard_podesavanja:
-				prikaziPodesavanja();
+				prikaziPodesavanja(); // TODO
 				break;
 			case R.id.meni_standard_save:
 //				snimiPrevod(); // TODO
 				break;
 			case R.id.meni_standard_help:
-				prikaziHelp();
+				prikaziHelp(); // TODO
 				break;
 			default:
 				return false;
 		}
 		return true;
 	}
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//		switch(requestCode) {
+//			case RQ_CODE_FILE_DIALOG:
+//				onZatvorenFajlDijalog(resultCode, data);
+//				break;
+//			case REQUEST_CODE_TRANSLATOR_ACTIVITY:
+//				onZatvorenPrevodilac(resultCode, data);
+//				break;
+//			case REQUEST_CODE_SETTINGS:
+//				boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
+//				if(izmenjen) prevodAdapter.notifyDataSetChanged();
+//				primeniPerzistentnaPodesavanjaNaKontrole();
+//				primeniFullscreen(panelView.isFullscreenOn());
+//				break;
+//		} // TODO
+
+        if(resultCode != RESULT_OK) return;
+
+        if(requestCode == REQUEST_CODE_OPEN_SUBTITLE && data != null) {
+            Uri currentUri = data.getData();
+
+            try {
+                String content = readFileContent(currentUri);
+                Log.e("WTF", content); // TODO
+            } catch (IOException e) {
+                // Handle error here
+            }
+        }
+    }
+
+
+
+
 
 	//	@Override // TODO
 	protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -205,18 +188,18 @@ public class EditorActivity extends AppCompatActivity
 //		prikaziEditor(red.lineNumber);
 	}
 
-	@Override
-	public void onKontroleMaximized() {
+//	@Override
+//	public void onKontroleMaximized() {
 //		skupiListu(editorControlsView.getSirinaSekcijeDugmici(), editorControlsView.getVisinaSekcijeDugmici(),
 //				editorControlsView.getTrenutnaPozicija());
-	}
-	@Override
-	public void onKontroleMinimized() {
+//	}
+//	@Override
+//	public void onKontroleMinimized() {
 //		rasiriListu();
-	}
+//	}
 
-	@Override
-	public void onDimenzionisanaSekcijaDugmici(final int sirina, final int visina, final int rotacija) {
+//	@Override
+//	public void onDimenzionisanaSekcijaDugmici(final int sirina, final int visina, final int rotacija) {
 //		Handler h = new Handler();
 //		h.post(new Runnable() {
 //			@Override
@@ -225,22 +208,22 @@ public class EditorActivity extends AppCompatActivity
 //				skupiListu(sirina, visina, rotacija);
 //			}
 //		});
-	}
+//	}
 
 	@Override
 	public void onBackPressed() {
-		if(editorControlsView.isInterfejsMinimiziran())
-			editorControlsView.setInterfejsMinimiziran(false);
-		else if(editorControlsView.isPrikazanPanel())
-			editorControlsView.skloniPrikazaniPanel();
-		else super.onBackPressed();
+//		if(editorControlsView.isInterfejsMinimiziran())
+//			editorControlsView.setInterfejsMinimiziran(false);
+//		else if(editorControlsView.isPrikazanPanel())
+//			editorControlsView.skloniPrikazaniPanel();
+//		else super.onBackPressed();
 	}
 
 
 	// ---------------------------------------------------------------------------------------- Eventovi - panel View
 
-	@Override
-	public void onPritisnutoFilter(String tekst, boolean ukljucen, boolean matchCase, boolean highlight) {
+//	@Override
+//	public void onPritisnutoFilter(String tekst, boolean ukljucen, boolean matchCase, boolean highlight) {
 //		if(!ukljucen) {
 //			osveziListu();
 //			prevodAdapter.clearTrazeniTekst();
@@ -250,41 +233,41 @@ public class EditorActivity extends AppCompatActivity
 //				return;
 //			izfiltrirajListu(tekst, matchCase, highlight);
 //		}
-	}
+//	}
 
-	@Override
-	public void onUnetTekstZaPretragu(String tekst, boolean matchCase, boolean highlight) {
+//	@Override
+//	public void onUnetTekstZaPretragu(String tekst, boolean matchCase, boolean highlight) {
 //		if(panelView.isUkljucenFilter()) {
 //			izfiltrirajListu(tekst, matchCase, highlight);
 //		}
-	}
-	@Override
-	public void onPritisnutoFullScreen(boolean prikazi) {
+//	}
+//	@Override
+//	public void onPritisnutoFullScreen(boolean prikazi) {
 //		primeniFullscreen(prikazi);
-	}
-	@Override
-	public void onPritisnutoStil(boolean prikazi) {
+//	}
+//	@Override
+//	public void onPritisnutoStil(boolean prikazi) {
 //		prevodAdapter.setPrikaziDrugiRed(prikazi);
 //		prevodAdapter.notifyDataSetChanged();
-	}
-	@Override
-	public void onPritisnutoTagovi(boolean prikazi) {
+//	}
+//	@Override
+//	public void onPritisnutoTagovi(boolean prikazi) {
 //		prevodAdapter.setPrikaziTagove(prikazi);
 //		prevodAdapter.notifyDataSetChanged();
-	}
-	@Override
-	public void onPritisnutoTajming(boolean prikazi) {
+//	}
+//	@Override
+//	public void onPritisnutoTajming(boolean prikazi) {
 //		prevodAdapter.setPrikaziPrviRed(prikazi);
 //		prevodAdapter.notifyDataSetChanged();
-	}
-	@Override
-	public void onPrikaziPodesavanjaFiltera() {
+//	}
+//	@Override
+//	public void onPrikaziPodesavanjaFiltera() {
 //		showDialog(PanelView.ID_DIJALOG_FILTER);
-	}
-	@Override
-	public void onPromenjenaPodesavanjaFiltera(boolean matchCase, boolean highlight) {
+//	}
+//	@Override
+//	public void onPromenjenaPodesavanjaFiltera(boolean matchCase, boolean highlight) {
 //		izfiltrirajListu(panelView.poljeUnos.getText().toString(), matchCase, highlight);
-	}
+//	}
 
 	@Override
 	public void onSubtitleLineClicked(@NonNull SubtitleLineVso subtitleLineVso, @NonNull SubtitleLineLayoutItem layoutItem) {
@@ -488,35 +471,9 @@ public class EditorActivity extends AppCompatActivity
 
 	// --------------------------------------------------------------------------------------- Startovanje aktivnosti
 
-	private static final int TEMP_OPEN_SUBTITLE = 1234;
-
-	private void prikaziIzborPrevoda() {
-		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-		intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-        startActivityForResult(intent, TEMP_OPEN_SUBTITLE);
-
-//		Intent namera = new Intent(this.getBaseContext(), FileDialog.class);
-		//TODO
-		// proveri jel ima SD card
-		// ako nema, prikazi poruku
-		// proveri zadnji folder u kom je otvarano nesto, ako ga nema otvori mnt/sdcard
-//		startActivityForResult(namera, RQ_CODE_FILE_DIALOG);
-//        FileListerDialog fileListerDialog = FileListerDialog.createFileListerDialog(this);
-//        fileListerDialog.setOnFileSelectedListener(new OnFileSelectedListener() {
-//            @Override
-//            public void onFileSelected(File file, String path) {
-//                //your code here
-//            }
-//        });
-//        fileListerDialog.setFileFilter(FileListerDialog.FILE_FILTER.ALL_FILES);
-//        fileListerDialog.show();
-//        fileListerDialog.setDefaultDir(path);
-	}
-
 	private void prikaziPodesavanja() {
 		Intent namera = new Intent(this,KategorijePodesavanjaAktivnost.class);
-		startActivityForResult(namera, RQ_CODE_PODESAVANJA);
+		startActivityForResult(namera, REQUEST_CODE_SETTINGS);
 	}
 
 	private void prikaziHelp() {
@@ -527,38 +484,7 @@ public class EditorActivity extends AppCompatActivity
 	private void prikaziEditor(int lineNumber) {
 		Intent namera = new Intent(this,PrevodilacAktivnost.class);
 		namera.putExtra(PrevodilacAktivnost.INPUT_BROJ_REDA, lineNumber);
-		startActivityForResult(namera, RQ_CODE_PREVODILAC_AKTIVNOST);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//		switch(requestCode) {
-//			case RQ_CODE_FILE_DIALOG:
-//				onZatvorenFajlDijalog(resultCode, data);
-//				break;
-//			case RQ_CODE_PREVODILAC_AKTIVNOST:
-//				onZatvorenPrevodilac(resultCode, data);
-//				break;
-//			case RQ_CODE_PODESAVANJA:
-//				boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
-//				if(izmenjen) prevodAdapter.notifyDataSetChanged();
-//				primeniPerzistentnaPodesavanjaNaKontrole();
-//				primeniFullscreen(panelView.isFullscreenOn());
-//				break;
-//		}
-
-		if(resultCode != RESULT_OK) return;
-
-		if(requestCode == TEMP_OPEN_SUBTITLE && data != null) {
-			Uri currentUri = data.getData();
-
-			try {
-				String content = readFileContent(currentUri);
-                Log.e("WTF", content);
-            } catch (IOException e) {
-				// Handle error here
-			}
-		}
+		startActivityForResult(namera, REQUEST_CODE_TRANSLATOR_ACTIVITY);
 	}
 
 	private String readFileContent(Uri uri) throws IOException {
@@ -590,6 +516,21 @@ public class EditorActivity extends AppCompatActivity
 //		}
 	}
 
+    @Override
+    public void onXClicked() {
+        // TODO
+    }
+
+    @Override
+    public void onSearchSubmitted(@NonNull String text) {
+        // TODO
+    }
+
+    @Override
+    public void onLetterInputted(@NonNull String text) {
+        // TODO
+    }
+
 //	private void onZatvorenPrevodilac(int resultCode, Intent data) {
 //		if(resultCode == RESULT_OK) {
 //			boolean menjanoTamo = data.getExtras().getBoolean(PrevodilacAktivnost.OUTPUT_RADJENE_IZMENE_OVDE);
@@ -609,5 +550,15 @@ public class EditorActivity extends AppCompatActivity
 //			}
 //		}
 //	}
+
+
+    // ------------------------------------------------------------------------------------ INTERNAL
+
+    private void showFileSelector() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/*");
+        startActivityForResult(intent, REQUEST_CODE_OPEN_SUBTITLE);
+    }
 
 }

@@ -1,54 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
+    android:id="@+id/activity_editor_root_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:kontrole="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/editor_koreni_lejaut"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:context=".editor.EditorActivity">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical" >
+    <knez.assdroid.util.gui.BgpEditText
+        android:id="@+id/editor_search_view"
+        style="@style/BaseSearchViewStyle"
+        app:hint="@string/editor_subtitle_search_hint"
+        app:noFullScreen="true"/>
 
-        <View
-            android:id="@+id/editor_zauzimac"
-            android:layout_width="0dp"
-            android:layout_height="0dp" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/editor_subtitle_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/editor_search_view"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/item_subtitle_line"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/subtitle_list_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:scrollbars="vertical"
-            android:scrollbarStyle="outsideOverlay"
-            app:layoutManager="LinearLayoutManager"
-            tools:listitem="@layout/item_subtitle_line"/>
+    <TextView
+        android:id="@+id/editor_center_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/standard_margin"
+        android:layout_marginRight="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/scroll_padding_under_search_top"
+        android:gravity="center"
+        android:textSize="@dimen/recycler_center_text_size"
+        android:text="@string/editor_subtitle_list_no_file_loaded"
+        android:visibility="visible"/>
 
-    </RelativeLayout>
-
-    <knez.assdroid.EditorControlsView
-        android:id="@+id/editor_controls_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        kontrole:ikonica_maximize="@drawable/kontrole_maximize"
-        kontrole:ikonica_minimize="@drawable/kontrole_minimize"
-        kontrole:pozadina_dugmici="@drawable/kontrole_pozadina_sekcije"
-        kontrole:pozadina_dugmici_desno="@drawable/kontrole_pozadina_sekcije_desno"
-        kontrole:pozadina_dugmici_gore="@drawable/kontrole_pozadina_sekcije_gore"
-        kontrole:pozadina_dugmici_levo="@drawable/kontrole_pozadina_sekcije_levo"
-        kontrole:pozadina_minimized="@drawable/kontrole_pozadina_cosak"
-        kontrole:pozadina_minimized_gore="@drawable/kontrole_pozadina_cosak_gore"
-        kontrole:pozadina_minimized_levo="@drawable/kontrole_pozadina_cosak_levo"
-        kontrole:pozadina_sekcije="@drawable/kontrole_pozadina_sekcije"
-        kontrole:pozadina_sekcije_desno="@drawable/kontrole_pozadina_sekcije_desno"
-        kontrole:pozadina_sekcije_gore="@drawable/kontrole_pozadina_sekcije_gore"
-        kontrole:pozadina_sekcije_levo="@drawable/kontrole_pozadina_sekcije_levo"
-        kontrole:pozicija_landscape="desno"
-        kontrole:pozicija_portrait="dole" />
-
-</FrameLayout>
+</RelativeLayout>

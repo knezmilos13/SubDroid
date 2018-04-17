@@ -1,10 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  THEMES -->
+
+    <style name="SubDroid.Theme" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/standard_bg_color</item>
+    </style>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  STYLES -->
+
+    <!-- TODO sta je ovo -->
     <style name="separator_fazon_lista">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">2dp</item>
         <item name="android:background">#AAAAAA</item>
+    </style>
+
+    <style name="BaseSearchViewStyle" >
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="hasXIcon">true</item>
+        <item name="android:background">@android:color/white</item>
     </style>
     
 </resources>
