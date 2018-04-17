@@ -3,6 +3,7 @@ package knez.assdroid.logika;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+// TODO: ovo u neki data odeljak i prevedi ga
 public class RedPrevoda {
 	
 	public Integer id = null;

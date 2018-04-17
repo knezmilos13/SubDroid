@@ -15,21 +15,21 @@ public class PodesavanjaEditorUtil {
 	
 	/** Vraca znak koji ce se koristiti umesto tagova {}, tj. kada su "minimizirani" */
 	public static String getMinimizedCharTag() {
-		Context apkont = App.dajKontekst();
+		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_MINIMIZED_TAG_CHAR, 
 			apkont.getResources().getString(R.string.podesavanja_editor_default_zamena_taga));
 	}
 	
 	/** Vraca vrednost opacity-ja za minimiziran interfejs */
 	public static int getMinimizedTransparentnost() {
-		Context apkont = App.dajKontekst();
+		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont).getInt(EDITOR_KONTROLE_MIN_TRANSP, 
 			apkont.getResources().getInteger(R.integer.editor_kontrole_min_transp_default));
 	}
 	
 	/** Vraca velicinu fonta za tekst (u pikselima) */
 	public static int getTextFontSize() {
-		Context apkont = App.dajKontekst();
+		Context apkont = App.getAppComponent().getContext();
 		String sVelicina = PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_FONT_TEXT, null);
 		
 		int velicina;
@@ -43,7 +43,7 @@ public class PodesavanjaEditorUtil {
 	
 	/** Vraca velicinu fonta za ostalo, sto nije tekst prevoda (u pikselima) */
 	public static int getOstaloFontSize() {
-		Context apkont = App.dajKontekst();
+		Context apkont = App.getAppComponent().getContext();
 		String sVelicina = PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_FONT_OSTALO, null);
 		
 		int velicina;

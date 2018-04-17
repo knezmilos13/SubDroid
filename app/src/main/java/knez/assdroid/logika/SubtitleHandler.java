@@ -9,13 +9,14 @@ import knez.assdroid.logika.Parser.ParserCallback;
 import knez.assdroid.App;
 import knez.assdroid.util.Loger;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
-
 
 public class SubtitleHandler implements ParserCallback {
 
@@ -24,21 +25,16 @@ public class SubtitleHandler implements ParserCallback {
 	private static final String PREF_ZADNJA_PUTANJA = "zadnja_otvorena_putanja";
 	private static final String PREF_MENJAN = "pref_prevod_menjan";
 
-	private SQLiteDatabase baza;
+	private final Context context;
+    private SQLiteDatabase baza;
 	private String putanja = "";
 	private String imePrevoda = "";
 	private boolean prevodMenjan = false; //TODO snimaj u preferencama? vreme zadnje izmene?
 	private long vremeZadnjeIzmene;
 
-	private static SubtitleHandler instanca;
-	private SubtitleHandler() {
-		baza = new ProvajderBaze(App.dajKontekst()).getWritableDatabase();
-	}	
-	public static SubtitleHandler dajInstancu() {
-		if(instanca == null) {
-			instanca = new SubtitleHandler();
-		}
-		return instanca;
+	public SubtitleHandler(@NonNull Context context) { // TODO: umesto da mu dajes kontekst, daj mu bazu i preference
+        this.context = context;
+		baza = new ProvajderBaze(context).getWritableDatabase();
 	}
 
 	/** Kreira novi, prazan prevod o kojem ce se ovaj handler starati. */
@@ -47,7 +43,7 @@ public class SubtitleHandler implements ParserCallback {
 		putanja = "";
 		imePrevoda = "";
 		prevodMenjan = true;
-		SharedPreferences.Editor edit = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
+		SharedPreferences.Editor edit = context.getSharedPreferences(PREFERENCE_FAJL, 0).edit();
 		edit.putString(PREF_ZADNJA_PUTANJA, putanja);
 		edit.putString(PREF_ZADNJI_FAJL, imePrevoda);
 		edit.putBoolean(PREF_MENJAN, prevodMenjan);
@@ -55,7 +51,7 @@ public class SubtitleHandler implements ParserCallback {
 	}
 
 	public void ucitajAkoPostojiOdPre() {
-		SharedPreferences shp = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0);
+		SharedPreferences shp = context.getSharedPreferences(PREFERENCE_FAJL, 0);
 		putanja = shp.getString(PREF_ZADNJA_PUTANJA, "");
 		imePrevoda = shp.getString(PREF_ZADNJI_FAJL, "");
 		prevodMenjan = shp.getBoolean(PREF_MENJAN, false);
@@ -74,14 +70,14 @@ public class SubtitleHandler implements ParserCallback {
 	public void setPrevodMenjan(boolean jelda) {
 		if(prevodMenjan == jelda) return;
 		prevodMenjan = jelda;
-		SharedPreferences.Editor edit = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
+		SharedPreferences.Editor edit = context.getSharedPreferences(PREFERENCE_FAJL, 0).edit();
 		edit.putBoolean(PREF_MENJAN, prevodMenjan);
 		edit.apply();
 	}
 
 	public void ucitajPrevod(Uri odakle) {
 		ocistiBazu();
-		Parser parser = Parser.Fabrika.dajParserZaFajl(odakle.getPath(), this);
+		Parser parser = Parser.Fabrika.dajParserZaFajl(context, odakle.getPath(), this);
 		try {
 			parser.zapocniParsiranje(odakle);
 			//TODO pamti ime na kraju, kad uspe/ne uspe da ucita
@@ -89,7 +85,7 @@ public class SubtitleHandler implements ParserCallback {
 			String parcad[] = putanja.split(File.separator);
 			imePrevoda = parcad[parcad.length - 1];
 			prevodMenjan = false;
-			SharedPreferences.Editor edit = App.dajKontekst().getSharedPreferences(PREFERENCE_FAJL, 0).edit();
+			SharedPreferences.Editor edit = context.getSharedPreferences(PREFERENCE_FAJL, 0).edit();
 			edit.putString(PREF_ZADNJA_PUTANJA, putanja);
 			edit.putString(PREF_ZADNJI_FAJL, imePrevoda);
 			edit.putBoolean(PREF_MENJAN, prevodMenjan);
@@ -102,7 +98,7 @@ public class SubtitleHandler implements ParserCallback {
 	}
 
 	public void snimiPrevod() throws FileNotFoundException {
-		Parser parser = Parser.Fabrika.dajParserZaFajl(imePrevoda, this);
+		Parser parser = Parser.Fabrika.dajParserZaFajl(context, imePrevoda, this);
 		parser.snimiPrevod(putanja, dajSveRedoveZaglavlja(), dajSveRedoveStila(), ucitajSveRedovePrevoda());
 		setPrevodMenjan(false);
 	}

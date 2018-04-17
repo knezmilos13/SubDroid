@@ -26,7 +26,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-public class KontroleView extends RelativeLayout implements OnClickListener, OnIzmeren {
+public class EditorControlsView extends RelativeLayout implements OnClickListener, OnIzmeren {
 
 	private static final int INTEGER_NIJE_SPECIFICIRAN = -1;
 	private static final int ID_SEKCIJE_DUGMICI = 100099;
@@ -71,15 +71,15 @@ public class KontroleView extends RelativeLayout implements OnClickListener, OnI
 
 	// ---------------------------------------------------------------------------------------------- Inicijalizacija
 
-	public KontroleView(Context context) {
+	public EditorControlsView(Context context) {
 		super(context);
 		init(null);
 	}
-	public KontroleView(Context context, AttributeSet attrs) {
+	public EditorControlsView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(attrs);
 	}
-	public KontroleView(Context context, AttributeSet attrs, int defStyle) {
+	public EditorControlsView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init(attrs);
 	}

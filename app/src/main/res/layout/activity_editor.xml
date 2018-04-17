@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:kontrole="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/editor_koreni_lejaut"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -16,15 +19,20 @@
             android:layout_width="0dp"
             android:layout_height="0dp" />
 
-        <ListView
-            android:id="@android:id/android:list"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:fastScrollEnabled="true" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/subtitle_list_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay"
+            app:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/item_subtitle_line"/>
+
     </RelativeLayout>
 
-    <knez.assdroid.KontroleView
-        android:id="@+id/kontrole_view"
+    <knez.assdroid.EditorControlsView
+        android:id="@+id/editor_controls_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         kontrole:ikonica_maximize="@drawable/kontrole_maximize"

@@ -5,11 +5,9 @@ import java.io.FileNotFoundException;
 import knez.assdroid.help.HelpEditorAkt;
 import knez.assdroid.logika.RedPrevoda;
 import knez.assdroid.logika.SubtitleHandler;
-import knez.assdroid.podesavanja.PodesavanjaGlobalUtil;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacAktivnost;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacUtil;
 import knez.assdroid.util.Loger;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,7 +27,6 @@ import android.widget.TextView.OnEditorActionListener;
 public class PrevodilacAktivnost extends Activity implements OnClickListener, OnKeyListener, OnEditorActionListener {
 
 	public static final String INPUT_BROJ_REDA = "input_broj_reda";
-	public static final String INPUT_FULLSCREEN = "input_fullscreen";
 	public static final String OUTPUT_RADJENE_IZMENE_OVDE = "save_radjene_izmene";
 	public static final String OUTPUT_ZADNJI_PREGLEDAN = "output_zadnji_pregledan";
 
@@ -57,7 +54,8 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.akt_prevodilac);
 
-		subtitleHandler = SubtitleHandler.dajInstancu();
+		// TODO ovo u prezenter
+		subtitleHandler = App.getAppComponent().getSubtitleHandler();
 
 		Bundle bandl;
 		if(savedInstanceState != null) {
@@ -68,9 +66,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 			throw new IllegalStateException("Nije primljen Bundle sa podacima!");
 		}
 		int brojReda = bandl.getInt(INPUT_BROJ_REDA, DEFAULT_BROJ_REDA);
-		boolean jelFullscreen = bandl.getBoolean(INPUT_FULLSCREEN, false);
-		primeniFullscreen(jelFullscreen);
-		
+
 		radjeneIzmeneOvde = bandl.getBoolean(OUTPUT_RADJENE_IZMENE_OVDE, false);
 
 		pokupiPoglede();
@@ -161,24 +157,6 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 		}
 
 		setTitle(ceoNaslov);
-	}
-	
-	/**
-	 * Aktivira ili deaktivira fullscreen rezim. Odvojeno kontrolise statusnu liniju, a 
-	 * odvojeno action bar (ili title bar, kako volis). Statusnu liniju razlicito skriva
-	 * za <16 i >= 16 verzije apija.
-	 * @param fullscreenOn - Ako je TRUE, prelazi u fullscreen i obrnuto.
-	 */
-	private void primeniFullscreen(boolean fullscreenOn) {
-		ActionBar actionBar = getActionBar();
-		if(fullscreenOn && PodesavanjaGlobalUtil.isHideTitleBar()) actionBar.hide();
-		else actionBar.show();
-
-		View decorView = getWindow().getDecorView();
-		if(fullscreenOn && PodesavanjaGlobalUtil.isHideStatusBar())
-			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-		else
-			decorView.setSystemUiVisibility(0);
 	}
 
 

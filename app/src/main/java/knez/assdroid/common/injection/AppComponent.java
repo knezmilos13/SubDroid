@@ -1,5 +1,7 @@
 package knez.assdroid.common.injection;
 
+import android.content.Context;
+
 import com.squareup.leakcanary.RefWatcher;
 
 import javax.inject.Singleton;
@@ -9,6 +11,8 @@ import dagger.Component;
 import knez.assdroid.App;
 import knez.assdroid.common.Navigator;
 import knez.assdroid.common.util.AppConfig;
+import knez.assdroid.editor.EditorPresenter;
+import knez.assdroid.logika.SubtitleHandler;
 import timber.log.Timber;
 
 @Singleton
@@ -28,5 +32,8 @@ public interface AppComponent {
     Timber.Tree getLogger();
     RefWatcher getRefWatcher();
     Navigator getNavigator();
+    EditorPresenter getEditorPresenter();
+    SubtitleHandler getSubtitleHandler();
+    Context getContext(); // TODO: ko koristi ovo da predje na druge klase
 
 }

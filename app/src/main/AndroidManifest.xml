@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@style/SubDroid.Theme" >
         <activity
-            android:name=".EditorAktivnost"
+            android:name=".editor.EditorActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

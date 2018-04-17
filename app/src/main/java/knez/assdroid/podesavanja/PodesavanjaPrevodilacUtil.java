@@ -14,7 +14,7 @@ public class PodesavanjaPrevodilacUtil {
 
 	/** Da li se u polju za unos prevoda ispisuje hint sa sadrzajem originala koji se prevodi. */
 	public static boolean isPrevodilacHintOn() {
-		Context apkont = App.dajKontekst();
+		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont)
 				.getBoolean(TRANSLATOR_USE_HINT, 
 						apkont.getResources().getBoolean(R.bool.podesavanja_translator_use_hint_default));
@@ -22,7 +22,7 @@ public class PodesavanjaPrevodilacUtil {
 
 	/** Da li se svaka linija automatski ispisuje u tekstualno polje */
 	public static boolean isAlwaysCopyOn() {
-		Context apkont = App.dajKontekst();
+		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont)
 				.getBoolean(TRANSLATOR_COPY_LINE, 
 						apkont.getResources().getBoolean(R.bool.podesavanja_translator_copy_line_default));
@@ -30,7 +30,7 @@ public class PodesavanjaPrevodilacUtil {
 
 	/** Da li commit zadrazava originalnu liniju. */
 	public static boolean isCommitKeepOriginalOn() {
-		Context apkont = App.dajKontekst();
+		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont)
 				.getBoolean(TRANSLATOR_EMPTY_COMMIT, 
 						apkont.getResources().getBoolean(R.bool.podesavanja_translator_empty_commit_default));

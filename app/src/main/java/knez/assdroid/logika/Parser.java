@@ -6,6 +6,7 @@ import java.util.List;
 
 import knez.assdroid.util.FormatValidator;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -24,9 +25,9 @@ public interface Parser {
 	
 	class Fabrika {
 		private Fabrika() {}
-		public static Parser dajParserZaFajl(String fajl, ParserCallback kolbek) {
+		public static Parser dajParserZaFajl(Context context, String fajl, ParserCallback kolbek) {
 			if(fajl.toLowerCase().endsWith(FormatValidator.EKSTENZIJA_ASS)) {
-				return new AssFileParser(kolbek);
+				return new AssFileParser(context);
 			} //TODO SRT
 			else throw new RuntimeException();
 		}
