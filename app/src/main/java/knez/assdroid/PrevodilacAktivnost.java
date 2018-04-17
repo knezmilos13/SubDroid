@@ -118,7 +118,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_prevodilac, menu);
+		getMenuInflater().inflate(R.menu.activity_translator, menu);
 		return true;
 	}
 
