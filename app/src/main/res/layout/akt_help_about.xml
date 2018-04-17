@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical" >
 
@@ -12,14 +12,14 @@
         android:src="@drawable/zoro" />
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/app_version_name"
         android:layout_marginTop="20dp"
         android:gravity="center" />
     
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Developer: Knez Milos"
         android:layout_marginTop="20dp"
@@ -27,7 +27,7 @@
     
     <TextView
         android:id="@+id/poljeLink"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/help_about_link"
         android:layout_marginTop="20dp"

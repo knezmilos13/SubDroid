@@ -16,7 +16,7 @@
 
     <!-- TODO sta je ovo -->
     <style name="separator_fazon_lista">
-        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">2dp</item>
         <item name="android:background">#AAAAAA</item>
     </style>

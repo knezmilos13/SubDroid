@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent" android:padding="3sp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="3sp">
 
     <ImageView
         android:layout_alignParentLeft="true"
@@ -21,6 +21,6 @@
         android:text="This is some ridiculously long filename that will likely get trimmed"
         android:textSize="20dp"
         android:singleLine="true"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </RelativeLayout>
