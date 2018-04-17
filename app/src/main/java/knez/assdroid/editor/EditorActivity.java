@@ -1,7 +1,11 @@
 package knez.assdroid.editor;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 import butterknife.BindView;
@@ -22,8 +26,6 @@ import knez.assdroid.logika.RedPrevoda;
 import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
 import knez.assdroid.podesavanja.PodesavanjaEditorUtil;
 import knez.assdroid.util.Loger;
-import yogesh.firzen.filelister.FileListerDialog;
-import yogesh.firzen.filelister.OnFileSelectedListener;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -35,6 +37,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -172,25 +175,25 @@ public class EditorActivity extends AppCompatActivity
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-//		switch (item.getItemId()) {
-//			case R.id.meni_standard_create:
-//				kreirajNoviPrevod();
-//				break;
-//			case R.id.meni_standard_load:
-//				prikaziIzborPrevoda();
-//				break;
-//			case R.id.meni_standard_podesavanja:
-//				prikaziPodesavanja();
-//				break;
-//			case R.id.meni_standard_save:
-//				snimiPrevod();
-//				break;
-//			case R.id.meni_standard_help:
-//				prikaziHelp();
-//				break;
-//			default:
-//				return false;
-//		}
+		switch (item.getItemId()) {
+			case R.id.meni_standard_create:
+//				kreirajNoviPrevod(); // TODO
+				break;
+			case R.id.meni_standard_load:
+				prikaziIzborPrevoda();
+				break;
+			case R.id.meni_standard_podesavanja:
+				prikaziPodesavanja();
+				break;
+			case R.id.meni_standard_save:
+//				snimiPrevod(); // TODO
+				break;
+			case R.id.meni_standard_help:
+				prikaziHelp();
+				break;
+			default:
+				return false;
+		}
 		return true;
 	}
 
@@ -482,24 +485,32 @@ public class EditorActivity extends AppCompatActivity
 //		osveziNaslov();
 //	}
 
+
 	// --------------------------------------------------------------------------------------- Startovanje aktivnosti
 
+	private static final int TEMP_OPEN_SUBTITLE = 1234;
+
 	private void prikaziIzborPrevoda() {
+		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        startActivityForResult(intent, TEMP_OPEN_SUBTITLE);
+
 //		Intent namera = new Intent(this.getBaseContext(), FileDialog.class);
 		//TODO
 		// proveri jel ima SD card
 		// ako nema, prikazi poruku
 		// proveri zadnji folder u kom je otvarano nesto, ako ga nema otvori mnt/sdcard
 //		startActivityForResult(namera, RQ_CODE_FILE_DIALOG);
-        FileListerDialog fileListerDialog = FileListerDialog.createFileListerDialog(this);
-        fileListerDialog.setOnFileSelectedListener(new OnFileSelectedListener() {
-            @Override
-            public void onFileSelected(File file, String path) {
-                //your code here
-            }
-        });
-        fileListerDialog.setFileFilter(FileListerDialog.FILE_FILTER.ALL_FILES);
-        fileListerDialog.show();
+//        FileListerDialog fileListerDialog = FileListerDialog.createFileListerDialog(this);
+//        fileListerDialog.setOnFileSelectedListener(new OnFileSelectedListener() {
+//            @Override
+//            public void onFileSelected(File file, String path) {
+//                //your code here
+//            }
+//        });
+//        fileListerDialog.setFileFilter(FileListerDialog.FILE_FILTER.ALL_FILES);
+//        fileListerDialog.show();
 //        fileListerDialog.setDefaultDir(path);
 	}
 
@@ -519,23 +530,51 @@ public class EditorActivity extends AppCompatActivity
 		startActivityForResult(namera, RQ_CODE_PREVODILAC_AKTIVNOST);
 	}
 
-//	@Override
-//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //		switch(requestCode) {
-//		case RQ_CODE_FILE_DIALOG:
-//			onZatvorenFajlDijalog(resultCode, data);
-//			break;
-//		case RQ_CODE_PREVODILAC_AKTIVNOST:
-//			onZatvorenPrevodilac(resultCode, data);
-//			break;
-//		case RQ_CODE_PODESAVANJA:
-//			boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
-//			if(izmenjen) prevodAdapter.notifyDataSetChanged();
-//			primeniPerzistentnaPodesavanjaNaKontrole();
-//			primeniFullscreen(panelView.isFullscreenOn());
-//			break;
+//			case RQ_CODE_FILE_DIALOG:
+//				onZatvorenFajlDijalog(resultCode, data);
+//				break;
+//			case RQ_CODE_PREVODILAC_AKTIVNOST:
+//				onZatvorenPrevodilac(resultCode, data);
+//				break;
+//			case RQ_CODE_PODESAVANJA:
+//				boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
+//				if(izmenjen) prevodAdapter.notifyDataSetChanged();
+//				primeniPerzistentnaPodesavanjaNaKontrole();
+//				primeniFullscreen(panelView.isFullscreenOn());
+//				break;
 //		}
-//	}
+
+		if(resultCode != RESULT_OK) return;
+
+		if(requestCode == TEMP_OPEN_SUBTITLE && data != null) {
+			Uri currentUri = data.getData();
+
+			try {
+				String content = readFileContent(currentUri);
+                Log.e("WTF", content);
+            } catch (IOException e) {
+				// Handle error here
+			}
+		}
+	}
+
+	private String readFileContent(Uri uri) throws IOException {
+
+		InputStream inputStream =
+				getContentResolver().openInputStream(uri);
+		BufferedReader reader =
+				new BufferedReader(new InputStreamReader(inputStream));
+		StringBuilder stringBuilder = new StringBuilder();
+		String currentline;
+		while ((currentline = reader.readLine()) != null) {
+			stringBuilder.append(currentline + "\n");
+		}
+		inputStream.close();
+		return stringBuilder.toString();
+	}
 
 	private void onZatvorenFajlDijalog(int resultCode, Intent data) {
 //		if(resultCode == RESULT_OK) {
