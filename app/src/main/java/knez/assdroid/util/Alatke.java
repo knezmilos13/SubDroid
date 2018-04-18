@@ -18,7 +18,7 @@ public class Alatke {
 
 			return centasekundi*10 + sekunde * 1000 + minuti * 60000 + sati * 3600000;
 		} catch (Exception numex) { // number format & array index out of bounds
-			Loger.log(numex);
+//			Loger.log(numex); // TODO wtf
 			outFailed[0] = true;
 			return backupParsiranje(vreme, defaultVrednost);
 		}
@@ -40,7 +40,7 @@ public class Alatke {
 			
 			return centasekundi*10 + sekundi * 1000 + minuti * 60000 + sati * 3600000;
 		} catch (NumberFormatException numex) {
-			Loger.log(numex);
+//			Loger.log(numex); // TODO wtf
 			return defaultVrednost;
 		}
 	}
@@ -99,7 +99,7 @@ public class Alatke {
 			return Integer.parseInt(broj);
 		} catch (NumberFormatException numex) {
 			outFailed[0] = true;
-			Loger.log(numex);
+//			Loger.log(numex); // TODO wtf
 			return defaultVrednost;
 		}
 	}

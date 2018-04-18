@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 
 import knez.assdroid.common.AbstractRepo;
 import knez.assdroid.logika.Parser.ParserCallback;
-import knez.assdroid.util.Loger;
 import knez.assdroid.util.Threader;
 import timber.log.Timber;
 
@@ -105,7 +104,7 @@ public class SubtitleHandler extends AbstractRepo implements ParserCallback {
 //			edit.putBoolean(PREF_MENJAN, prevodMenjan); // TODO oce ovo ovaj da radi ili neko drugi?
 			edit.apply();
 		} catch (IOException | ParsiranjeException e) {
-			Loger.log(e);
+			logger.e(e);
 			kreirajNoviPrevod();
 			//Toast.makeText(this, R.string.editor_load_fail, Toast.LENGTH_LONG).show(); //JAVI NEKOME
 		}

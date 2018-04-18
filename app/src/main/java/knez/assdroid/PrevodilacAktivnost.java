@@ -7,7 +7,6 @@ import knez.assdroid.logika.RedPrevoda;
 import knez.assdroid.logika.SubtitleHandler;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacAktivnost;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacUtil;
-import knez.assdroid.util.Loger;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -213,7 +212,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 		try {
 			subtitleHandler.snimiPrevod();
 		} catch (FileNotFoundException e) {
-			Loger.log(e);
+//			Loger.log(e);
 			e.printStackTrace();
 			//TODO ne postoji fajl... a ovo je save... da je saveas pa ajde
 			// u ovoj varijanti u prevodiocu moze da ga snimi negde na SD kao temp fajl i da ispise obavestenje

@@ -1,6 +1,5 @@
 package knez.assdroid.logika;
 
-import knez.assdroid.util.Loger;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -25,7 +24,7 @@ public class ProvajderBaze extends SQLiteOpenHelper {
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();
-			Loger.log(e);
+//			Loger.log(e);
 			kontekst.deleteDatabase(IME_BAZE);
 		}
 	}
