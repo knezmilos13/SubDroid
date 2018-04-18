@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    tools:context=".editor.EditorActivity">
+    tools:kontekst=".editor.EditorActivity">
 
     <knez.assdroid.util.gui.BgpEditText
         android:id="@+id/editor_search_view"

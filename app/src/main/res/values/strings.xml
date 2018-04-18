@@ -4,6 +4,11 @@
     <string name="app_version_name">Ver. 1.0.0 - Zoro</string>
 
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  COMMON STRINGS -->
+
+    <string name="common_strings_untitled">Untitled</string>
+
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
 
     <string name="editor_subtitle_list_no_file_loaded">No subtitle file loaded</string>
@@ -21,7 +26,6 @@
     <string name="standard_podesavanja">Settings</string>
     <string name="standard_ucitaj_fajl">Load subtitle</string>
     <string name="standard_kreiraj_fajl">Create new subtitle</string>
-    <string name="standard_untitled">Untitled</string>
     <string name="standard_save">Save</string>
     <string name="standard_save_as">Save As…</string>
     <string name="standard_help">Help</string>

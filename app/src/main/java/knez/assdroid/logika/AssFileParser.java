@@ -13,7 +13,6 @@ import java.util.List;
 
 import knez.assdroid.R;
 import knez.assdroid.util.Alatke;
-import knez.assdroid.App;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -80,9 +79,9 @@ public class AssFileParser implements Parser {
 	private static final String SEKCIJA_ZAGLAVLJE = "[Script Info]";
 	private static final String SEKCIJA_ZAGLAVLJE_LOWER_CASE = "[script info]";
 
-	public AssFileParser(@NonNull Context context) {
+	public AssFileParser(@NonNull Context context, ParserCallback kolbek) {
 		this.context = context;
-//		ParserCallback kolbek = kolbek; // TODO ovo cemo morati drugacije
+		this.kolbek = kolbek;
 	}
 	
 	/** Svim promenjljivama koje se koriste u parsiranju dodeljuje default vrednosti. */

@@ -1,20 +1,16 @@
 package knez.assdroid.editor;
 
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import knez.assdroid.common.Navigator;
 import knez.assdroid.logika.SubtitleHandler;
 import knez.assdroid.util.DelayAsyncTask;
-import solid.collections.SolidList;
 
 public class EditorPresenter
-        implements EditorMVP.PresenterInterface, DelayAsyncTask.Callback, ItemRepository.Callback {
+        implements EditorMVP.PresenterInterface, DelayAsyncTask.Callback,
+        SubtitleHandler.Callback {
 
     @NonNull private final SubtitleHandler subtitleHandler;
     @NonNull private final Navigator navigator;
@@ -39,7 +35,6 @@ public class EditorPresenter
         this.subtitleHandler = subtitleHandler;
         this.navigator = navigator;
 //        this.itemVsoFactory = itemVsoFactory;
-//        this.logoutUc = logoutUc;
         this.typingDelayMillis = typingDelayMillis;
     }
 
@@ -50,17 +45,9 @@ public class EditorPresenter
     public void onAttach(@NonNull EditorMVP.ViewInterface viewInterface) {
         this.viewInterface = viewInterface;
 
-//        itemRepository.attachListener(this);
+        subtitleHandler.attachListener(this);
 
-        // TODO: itemRepository i subtitleHandler treba da su jedno
-
-        // TODO: odredjuje koje se stavke vide, tipa tajming, actor i tako to
-//        osveziStanjeAdaptera();
-
-
-
-        // TODO nema priority, lepo metoda takva + zadaj kes kako oces
-//        itemRepository.requestItems(GetItemsTask.PRIORITY_TOP, 0, 20);
+        // TODO: vidi da li treba sta da ucitas; da li imas u bazi nesto i neki editovan fajl u opticaju
     }
 
     @Override
@@ -78,17 +65,17 @@ public class EditorPresenter
 //            delayAsyncTask = null;
 //        }
 
-//        itemRepository.detachListener(this);
+        subtitleHandler.detachListener(this);
         viewInterface = null;
     }
 
 
     // --------------------------------------------------------------------------- USER & APP EVENTS
 
-    @Override
-    public void showItemDetails(int itemId) {
+//    @Override
+//    public void showItemDetails(int itemId) {
 //        navigator.startItemDetailsScreen(itemId);
-    }
+//    }
 
     @Override
     public void onSearchSubmitted(@NonNull final String text) {
@@ -103,6 +90,33 @@ public class EditorPresenter
 //        if(delayAsyncTask != null) delayAsyncTask.cancel(true);
 //        delayAsyncTask = new DelayAsyncTask(this, typingDelayMillis);
 //        delayAsyncTask.execute();
+    }
+
+    @Override
+    public void onFileSelectedForLoad(@NonNull Uri data, @NonNull String filename) {
+        if(!subtitleHandler.canLoadSubtitle(filename)) {
+            viewInterface.showErrorLoadingSubtitleInvalidFormat(filename);
+            return;
+        }
+
+        viewInterface.removeAllCurrentSubtitleData();
+        // TODO: ocisti linije koje mi sami drzimo ovde
+
+        subtitleHandler.loadSubtitle(data);
+
+        // TODO: kojim ces redom ovo? odma da pokazes novi naslov... ili da uklonis stari... ili da ostavis
+        // stari dok ne zavrsi sa poslom? Mozda ta zadnja opcija je najbolja...
+        viewInterface.showTitleForFilename(filename, false);
+    }
+
+    @Override
+    public void onShowHelpClicked() {
+        navigator.showHelpScreen();
+    }
+
+    @Override
+    public void onShowSettingsClicked() {
+        navigator.showSettingsScreen();
     }
 
     @Override

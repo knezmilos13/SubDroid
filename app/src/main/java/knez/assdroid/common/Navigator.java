@@ -1,7 +1,11 @@
 package knez.assdroid.common;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+
+import knez.assdroid.help.KategorijeHelpaAktivnost;
+import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
 
 public class Navigator {
 
@@ -10,27 +14,15 @@ public class Navigator {
     public Navigator(@NonNull final Context context) {
         this.context = context;
     }
-//
-//    /** Note: will always close all other screens */
-//    public void showLoginScreen(LoginActivity.AuthErrorMessage authErrorMessage) {
-//        Intent mainIntent = new Intent(context, LoginActivity.class);
-//
-//        int flags = Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK;
-//        mainIntent.addFlags(flags);
-//        mainIntent.putExtra(LoginActivity.EXTRA_FAIL_MESSAGE, authErrorMessage);
-//
-//        context.startActivity(mainIntent);
-//    }
-//
-//    public void showItemsScreen(boolean closeOtherScreens) {
-//        Intent intent = new Intent(context, ItemListActivity.class);
-//        if(closeOtherScreens)
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-//        context.startActivity(intent);
-//    }
-//
-//    public void startItemDetailsScreen(int itemId) {
-//
-//    }
+
+    public void showSettingsScreen() {
+        Intent settingsIntent = new Intent(context, KategorijePodesavanjaAktivnost.class);
+        context.startActivity(settingsIntent);
+    }
+
+    public void showHelpScreen() {
+        Intent helpIntent = new Intent(context, KategorijeHelpaAktivnost.class);
+        context.startActivity(helpIntent);
+    }
 
 }
