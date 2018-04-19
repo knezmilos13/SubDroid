@@ -2,17 +2,15 @@ package knez.assdroid.editor;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import knez.assdroid.common.Navigator;
-import knez.assdroid.logika.SubtitleHandler;
+import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.util.DelayAsyncTask;
 
 public class EditorPresenter
-        implements EditorMVP.PresenterInterface, DelayAsyncTask.Callback,
-        SubtitleHandler.Callback {
+        implements EditorMVP.PresenterInterface, SubtitleController.Callback {
 
-    @NonNull private final SubtitleHandler subtitleHandler;
+    @NonNull private final SubtitleController subtitleController;
     @NonNull private final Navigator navigator;
 //    @NonNull private final ItemVsoFactory itemVsoFactory;
     private final long typingDelayMillis;
@@ -28,11 +26,11 @@ public class EditorPresenter
 //    @NonNull private SolidList<ItemVso> filteredItemVsos = SolidList.empty();
 
     public EditorPresenter(
-            @NonNull SubtitleHandler subtitleHandler,
+            @NonNull SubtitleController subtitleController,
             @NonNull Navigator navigator,
 //            @NonNull ItemVsoFactory itemVsoFactory,
             long typingDelayMillis) {
-        this.subtitleHandler = subtitleHandler;
+        this.subtitleController = subtitleController;
         this.navigator = navigator;
 //        this.itemVsoFactory = itemVsoFactory;
         this.typingDelayMillis = typingDelayMillis;
@@ -45,7 +43,7 @@ public class EditorPresenter
     public void onAttach(@NonNull EditorMVP.ViewInterface viewInterface) {
         this.viewInterface = viewInterface;
 
-        subtitleHandler.attachListener(this);
+        subtitleController.attachListener(this);
 
         // TODO: vidi da li treba sta da ucitas; da li imas u bazi nesto i neki editovan fajl u opticaju
     }
@@ -65,7 +63,7 @@ public class EditorPresenter
 //            delayAsyncTask = null;
 //        }
 
-        subtitleHandler.detachListener(this);
+        subtitleController.detachListener(this);
         viewInterface = null;
     }
 
@@ -94,7 +92,7 @@ public class EditorPresenter
 
     @Override
     public void onFileSelectedForLoad(@NonNull Uri data, @NonNull String filename) {
-        if(!subtitleHandler.canLoadSubtitle(filename)) {
+        if(!subtitleController.canLoadSubtitle(filename)) {
             viewInterface.showErrorLoadingSubtitleInvalidFormat(filename);
             return;
         }
@@ -102,7 +100,7 @@ public class EditorPresenter
         viewInterface.removeAllCurrentSubtitleData();
         // TODO: ocisti linije koje mi sami drzimo ovde
 
-        subtitleHandler.loadSubtitle(data);
+        subtitleController.loadSubtitle(data);
 
         // TODO: kojim ces redom ovo? odma da pokazes novi naslov... ili da uklonis stari... ili da ostavis
         // stari dok ne zavrsi sa poslom? Mozda ta zadnja opcija je najbolja...
@@ -119,12 +117,6 @@ public class EditorPresenter
         navigator.showSettingsScreen();
     }
 
-    @Override
-    public void onDelayCompleted() {
-//        delayAsyncTask = null;
-//        showResultsForQuery(currentSearchQuery);
-    }
-
 
     // ------------------------------------------------------------------------------- REPO CALLBACK
 //
@@ -132,6 +124,16 @@ public class EditorPresenter
 //    public void onDataDownloaded(List<Item> items, PaginationData paginationData, int priority) {
 //        asyncCreateItemVsos(new SolidList<>(items));
 //    }
+
+    @Override
+    public void onInvalidSubtitleFormat(@NonNull String subtitleFilename) {
+        // TODO prikazi poruku
+    }
+
+    @Override
+    public void onFileReadingFailed(@NonNull String subtitleFilename) {
+        // TODO prikazi poruku
+    }
 
 
     // ------------------------------------------------------------------------------------ INTERNAL

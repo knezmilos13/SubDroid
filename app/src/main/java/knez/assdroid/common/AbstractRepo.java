@@ -18,13 +18,16 @@ public abstract class AbstractRepo {
      */
     protected <T> void fireCallbacks(
             List<T> callbacks, CallbackCaller<T> callbackCaller, @Nullable Threader threader) {
-        for (T callback : callbacks) {
-            try {
-                Runnable task = () -> callbackCaller.callCallback(callback);
-                if(threader != null) threader.justExecute(task);
-                else task.run();
-            } catch (Exception ex) {
-                Timber.e(ex);
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (callbacks) {
+            for (T callback : callbacks) {
+                try {
+                    Runnable task = () -> callbackCaller.callCallback(callback);
+                    if (threader != null) threader.justExecute(task);
+                    else task.run();
+                } catch (Exception ex) {
+                    Timber.e(ex);
+                }
             }
         }
     }

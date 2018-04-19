@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import knez.assdroid.common.data.IdentifiableImpl;
 import knez.assdroid.editor.data.SubtitleLineSettings;
-import knez.assdroid.logika.RedPrevoda;
+import knez.assdroid.subtitle.RedPrevoda;
 
 public class SubtitleLineVso extends IdentifiableImpl {
 

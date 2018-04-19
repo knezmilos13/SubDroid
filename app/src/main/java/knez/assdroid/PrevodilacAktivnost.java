@@ -3,8 +3,8 @@ package knez.assdroid;
 import java.io.FileNotFoundException;
 
 import knez.assdroid.help.HelpEditorAkt;
-import knez.assdroid.logika.RedPrevoda;
-import knez.assdroid.logika.SubtitleHandler;
+import knez.assdroid.subtitle.RedPrevoda;
+import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacAktivnost;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacUtil;
 import android.app.Activity;
@@ -39,7 +39,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	private Button dugmeCopy, dugmeCommit, dugmeCommitNext;
 
 	private RedPrevoda prethodniRed, tekuciRed, sledeciRed;
-	private SubtitleHandler subtitleHandler;
+	private SubtitleController subtitleController;
 
 	// iako postoji evidencija globalno da li je prevod menjan, ovo je zgodno znati da bi se vratila
 	// informacija editoru da li treba da refreshuje ista
@@ -54,7 +54,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 		setContentView(R.layout.akt_prevodilac);
 
 		// TODO ovo u prezenter
-		subtitleHandler = App.getAppComponent().getSubtitleHandler();
+		subtitleController = App.getAppComponent().getSubtitleHandler();
 
 		Bundle bandl;
 		if(savedInstanceState != null) {
@@ -148,11 +148,11 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	/** Sklapa i prikazuje naslov ove aktivnosti koji zavisi od imena prevoda i njegovog statusa snimljenosti. */
 	private void osveziNaslov() {
 		String ceoNaslov = 
-				subtitleHandler.isPrevodMenjan()? getResources().getString(R.string.editor_prevod_menjan_znak) : "";
-		if(subtitleHandler.getImePrevoda().equals("")) {
+				subtitleController.isPrevodMenjan()? getResources().getString(R.string.editor_prevod_menjan_znak) : "";
+		if(subtitleController.getImePrevoda().equals("")) {
 			ceoNaslov += getResources().getString(R.string.standard_untitled);
 		} else {
-			ceoNaslov += subtitleHandler.getImePrevoda();
+			ceoNaslov += subtitleController.getImePrevoda();
 		}
 
 		setTitle(ceoNaslov);
@@ -170,9 +170,9 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	}
 	
 	private void ucitajRedove(int tekuci) {
-		prethodniRed = tekuci>1 ? subtitleHandler.dajRedPrevoda(tekuci - 1) : null;
-		tekuciRed = subtitleHandler.dajRedPrevoda(tekuci);
-		sledeciRed = subtitleHandler.postojiLiRedPrevoda(tekuci + 1)? subtitleHandler.dajRedPrevoda(tekuci + 1) : null;
+		prethodniRed = tekuci>1 ? subtitleController.dajRedPrevoda(tekuci - 1) : null;
+		tekuciRed = subtitleController.dajRedPrevoda(tekuci);
+		sledeciRed = subtitleController.postojiLiRedPrevoda(tekuci + 1)? subtitleController.dajRedPrevoda(tekuci + 1) : null;
 	}
 	
 	/** Primenjuje izmene na tekucu liniju prevoda i osvezava naslov aktivnosti */
@@ -181,10 +181,10 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 			// ako commit prazne linije ne menja nista, a jeste bila prazna linija... do nothing
 		} else {
 			tekuciRed.text = unos.getText().toString();
-			subtitleHandler.updateRedPrevoda(tekuciRed);
+			subtitleController.updateRedPrevoda(tekuciRed);
 			radjeneIzmeneOvde = true;
-			if(!subtitleHandler.isPrevodMenjan()) {
-				subtitleHandler.setPrevodMenjan(true);
+			if(!subtitleController.isPrevodMenjan()) {
+				subtitleController.setPrevodMenjan(true);
 				osveziNaslov();
 			}
 		}
@@ -210,7 +210,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	
 	private void snimiPrevod() {
 		try {
-			subtitleHandler.snimiPrevod();
+			subtitleController.snimiPrevod();
 		} catch (FileNotFoundException e) {
 //			Loger.log(e);
 			e.printStackTrace();

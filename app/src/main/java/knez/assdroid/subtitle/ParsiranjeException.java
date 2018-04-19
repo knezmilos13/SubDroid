@@ -1,4 +1,4 @@
-package knez.assdroid.logika;
+package knez.assdroid.subtitle;
 
 public class ParsiranjeException extends Exception {
 	

@@ -1,23 +1,23 @@
-package knez.assdroid.logika;
+package knez.assdroid.subtitle;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 
-public class RedZaglavlja {
+public class RedStila {
 	
 	public Integer id = null;
 	public String sadrzaj = null;
 	
-	public RedZaglavlja() {}
-	public RedZaglavlja(String sadrzaj) {
+	public RedStila() {}
+	public RedStila(String sadrzaj) {
 		this.sadrzaj = sadrzaj;
 	}
-	public RedZaglavlja(int id, String sadrzaj) {
+	public RedStila(int id, String sadrzaj) {
 		this.id = id;
 		this.sadrzaj = sadrzaj;
 	}
 
-	public static final String IME_TABELE = "red_zaglavlja";
+	public static final String IME_TABELE = "red_stila";
 	public static final String K_ID = "_id";
 	public static final String K_SADRZAJ = "sadrzaj";
 	public static final String SEMA = 
@@ -31,9 +31,9 @@ public class RedZaglavlja {
 		return cv;
 	}
 	
-	public static RedZaglavlja kreirajIzKursora(Cursor kurs) {
+	public static RedStila kreirajIzKursora(Cursor kurs) {
 		if(!indeksiSetovani) setujIndekse(kurs);
-		RedZaglavlja red = new RedZaglavlja();
+		RedStila red = new RedStila();
 		red.id = kurs.getInt(indexID);
 		red.sadrzaj = kurs.getString(indexSadrzaj);
 		return red;

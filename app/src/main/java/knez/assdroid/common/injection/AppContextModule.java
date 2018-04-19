@@ -18,7 +18,8 @@ import knez.assdroid.App;
 import knez.assdroid.common.Navigator;
 import knez.assdroid.common.util.AppConfig;
 import knez.assdroid.editor.EditorPresenter;
-import knez.assdroid.logika.SubtitleHandler;
+import knez.assdroid.subtitle.SubtitleController;
+import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
 import timber.log.Timber;
 
@@ -51,26 +52,24 @@ public class AppContextModule {
     }
 
     @Provides @Singleton
-    SubtitleHandler getSubtitleHandler(
-            ContentResolver contentResolver,
-            @Named("ioExecutor") ExecutorService executorService,
-            @Named("mainThreader") Threader mainThreader, Timber.Tree logger, Context context) {
-        return new SubtitleHandler(contentResolver, executorService, mainThreader, logger, context);
-    }
-
-    @Provides @Singleton
     ContentResolver getContentResolver(Context context) {
         return context.getContentResolver();
     }
 
     @Provides
     EditorPresenter getEditorPresenter(
-            SubtitleHandler subtitleHandler, Navigator navigator, AppConfig appConfig) {
+            SubtitleController subtitleController, Navigator navigator, AppConfig appConfig) {
         return new EditorPresenter(
-                subtitleHandler,
+                subtitleController,
                 navigator,
                 appConfig.getTypingDelayMillis()
         );
     }
+
+    @Provides @Singleton
+    FileHandler getFileHandler(ContentResolver contentResolver) {
+        return new FileHandler(contentResolver);
+    }
+
 
 }

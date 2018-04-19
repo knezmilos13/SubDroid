@@ -1,4 +1,4 @@
-package knez.assdroid.logika;
+package knez.assdroid.subtitle;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

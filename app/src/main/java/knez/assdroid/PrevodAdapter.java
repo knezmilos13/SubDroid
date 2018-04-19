@@ -1,17 +1,5 @@
 package knez.assdroid;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import knez.assdroid.logika.RedPrevoda;
-import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.text.SpannableStringBuilder;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
-import android.widget.CursorAdapter;
-
 /*
 public class PrevodAdapter extends CursorAdapter {
 

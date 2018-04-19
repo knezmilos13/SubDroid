@@ -12,12 +12,12 @@ import knez.assdroid.App;
 import knez.assdroid.common.Navigator;
 import knez.assdroid.common.util.AppConfig;
 import knez.assdroid.editor.EditorPresenter;
-import knez.assdroid.logika.SubtitleHandler;
+import knez.assdroid.subtitle.SubtitleController;
 import timber.log.Timber;
 
 @Singleton
 @Component(modules = {
-        AppContextModule.class, ViewFactoryModule.class
+        AppContextModule.class, SubtitleModule.class, ViewFactoryModule.class
 })
 public interface AppComponent {
 
@@ -33,7 +33,7 @@ public interface AppComponent {
     RefWatcher getRefWatcher();
     Navigator getNavigator();
     EditorPresenter getEditorPresenter();
-    SubtitleHandler getSubtitleHandler();
+    SubtitleController getSubtitleHandler();
     Context getContext(); // TODO: ko koristi ovo da predje na druge klase
 
 }

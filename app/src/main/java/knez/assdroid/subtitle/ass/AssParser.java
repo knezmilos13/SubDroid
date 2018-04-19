@@ -1,35 +1,25 @@
-package knez.assdroid.logika;
+package knez.assdroid.subtitle.ass;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import knez.assdroid.R;
+import knez.assdroid.subtitle.ParsiranjeException;
+import knez.assdroid.subtitle.RedPrevoda;
+import knez.assdroid.subtitle.RedStila;
+import knez.assdroid.subtitle.RedZaglavlja;
+import knez.assdroid.subtitle.SubtitleParser;
+import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.util.Alatke;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.database.Cursor;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
-public class AssFileParser implements Parser {
-
-	@NonNull private final Context context;
+public class AssParser implements SubtitleParser {
 
 	private enum Sekcija { INFO, STYLE, PREVOD, NEPOZNATA }
 
-	private ParserCallback kolbek;
 	private Sekcija tekucaSekcija = null;
-	@SuppressWarnings("rawtypes")
 	private List lista;
 
 	private SparseArray<Object> mapaProblema;
@@ -42,7 +32,6 @@ public class AssFileParser implements Parser {
 	private boolean formatPrevodaUcitan = false;
 	private int odeljakaPrevoda;
 
-	private static final String UTF_BOM = "\uFEFF";
 
 	// ------------------------------------------------------------------- Informacije za parsiranje prevoda
 	private static final String SEKCIJA_PREVOD = "[Events]";
@@ -79,12 +68,42 @@ public class AssFileParser implements Parser {
 	private static final String SEKCIJA_ZAGLAVLJE = "[Script Info]";
 	private static final String SEKCIJA_ZAGLAVLJE_LOWER_CASE = "[script info]";
 
-	public AssFileParser(@NonNull Context context, ParserCallback kolbek) {
-		this.context = context;
-		this.kolbek = kolbek;
+    // TODO: sve iznad izvuci u odvojene fajlove, konstante itd
+
+	public AssParser() {
+
 	}
-	
-	/** Svim promenjljivama koje se koriste u parsiranju dodeljuje default vrednosti. */
+
+	@Override
+	public boolean canOpenSubtitleFile(@NonNull String subtitleFilename) {
+		return subtitleFilename.toLowerCase().endsWith(".ass");
+	}
+
+    @Override @NonNull
+    public SubtitleFile parseSubtitle(@NonNull List<String> subtitleLines) throws ParsiranjeException {
+//        inicijalizujVrednosti();
+//        boolean prvaLinija = true;
+//        try (BufferedReader citac = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())))) {
+//            while (true) {
+//                String linija = citac.readLine();
+//                if (linija == null) break;
+//                if (prvaLinija) {
+//                    prvaLinija = false;
+//                    if (linija.startsWith(UTF_BOM))
+//                        linija = linija.substring(1);
+//                }
+//                linija = linija.trim();
+//                if (linija.equals("") || linija.startsWith(";")) continue;
+//                obradi(linija);
+//            }
+//            proslediTekucuSekciju(); // posto ucitavas od sekcije do sekcije, a na kraju nema sekcija da zatvori sve
+//            javiZavrsenoParsiranje();
+//        }
+		return null;
+    }
+
+
+    /** Svim promenjljivama koje se koriste u parsiranju dodeljuje default vrednosti. */
 	private void inicijalizujVrednosti() {
 		warnString = "";
 		indexPrevodLayer = 0;
@@ -101,29 +120,6 @@ public class AssFileParser implements Parser {
 		formatPrevodaUcitan = false;
 		tekucaSekcija = null;
 		mapaProblema = new SparseArray<>(KAPACITET_MAPE_PROBLEMA);
-	}
-
-	/** Ucitava prevod sa tekuce putanje o kojem ce se ovaj handler starati. 
-	 * @throws ParsiranjeException Ako dodje do problema pri parsiranju, usled pogresnog formata prevoda. */
-	public void zapocniParsiranje(Uri uri) throws IOException, ParsiranjeException {
-		inicijalizujVrednosti();
-		boolean prvaLinija = true;
-		try (BufferedReader citac = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())))) {
-			while (true) {
-				String linija = citac.readLine();
-				if (linija == null) break;
-				if (prvaLinija) {
-					prvaLinija = false;
-					if (linija.startsWith(UTF_BOM))
-						linija = linija.substring(1);
-				}
-				linija = linija.trim();
-				if (linija.equals("") || linija.startsWith(";")) continue;
-				obradi(linija);
-			}
-			proslediTekucuSekciju(); // posto ucitavas od sekcije do sekcije, a na kraju nema sekcija da zatvori sve
-			javiZavrsenoParsiranje();
-		}
 	}
 
 	/** Obradjuje liniju - belezi ako je pocetak sekcije, parsira i ubacuje u listu ako je neki od redova. */
@@ -165,13 +161,13 @@ public class AssFileParser implements Parser {
 	private void proslediTekucuSekciju() {
 		switch (tekucaSekcija) {
 		case INFO:
-			kolbek.ucitaniRedoviZaglavlja((List<RedZaglavlja>) lista);
+//			kolbek.ucitaniRedoviZaglavlja((List<RedZaglavlja>) lista);
 			break;
 		case PREVOD:
-			kolbek.ucitaniRedoviPrevoda((List<RedPrevoda>) lista);
+//			kolbek.ucitaniRedoviPrevoda((List<RedPrevoda>) lista);
 			break;
 		case STYLE:
-			kolbek.ucitaniRedoviStila((List<RedStila>) lista);
+//			kolbek.ucitaniRedoviStila((List<RedStila>) lista);
 			break;
 		default:
 			break;
@@ -305,28 +301,28 @@ public class AssFileParser implements Parser {
 	}
 
 	private void javiZavrsenoParsiranje() {
-		if(mapaProblema.size() != 0) {
-			Resources r = context.getResources();
-			if(mapaProblema.get(PROB_FORMAT_PREVODA) != null) {
-				warnString = r.getString(R.string.parsiranje_fail_nema_prevod_format_linije);
-			}
-			Integer broj = (Integer) mapaProblema.get(PROB_NEPOZNAT_RED_PREVODA);
-			if(broj != null) {
-				warnString += (warnString.length() > 0? "\n" : "")
-						+ r.getString(R.string.parsiranje_fail_problem_nepoznat_red_prevoda, broj);
-			}
-			@SuppressWarnings("unchecked")
-			List<Integer> puknuti = (List<Integer>) mapaProblema.get(PROB_PARSIRANJE_PREVODA);
-			if(puknuti != null) {
-				StringBuilder spakovan = new StringBuilder();
-				for(Integer b : puknuti)
-					spakovan.append(b).append(",");
-				spakovan.deleteCharAt(spakovan.length()-1);
-				warnString += (warnString.length() > 0? "\n" : "")
-						+ r.getString(R.string.parsiranje_fail_problem_red_prevoda, spakovan);
-			}
-		}
-		kolbek.zavrsenoParsiranje(mapaProblema.size() != 0, warnString);
+//		if(mapaProblema.size() != 0) {
+//			Resources r = context.getResources();
+//			if(mapaProblema.get(PROB_FORMAT_PREVODA) != null) {
+//				warnString = r.getString(R.string.parsiranje_fail_nema_prevod_format_linije);
+//			}
+//			Integer broj = (Integer) mapaProblema.get(PROB_NEPOZNAT_RED_PREVODA);
+//			if(broj != null) {
+//				warnString += (warnString.length() > 0? "\n" : "")
+//						+ r.getString(R.string.parsiranje_fail_problem_nepoznat_red_prevoda, broj);
+//			}
+//			@SuppressWarnings("unchecked")
+//			List<Integer> puknuti = (List<Integer>) mapaProblema.get(PROB_PARSIRANJE_PREVODA);
+//			if(puknuti != null) {
+//				StringBuilder spakovan = new StringBuilder();
+//				for(Integer b : puknuti)
+//					spakovan.append(b).append(",");
+//				spakovan.deleteCharAt(spakovan.length()-1);
+//				warnString += (warnString.length() > 0? "\n" : "")
+//						+ r.getString(R.string.parsiranje_fail_problem_red_prevoda, spakovan);
+//			}
+//		}
+//		kolbek.zavrsenoParsiranje(mapaProblema.size() != 0, warnString);
 	}
 	
 	// --------------------------------------- Problemi
@@ -351,47 +347,5 @@ public class AssFileParser implements Parser {
 		int brojNepoznatih = (Integer) mapaProblema.get(PROB_NEPOZNAT_RED_PREVODA, 0);
 		mapaProblema.put(PROB_NEPOZNAT_RED_PREVODA, ++brojNepoznatih);
 	}
-	
-	// -------------------------------------------------------------------------------------------- Snimanje prevoda
 
-	public void snimiPrevod(String putanjaPrevoda, Cursor redoviZaglavlja, Cursor redoviStila, Cursor redoviPrevoda)
-			throws FileNotFoundException {
-		File fajl = new File(putanjaPrevoda);
-		PrintWriter p = new PrintWriter(fajl);
-
-		p.print(UTF_BOM);
-
-		p.println(SEKCIJA_ZAGLAVLJE);
-		while(redoviZaglavlja.moveToNext()) {
-			p.println(RedZaglavlja.kreirajStringIzKursora(redoviZaglavlja));
-		}
-		p.println();
-
-		p.println(SEKCIJA_STIL);
-		//TODO: ne stampas eksplicitno red za format stila - zajedno ti je na gomili sa ostalim
-		// ali kad izmenis gore ucitavanje stila, onda menjaj i ovde stampanje stila
-		while(redoviStila.moveToNext()) {
-			p.println(RedStila.kreirajStringIzKursora(redoviStila)); //TODO: nece da moze. ili oce ako je AssRedStila
-		}
-		p.println();
-
-		p.println(SEKCIJA_PREVOD);
-		p.println(SEKCIJA_PREVOD_DEFAULT_FORMAT);
-		while(redoviPrevoda.moveToNext()) {
-			RedPrevoda red = RedPrevoda.kreirajIzKursora(redoviPrevoda);
-			p.printf("%s%d,%s,%s,%s,%s,%04d,%04d,%04d,%s,%s\n", 
-					(red.komentar? SEKCIJA_PREVOD_RED_COMMENT : SEKCIJA_PREVOD_RED_DIALOGUE) + " ",
-					red.layer, 
-					Alatke.formatirajVreme(red.start), 
-					Alatke.formatirajVreme(red.end), 
-					red.style, 
-					red.actorName,
-					red.marginL, 
-					red.marginR, 
-					red.marginV, 
-					red.effect, 
-					red.text);
-		}
-		p.close();
-	}
 }
