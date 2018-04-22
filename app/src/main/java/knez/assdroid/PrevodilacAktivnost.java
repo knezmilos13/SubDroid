@@ -3,10 +3,11 @@ package knez.assdroid;
 import java.io.FileNotFoundException;
 
 import knez.assdroid.help.HelpEditorAkt;
-import knez.assdroid.subtitle.RedPrevoda;
+import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacAktivnost;
 import knez.assdroid.podesavanja.PodesavanjaPrevodilacUtil;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +39,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	private EditText unos;
 	private Button dugmeCopy, dugmeCommit, dugmeCommitNext;
 
-	private RedPrevoda prethodniRed, tekuciRed, sledeciRed;
+	private SubtitleLine prethodniRed, tekuciRed, sledeciRed;
 	private SubtitleController subtitleController;
 
 	// iako postoji evidencija globalno da li je prevod menjan, ovo je zgodno znati da bi se vratila
@@ -101,7 +102,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putInt(INPUT_BROJ_REDA, tekuciRed.lineNumber);
+		outState.putInt(INPUT_BROJ_REDA, tekuciRed.getLineNumber());
 		outState.putBoolean(OUTPUT_RADJENE_IZMENE_OVDE, radjeneIzmeneOvde);
 		super.onSaveInstanceState(outState);
 	}
@@ -110,7 +111,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	public void onBackPressed() {
 		Intent output = new Intent();
 		output.putExtra(OUTPUT_RADJENE_IZMENE_OVDE, radjeneIzmeneOvde);
-		output.putExtra(OUTPUT_ZADNJI_PREGLEDAN, tekuciRed.lineNumber);
+		output.putExtra(OUTPUT_ZADNJI_PREGLEDAN, tekuciRed.getLineNumber());
 		setResult(RESULT_OK, output);
 		finish();
 	}
@@ -126,22 +127,22 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	
 	/** Prikazuje tekst tekuce ucitanih redova u odgovarajucim labelama. */
 	private void prikaziRedove() {
-		labelaPrethodniRed.setText(prethodniRed == null? " " : prethodniRed.text);
-		labelaTekuciRed.setText(tekuciRed.text);
-		labelaSledeciRed.setText(sledeciRed == null? " " : sledeciRed.text);
+			labelaPrethodniRed.setText(prethodniRed == null? " " : prethodniRed.getText());
+		labelaTekuciRed.setText(tekuciRed.getText());
+		labelaSledeciRed.setText(sledeciRed == null? " " : sledeciRed.getText());
 	}
 	
 	/** Primenjuje podesavanja koja se odnose na prikaz polja za unos. */
 	private void primeniUnosPodesavanja() {
 		if(PodesavanjaPrevodilacUtil.isPrevodilacHintOn() && unos.getText().toString().equals("")) {
-			unos.setHint(tekuciRed.text); //pazi da iza hinta imas setText inace mozda nece raditi
+			unos.setHint(tekuciRed.getText()); //pazi da iza hinta imas setText inace mozda nece raditi
 			unos.setText("");
 		} else {
 			unos.setHint(null);
 		}
 		
 		if(PodesavanjaPrevodilacUtil.isAlwaysCopyOn() && unos.getText().toString().equals("")) {
-			unos.setText(tekuciRed.text);
+			unos.setText(tekuciRed.getText());
 		}
 	}
 	
@@ -180,7 +181,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 		if(PodesavanjaPrevodilacUtil.isCommitKeepOriginalOn() && unos.getText().toString().equals("")) {
 			// ako commit prazne linije ne menja nista, a jeste bila prazna linija... do nothing
 		} else {
-			tekuciRed.text = unos.getText().toString();
+//			tekuciRed.text = unos.getText().toString(); // TODO: nece da moze setText - immutable tebra
 			subtitleController.updateRedPrevoda(tekuciRed);
 			radjeneIzmeneOvde = true;
 			if(!subtitleController.isPrevodMenjan()) {
@@ -192,20 +193,20 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	
 	private void premotajNaSledeciRed() {
 		if(sledeciRed != null)
-			namestiRed(sledeciRed.lineNumber);
+			namestiRed(sledeciRed.getLineNumber());
 		else
 			osveziTekuciRed();
 	}
 	
 	private void premotajNaPrethodniRed() {
 		if(prethodniRed != null)
-			namestiRed(prethodniRed.lineNumber);
+			namestiRed(prethodniRed.getLineNumber());
 		else
 			osveziTekuciRed();
 	}
 	
 	private void osveziTekuciRed() {
-		labelaTekuciRed.setText(tekuciRed.text);
+		labelaTekuciRed.setText(tekuciRed.getText());
 	}
 	
 	private void snimiPrevod() {
@@ -240,7 +241,7 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 			premotajNaSledeciRed();
 			break;
 		case R.id.prevodilac_dugme_kopiraj:
-			unos.setText(tekuciRed.text);
+			unos.setText(tekuciRed.getText());
 			break;
 		}
 	}

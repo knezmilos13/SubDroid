@@ -1,8 +1,10 @@
-package knez.assdroid.subtitle;
+package knez.assdroid.subtitle.handler;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import knez.assdroid.subtitle.handler.SubtitleFormatter;
+import knez.assdroid.subtitle.handler.SubtitleParser;
 import solid.collections.SolidList;
 
 public class SubtitleHandlerRepository {

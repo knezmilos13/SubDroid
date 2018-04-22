@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
+import org.threeten.bp.format.DateTimeFormatter;
+
 import knez.assdroid.common.adapter.AdapterPack;
 import knez.assdroid.common.data.Identifiable;
 import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
@@ -20,7 +22,8 @@ public class SubtitleLineAdapterPack implements AdapterPack {
 
     @Override @NonNull
     public RecyclerView.ViewHolder getLayoutItem(@NonNull Context context) {
-        return new ViewHolderItemLayoutItem(new SubtitleLineLayoutItem(context), listener);
+        return new ViewHolderItemLayoutItem(new SubtitleLineLayoutItem(context,
+                DateTimeFormatter.ofPattern("H:mm:ss.SS")), listener); // TODO znaci necemo formater njemu nego da u VSO vec bude formatirano
     }
 
     @Override

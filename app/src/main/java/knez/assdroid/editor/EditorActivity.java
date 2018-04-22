@@ -170,7 +170,7 @@ public class EditorActivity extends AppCompatActivity
         // TODO
         //		boolean maknuo = prevodAdapter.getCursor().moveToPosition(position);
 //		if(!maknuo) return;
-//		RedPrevoda red = RedPrevoda.kreirajIzKursora(prevodAdapter.getCursor());
+//		SubtitleLine red = SubtitleLine.kreirajIzKursora(prevodAdapter.getCursor());
 //		prikaziEditor(red.lineNumber);
     }
 

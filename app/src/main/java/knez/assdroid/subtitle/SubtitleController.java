@@ -9,6 +9,10 @@ import java.util.concurrent.ExecutorService;
 
 import knez.assdroid.common.AbstractRepo;
 import knez.assdroid.subtitle.data.SubtitleFile;
+import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.subtitle.handler.SubtitleContent;
+import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
+import knez.assdroid.subtitle.handler.SubtitleParser;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
 import timber.log.Timber;
@@ -96,7 +100,8 @@ public class SubtitleController extends AbstractRepo {
 
         // TODO: vidi kakve izuzetke baca ovaj pa hendlaj; ali tek nakon sto prodjes kroz logiku parsera detaljno
 		try {
-			currentSubtitleFile = subtitleParser.parseSubtitle(fileContent);
+			SubtitleContent subtitleContent = subtitleParser.parseSubtitle(fileContent);
+			// TODO pa mu ubaci content u file
 		} catch (ParsiranjeException e) {
 			e.printStackTrace();
 			// TODO u staroj implementaciji si cisto kreirao novi fajl, ali ovde ne moras nista
@@ -163,7 +168,7 @@ public class SubtitleController extends AbstractRepo {
 //		setPrevodMenjan(false);
 	}
 
-	public RedPrevoda dajRedPrevoda(int lineNumber) {
+	public SubtitleLine dajRedPrevoda(int lineNumber) {
 		return ucitajRedPrevoda(lineNumber);
 	}
 
@@ -174,28 +179,28 @@ public class SubtitleController extends AbstractRepo {
 	// ------------------------------------------------------------------------------------------ Ucitavanje prevoda
 
 //	@Override
-	public void ucitaniRedoviPrevoda(List<RedPrevoda> redovi) {		
+	public void ucitaniRedoviPrevoda(List<SubtitleLine> redovi) {
 //		baza.beginTransaction();
 //		baza.setLockingEnabled(false);
 		
 		// Create a single InsertHelper to handle this set of insertions.
-//        InsertHelper ih = new InsertHelper(baza, RedPrevoda.IME_TABELE);
+//        InsertHelper ih = new InsertHelper(baza, SubtitleLine.IME_TABELE);
  
         // Get the numeric indexes for each of the columns that we're updating
-//        int indexLine = ih.getColumnIndex(RedPrevoda.K_LINE);
-//        int indexLayer = ih.getColumnIndex(RedPrevoda.K_LAYER);
-//        int indexMarginL = ih.getColumnIndex(RedPrevoda.K_MARGIN_L);
-//        int indexMarginR = ih.getColumnIndex(RedPrevoda.K_MARGIN_R);
-//        int indexMarginV = ih.getColumnIndex(RedPrevoda.K_MARGIN_V);
-//        int indexStart = ih.getColumnIndex(RedPrevoda.K_START);
-//        int indexEnd = ih.getColumnIndex(RedPrevoda.K_END);
-//        int indexStyle = ih.getColumnIndex(RedPrevoda.K_STYLE);
-//		int indexActor = ih.getColumnIndex(RedPrevoda.K_ACTOR_NAME);
-//		int indexEffect = ih.getColumnIndex(RedPrevoda.K_EFFECT);
-//		int indexText = ih.getColumnIndex(RedPrevoda.K_TEXT);
-//		int indexKomentar = ih.getColumnIndex(RedPrevoda.K_KOMENTAR);
+//        int indexLine = ih.getColumnIndex(SubtitleLine.K_LINE);
+//        int indexLayer = ih.getColumnIndex(SubtitleLine.K_LAYER);
+//        int indexMarginL = ih.getColumnIndex(SubtitleLine.K_MARGIN_L);
+//        int indexMarginR = ih.getColumnIndex(SubtitleLine.K_MARGIN_R);
+//        int indexMarginV = ih.getColumnIndex(SubtitleLine.K_MARGIN_V);
+//        int indexStart = ih.getColumnIndex(SubtitleLine.K_START);
+//        int indexEnd = ih.getColumnIndex(SubtitleLine.K_END);
+//        int indexStyle = ih.getColumnIndex(SubtitleLine.K_STYLE);
+//		int indexActor = ih.getColumnIndex(SubtitleLine.K_ACTOR_NAME);
+//		int indexEffect = ih.getColumnIndex(SubtitleLine.K_EFFECT);
+//		int indexText = ih.getColumnIndex(SubtitleLine.K_TEXT);
+//		int indexKomentar = ih.getColumnIndex(SubtitleLine.K_KOMENTAR);
 //
-//		for(RedPrevoda red : redovi) {
+//		for(SubtitleLine red : redovi) {
 //			ih.prepareForInsert();
 //			ih.bind(indexLine, red.lineNumber);
 //			ih.bind(indexLayer, red.layer);
@@ -208,7 +213,7 @@ public class SubtitleController extends AbstractRepo {
 //			ih.bind(indexActor, red.actorName);
 //			ih.bind(indexEffect, red.effect);
 //			ih.bind(indexText, red.text);
-//			ih.bind(indexKomentar, red.komentar);
+//			ih.bind(indexKomentar, red.isComment);
 //			ih.execute();
 //		}
 //		ih.close();
@@ -236,13 +241,13 @@ public class SubtitleController extends AbstractRepo {
 	// --------------------------------------------------------------------------------------------------------- SQL
 
 	private void ocistiBazu() {
-//		baza.delete(RedPrevoda.IME_TABELE, null, null);
+//		baza.delete(SubtitleLine.IME_TABELE, null, null);
 //		baza.delete(RedStila.IME_TABELE, null, null);
 //		baza.delete(RedZaglavlja.IME_TABELE, null, null);
 	}
 
-	private void ubaciRedPrevodaUBazu(RedPrevoda red) {
-//		baza.insert(RedPrevoda.IME_TABELE, null, red.dajVrednostiZaBazu());
+	private void ubaciRedPrevodaUBazu(SubtitleLine red) {
+//		baza.insert(SubtitleLine.IME_TABELE, null, red.dajVrednostiZaBazu());
 	}
 
 	private void ubaciRedStilaUBazu(RedStila red) {
@@ -253,8 +258,8 @@ public class SubtitleController extends AbstractRepo {
 //		baza.insert(RedZaglavlja.IME_TABELE, null, red.dajVrednostiZaBazu());
 	}
 	
-	public void updateRedPrevoda(RedPrevoda red) {
-//		baza.update(RedPrevoda.IME_TABELE, red.dajVrednostiZaBazu(), RedPrevoda.K_ID + "=" + red.id, null);
+	public void updateRedPrevoda(SubtitleLine red) {
+//		baza.update(SubtitleLine.IME_TABELE, red.dajVrednostiZaBazu(), SubtitleLine.K_ID + "=" + red.id, null);
 	}
 
 	public Cursor ucitajSveRedovePrevoda() {
@@ -272,21 +277,21 @@ public class SubtitleController extends AbstractRepo {
 	}
 
 	public Cursor ucitajRedovePrevoda(String trazeniTekst, boolean matchCase) {
-		if(trazeniTekst != null) {
-			if(matchCase)
-				trazeniTekst = RedPrevoda.K_TEXT + " glob '*" + trazeniTekst + "*'";
-			else
-				trazeniTekst = RedPrevoda.K_TEXT + " like '%" + trazeniTekst + "%'";
-		}
-//		return baza.query(RedPrevoda.IME_TABELE, null, trazeniTekst, null, null, null, RedPrevoda.K_LINE);
+//		if(trazeniTekst != null) { // TODO ovo je zapravo filtriranje... iz baze? mi cemo to in-memory jbg
+//			if(matchCase)
+//				trazeniTekst = SubtitleLine.K_TEXT + " glob '*" + trazeniTekst + "*'";
+//			else
+//				trazeniTekst = SubtitleLine.K_TEXT + " like '%" + trazeniTekst + "%'";
+//		}
+//		return baza.query(SubtitleLine.IME_TABELE, null, trazeniTekst, null, null, null, SubtitleLine.K_LINE);
 		return null;
 	}
 
-	public RedPrevoda ucitajRedPrevoda(int lineNumber) {
-//		Cursor kurs = baza.query(RedPrevoda.IME_TABELE, null, RedPrevoda.K_LINE + " = " + lineNumber,
-//				null, null, null, RedPrevoda.K_LINE);
+	public SubtitleLine ucitajRedPrevoda(int lineNumber) {
+//		Cursor kurs = baza.query(SubtitleLine.IME_TABELE, null, SubtitleLine.K_LINE + " = " + lineNumber,
+//				null, null, null, SubtitleLine.K_LINE);
 //		if(kurs.moveToFirst()) {
-//			return RedPrevoda.kreirajIzKursora(kurs);
+//			return SubtitleLine.kreirajIzKursora(kurs);
 //		} else return null;
 		return null;
 	}

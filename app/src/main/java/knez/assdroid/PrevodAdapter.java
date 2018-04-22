@@ -51,7 +51,7 @@ public class PrevodAdapter extends CursorAdapter {
 		int start, end, midPt, tekuciLN;
 		start = 0;
 		end = getCursor().getCount() - 1;
-		int indeksLineNumber = getCursor().getColumnIndex(RedPrevoda.K_LINE);
+		int indeksLineNumber = getCursor().getColumnIndex(SubtitleLine.K_LINE);
 		while (start <= end) {
 			midPt = (start + end) / 2;
 			getCursor().moveToPosition(midPt);

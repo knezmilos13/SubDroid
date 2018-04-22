@@ -11,13 +11,15 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import org.threeten.bp.format.DateTimeFormatter;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knez.assdroid.R;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVso;
-import knez.assdroid.util.Alatke;
+import knez.assdroid.subtitle.ParserHelper;
 
 public class SubtitleLineLayoutItem extends FrameLayout {
 
@@ -37,32 +39,33 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     @BindView(R.id.stavka_prevod_tekst) protected TextView tekst;
 
     @Nullable private Callback listener;
-    private SubtitleLineVso subtitleLineVso;
+    @Nullable private SubtitleLineVso subtitleLineVso;
+    @NonNull private final DateTimeFormatter subtitleTimeFormatter;
 
-    public SubtitleLineLayoutItem(Context context) {
+    public SubtitleLineLayoutItem(Context context, @NonNull DateTimeFormatter dateTimeFormatter) {
         super(context);
+        this.subtitleTimeFormatter = dateTimeFormatter;
         init();
     }
 
     public SubtitleLineLayoutItem(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        throw new UnsupportedOperationException();
     }
 
     public SubtitleLineLayoutItem(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        throw new UnsupportedOperationException();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public SubtitleLineLayoutItem(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        throw new UnsupportedOperationException();
     }
 
     protected void init() {
         inflate(getContext(), R.layout.item_subtitle_line, this);
-
         ButterKnife.bind(this);
     }
 
@@ -100,9 +103,9 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         if(subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
             prviRed.setVisibility(View.VISIBLE);
             redniBroj1.setVisibility(View.VISIBLE);
-            redniBroj1.setText("#" + subtitleLineVso.getRedPrevoda().lineNumber);
-            vremeOd.setText(Alatke.formatirajVreme(subtitleLineVso.getRedPrevoda().start));
-            vremeDo.setText(Alatke.formatirajVreme(subtitleLineVso.getRedPrevoda().end));
+            redniBroj1.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
+            vremeOd.setText(subtitleLineVso.getSubtitleLine().getStart().format(subtitleTimeFormatter));
+            vremeDo.setText(subtitleLineVso.getSubtitleLine().getEnd().format(subtitleTimeFormatter));
         }  else {
             prviRed.setVisibility(View.GONE);
             redniBroj1.setVisibility(View.GONE);
@@ -113,10 +116,10 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     private void handleStyleAndActorLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
         if(subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
             drugiRed.setVisibility(View.VISIBLE);
-            actor.setText(subtitleLineVso.getRedPrevoda().actorName);
-            style.setText(subtitleLineVso.getRedPrevoda().style);
+            actor.setText(subtitleLineVso.getSubtitleLine().getActorName());
+            style.setText(subtitleLineVso.getSubtitleLine().getStyle());
             if(!subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
-                redniBroj2.setText("#" + subtitleLineVso.getRedPrevoda().lineNumber);
+                redniBroj2.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
                 redniBroj2.setVisibility(View.VISIBLE);
             } else {
                 redniBroj2.setVisibility(View.GONE);
@@ -129,9 +132,9 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     /** Sredjuje prikaz reda sa tekstom - da li se prikazuju tagovi, da li se hajlajtuje neki trazeni izraz
      *  i da li se prikazuje redni broj u trecem redu (ili je vec prikazan u prvom/drugom) */
     private void handleSubtitleLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        String tekstZaPrikaz = subtitleLineVso.getRedPrevoda().text;
+        String tekstZaPrikaz = subtitleLineVso.getSubtitleLine().getText();
         if(!subtitleLineVso.getSubtitleLineSettings().isShowTagContents())
-            tekstZaPrikaz = Alatke.izbaciTagove(tekstZaPrikaz,
+            tekstZaPrikaz = ParserHelper.izbaciTagove(tekstZaPrikaz,
                     subtitleLineVso.getSubtitleLineSettings().getTagReplacement());
 
         // TODO highligh/pretraga fazon
@@ -143,7 +146,7 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         if(!subtitleLineVso.getSubtitleLineSettings().isShowTimings()
                 && !subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
             redniBroj3.setVisibility(View.VISIBLE);
-            redniBroj3.setText("#" + subtitleLineVso.getRedPrevoda().lineNumber);
+            redniBroj3.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
         } else {
             redniBroj3.setVisibility(View.GONE);
         }

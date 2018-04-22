@@ -1,4 +1,4 @@
-package knez.assdroid.subtitle;
+package knez.assdroid.subtitle.handler;
 
 import android.support.annotation.NonNull;
 

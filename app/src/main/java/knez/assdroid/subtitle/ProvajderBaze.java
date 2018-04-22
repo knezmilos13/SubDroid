@@ -4,12 +4,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import knez.assdroid.subtitle.data.SubtitleLine;
+
 public class ProvajderBaze extends SQLiteOpenHelper {
 	private static final int VERZIJA_BAZE = 2;
 	public static final String IME_BAZE = "assDroid.db";
 	private Context kontekst;
 	
-	private static final String[] UPITI_CREATE_TABELE = { RedPrevoda.SEMA, RedStila.SEMA, RedZaglavlja.SEMA };
+	private static final String[] UPITI_CREATE_TABELE = { /*SubtitleLine.SEMA, RedStila.SEMA, RedZaglavlja.SEMA */};
 
 	public ProvajderBaze(Context kontekst) { 
 		super(kontekst, IME_BAZE, null, VERZIJA_BAZE);

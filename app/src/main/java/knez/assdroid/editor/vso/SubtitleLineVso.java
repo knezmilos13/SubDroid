@@ -5,24 +5,29 @@ import android.support.annotation.NonNull;
 
 import knez.assdroid.common.data.IdentifiableImpl;
 import knez.assdroid.editor.data.SubtitleLineSettings;
-import knez.assdroid.subtitle.RedPrevoda;
+import knez.assdroid.subtitle.data.SubtitleLine;
 
 public class SubtitleLineVso extends IdentifiableImpl {
 
+    // TODO: gresis sa VSO-om. ne sme da ima ceo subtitle line, nije u tome poenta.
+    // treba da ima vec formatiran timestamp; i treba da ima vec dodate actor, ovo/ono
+    // pa ako ih ima da se prikazu, a ako ih nema da se ne prikazu, a ne layout item da razmisllja
+    // onda ti ne treba mozda ni settings recimo
+
     @NonNull private final SubtitleLineSettings subtitleLineSettings;
-    @NonNull private final RedPrevoda redPrevoda;
+    @NonNull private final SubtitleLine subtitleLine;
     @DrawableRes private final int backgroundDrawable;
 
-    public SubtitleLineVso(@NonNull RedPrevoda redPrevoda,
+    public SubtitleLineVso(@NonNull SubtitleLine subtitleLine,
                            @NonNull SubtitleLineSettings subtitleLineSettings,
                            @DrawableRes int backgroundDrawable) {
-        super(redPrevoda.id);
-        this.redPrevoda = redPrevoda;
+        super(subtitleLine.getId());
+        this.subtitleLine = subtitleLine;
         this.subtitleLineSettings = subtitleLineSettings;
         this.backgroundDrawable = backgroundDrawable;
     }
 
-    @NonNull public RedPrevoda getRedPrevoda() { return redPrevoda; }
+    @NonNull public SubtitleLine getSubtitleLine() { return subtitleLine; }
     @NonNull public SubtitleLineSettings getSubtitleLineSettings() { return subtitleLineSettings; }
     public int getBackgroundDrawable() { return backgroundDrawable; }
 
