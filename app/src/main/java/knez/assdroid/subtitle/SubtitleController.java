@@ -99,14 +99,10 @@ public class SubtitleController extends AbstractRepo {
         }
 
         // TODO: vidi kakve izuzetke baca ovaj pa hendlaj; ali tek nakon sto prodjes kroz logiku parsera detaljno
-		try {
 			SubtitleContent subtitleContent = subtitleParser.parseSubtitle(fileContent);
-			// TODO pa mu ubaci content u file
-		} catch (ParsiranjeException e) {
-			e.printStackTrace();
-			// TODO u staroj implementaciji si cisto kreirao novi fajl, ali ovde ne moras nista
-            // posto taman nisi nista izmenio dok nisi uspesno ucitao fajl, cisto javi nazad callbackom
-		}
+        // TODO pa mu ubaci content u file
+        // TODO u staroj implementaciji si cisto kreirao novi fajl, ali ovde ne moras nista
+        // posto taman nisi nista izmenio dok nisi uspesno ucitao fajl, cisto javi nazad callbackom
 
 //		ocistiBazu(); // TODO zameni sve stare podatke novim
         // TODO: javi klijentu na main threadu da je ucitan fajl... samo ne znam sta/kako da mu prosledis... sve?
@@ -222,20 +218,15 @@ public class SubtitleController extends AbstractRepo {
 //		baza.setLockingEnabled(true);
 	}
 //	@Override
-	public void ucitaniRedoviStila(List<RedStila> redovi) {
-		for(RedStila red : redovi)
-			ubaciRedStilaUBazu(red);
-	}
+//	public void ucitaniRedoviStila(List<RedStila> redovi) {
+//		for(RedStila red : redovi)
+//			ubaciRedStilaUBazu(red);
+//	}
 //	@Override
-	public void ucitaniRedoviZaglavlja(List<RedZaglavlja> redovi) {
-		for(RedZaglavlja red : redovi)
-			ubaciRedZaglavljaUBazu(red);
-	}
-//	@Override
-	public void zavrsenoParsiranje(boolean problemi, String warnString) {
-		if(problemi)
-			Log.d("UPOZORENJE", warnString); //TODO poslati neki warn korisniku
-	}
+//	public void ucitaniRedoviZaglavlja(List<RedZaglavlja> redovi) {
+//		for(RedZaglavlja red : redovi)
+//			ubaciRedZaglavljaUBazu(red);
+//	}
 
 
 	// --------------------------------------------------------------------------------------------------------- SQL
@@ -250,13 +241,13 @@ public class SubtitleController extends AbstractRepo {
 //		baza.insert(SubtitleLine.IME_TABELE, null, red.dajVrednostiZaBazu());
 	}
 
-	private void ubaciRedStilaUBazu(RedStila red) {
+//	private void ubaciRedStilaUBazu(RedStila red) {
 //		baza.insert(RedStila.IME_TABELE, null, red.dajVrednostiZaBazu());
-	}
+//	}
 
-	private void ubaciRedZaglavljaUBazu(RedZaglavlja red) {
+//	private void ubaciRedZaglavljaUBazu(RedZaglavlja red) {
 //		baza.insert(RedZaglavlja.IME_TABELE, null, red.dajVrednostiZaBazu());
-	}
+//	}
 	
 	public void updateRedPrevoda(SubtitleLine red) {
 //		baza.update(SubtitleLine.IME_TABELE, red.dajVrednostiZaBazu(), SubtitleLine.K_ID + "=" + red.id, null);

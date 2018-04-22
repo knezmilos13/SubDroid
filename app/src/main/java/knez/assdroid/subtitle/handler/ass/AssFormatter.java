@@ -3,14 +3,8 @@ package knez.assdroid.subtitle.handler.ass;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.List;
 
-import knez.assdroid.subtitle.data.SubtitleLine;
-import knez.assdroid.subtitle.RedStila;
-import knez.assdroid.subtitle.RedZaglavlja;
 import knez.assdroid.subtitle.handler.SubtitleFormatter;
 
 public class AssFormatter implements SubtitleFormatter {

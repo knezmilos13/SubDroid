@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import knez.assdroid.subtitle.ParsiranjeException;
+import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.SubtitleParser;
@@ -34,7 +34,7 @@ public class AssParser implements SubtitleParser {
 	}
 
     @Override @NonNull
-    public SubtitleContent parseSubtitle(@NonNull List<String> subtitleLines) throws ParsiranjeException {
+    public SubtitleContent parseSubtitle(@NonNull List<String> subtitleLines) {
 		SubtitleContent subtitleContent = new SubtitleContent();
 		Section currentSection = null;
 		List<String> currentSectionLines = new ArrayList<>();
@@ -89,6 +89,7 @@ public class AssParser implements SubtitleParser {
                                 @NonNull SubtitleContent subtitleContent) {
         switch (currentSection) {
             case SUBTITLE_LINES:
+                // TODO sta ces sa errorima koje vraca
                 parseSubtitleLines(currentSectionLines, subtitleContent);
                 break;
             case SCRIPT_INFO:
@@ -166,28 +167,43 @@ public class AssParser implements SubtitleParser {
     }
 
 
-    // TODO: posebna klasa? za linije samo... a posle za druge stvari ako treba
     // ---------------------------------------------------------------------- SUBTITLE LINES PARSING
 
-    private void parseSubtitleLines(
+    private List<ParsingError> parseSubtitleLines(
             @NonNull List<String> sectionLines, @NonNull SubtitleContent subtitleContent) {
 
+        List<ParsingError> parsingErrors = new ArrayList<>();
+
 	    if(sectionLines.size() == 0) {
-	        // TODO: javi problem - missing subtitle content ili stagod
-            return;
+	        parsingErrors.add(new ParsingError(
+	                ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                    ParsingError.ErrorLevel.SECTION_INVALID,
+                    ParsingError.ErrorType.MISSING_SECTION_CONTENT));
+            return parsingErrors;
         }
 
         // First line in subtitle (events) section must be Format. This line defines the format of
         // the following subtitle lines.
         if(!sectionLines.get(0).startsWith(LINE_SUBTITLE_LINES_FORMAT)) {
-	        // TODO: javi problem - nedostaje format linija koja po specifikaciji mora biti prva
-//            dodajProblemNedostajucFormatPrevoda();
-            return;
+            parsingErrors.add(new ParsingError(
+                    ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                    ParsingError.ErrorLevel.SECTION_INVALID,
+                    ParsingError.ErrorType.INVALID_FORMAT));
+            return parsingErrors;
         }
 
+        // Text, start and end are the required elements. If any of them is missing from the format
+        // specification, give up, since that means we are not capable of producing a working subtitle
         Map<String, Integer> formatIndexes = getSubtitleContentIndexes(sectionLines.get(0));
-	    // TODO: vidi ako nema bar text, start i end, onda imas neispravan titl
-        // takodje ako tekst nije zadnji (mora biti po specifikaciji)
+	    if(!formatIndexes.containsKey(TAG_SUBTITLE_FORMAT_TEXT)
+                || !formatIndexes.containsKey(TAG_SUBTITLE_FORMAT_START)
+                || !formatIndexes.containsKey(TAG_SUBTITLE_FORMAT_END)) {
+            parsingErrors.add(new ParsingError(
+                    ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                    ParsingError.ErrorLevel.SECTION_INVALID,
+                    ParsingError.ErrorType.INVALID_FORMAT));
+            return parsingErrors;
+        }
 
         sectionLines.remove(0);
 
@@ -198,6 +214,7 @@ public class AssParser implements SubtitleParser {
         for(String line : sectionLines) {
             subtitleLineBuilder.reset();
 
+            // TODO video, itd - neke specijalne linije. ako mozes da ih izignorises recimo
             if (line.startsWith(LINE_SUBTITLE_LINES_COMMENT)) {
                 subtitleLineBuilder.setIsComment(Boolean.TRUE);
                 line = line.substring(LINE_SUBTITLE_LINES_COMMENT.length()).trim();
@@ -319,78 +336,10 @@ public class AssParser implements SubtitleParser {
 
             subtitleLines.add(subtitleLineBuilder.build());
         }
+
+//        subtitleContent. // TODO set subtitle lines
+
+        return parsingErrors;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-//    private RedZaglavlja parsirajZaglavlje(String linija) {
-//        return new RedZaglavlja(linija);
-//    }
-//
-//	private RedStila parsirajStil(String linija) {
-//		return new RedStila(linija); //TODO: ne radis nista sa linijom koja odredjuje format
-//	}
-//
-//	private void javiZavrsenoParsiranje() {
-//		if(mapaProblema.size() != 0) {
-//			Resources r = context.getResources();
-//			if(mapaProblema.get(PROB_FORMAT_PREVODA) != null) {
-//				warnString = r.getString(R.string.parsiranje_fail_nema_prevod_format_linije);
-//			}
-//			Integer broj = (Integer) mapaProblema.get(PROB_NEPOZNAT_RED_PREVODA);
-//			if(broj != null) {
-//				warnString += (warnString.length() > 0? "\n" : "")
-//						+ r.getString(R.string.parsiranje_fail_problem_nepoznat_red_prevoda, broj);
-//			}
-//			@SuppressWarnings("unchecked")
-//			List<Integer> puknuti = (List<Integer>) mapaProblema.get(PROB_PARSIRANJE_PREVODA);
-//			if(puknuti != null) {
-//				StringBuilder spakovan = new StringBuilder();
-//				for(Integer b : puknuti)
-//					spakovan.append(b).append(",");
-//				spakovan.deleteCharAt(spakovan.length()-1);
-//				warnString += (warnString.length() > 0? "\n" : "")
-//						+ r.getString(R.string.parsiranje_fail_problem_red_prevoda, spakovan);
-//			}
-//		}
-//		kolbek.zavrsenoParsiranje(mapaProblema.size() != 0, warnString);
-//	}
-	
-	// --------------------------------------- Problemi
-	
-	/** U mapu problema ovog parsera dodaje novi zapis o problemu sa parsiranjem redova. */
-//	private void dodajProblemParsiranjePrevoda(int lineNumber) {
-//		List<Integer> puknuti = (List<Integer>) mapaProblema.get(PROB_PARSIRANJE_PREVODA);
-//		if(puknuti == null) {
-//			puknuti = new ArrayList<>();
-//			mapaProblema.put(PROB_PARSIRANJE_PREVODA, puknuti);
-//		}
-//		puknuti.add(lineNumber);
-//	}
-	
-//	/** U mapu problema ovog parsera dodaje novi zapis o nedostajucem redu sa formatom prevoda. */
-//	private void dodajProblemNedostajucFormatPrevoda() {
-//		mapaProblema.put(PROB_FORMAT_PREVODA, new Object());
-//	}
-	
-//	private void dodajProblemNepoznatRedPrevoda() {
-//		int brojNepoznatih = (Integer) mapaProblema.get(PROB_NEPOZNAT_RED_PREVODA, 0);
-//		mapaProblema.put(PROB_NEPOZNAT_RED_PREVODA, ++brojNepoznatih);
-//	}
 
 }
