@@ -1,6 +1,7 @@
 package knez.assdroid.subtitle.handler.ass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,45 +126,37 @@ public class AssParser implements SubtitleParser {
         String tags[] = lineContent.split(",");
         for(int i = 0; i < tags.length; i++) tags[i] = tags[i].trim();
 
-        int indexEffect = findTagIndex(TAG_SUBTITLE_FORMAT_EFFECT, tags);
-        if(indexEffect != -1) indexMap.put(TAG_SUBTITLE_FORMAT_EFFECT, indexEffect);
+        int indexEffect = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_EFFECT);
+        if(indexEffect > -1) indexMap.put(TAG_SUBTITLE_FORMAT_EFFECT, indexEffect);
 
-        int indexEnd = findTagIndex(TAG_SUBTITLE_FORMAT_END, tags);
-        if(indexEnd != -1) indexMap.put(TAG_SUBTITLE_FORMAT_END, indexEnd);
+        int indexEnd = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_END);
+        if(indexEnd > -1) indexMap.put(TAG_SUBTITLE_FORMAT_END, indexEnd);
 
-        int indexLayer = findTagIndex(TAG_SUBTITLE_FORMAT_LAYER, tags);
-        if(indexLayer != -1) indexMap.put(TAG_SUBTITLE_FORMAT_LAYER, indexLayer);
+        int indexLayer = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_LAYER);
+        if(indexLayer > -1) indexMap.put(TAG_SUBTITLE_FORMAT_LAYER, indexLayer);
 
-        int indexMarginL = findTagIndex(TAG_SUBTITLE_FORMAT_MARGIN_L, tags);
-        if(indexMarginL != -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_L, indexMarginL);
+        int indexMarginL = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_MARGIN_L);
+        if(indexMarginL > -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_L, indexMarginL);
 
-        int indexMarginR = findTagIndex(TAG_SUBTITLE_FORMAT_MARGIN_R, tags);
-        if(indexMarginR != -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_R, indexMarginR);
+        int indexMarginR = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_MARGIN_R);
+        if(indexMarginR > -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_R, indexMarginR);
 
-        int indexMarginV = findTagIndex(TAG_SUBTITLE_FORMAT_MARGIN_V, tags);
-        if(indexMarginV != -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_V, indexMarginV);
+        int indexMarginV = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_MARGIN_V);
+        if(indexMarginV > -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_V, indexMarginV);
 
-        int indexName = findTagIndex(TAG_SUBTITLE_FORMAT_NAME, tags);
-        if(indexName != -1) indexMap.put(TAG_SUBTITLE_FORMAT_NAME, indexName);
+        int indexName = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_NAME);
+        if(indexName > -1) indexMap.put(TAG_SUBTITLE_FORMAT_NAME, indexName);
 
-        int indexStart = findTagIndex(TAG_SUBTITLE_FORMAT_START, tags);
-        if(indexStart != -1) indexMap.put(TAG_SUBTITLE_FORMAT_START, indexStart);
+        int indexStart = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_START);
+        if(indexStart > -1) indexMap.put(TAG_SUBTITLE_FORMAT_START, indexStart);
 
-        int indexStyle = findTagIndex(TAG_SUBTITLE_FORMAT_STYLE, tags);
-        if(indexStyle != -1) indexMap.put(TAG_SUBTITLE_FORMAT_STYLE, indexStyle);
+        int indexStyle = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_STYLE);
+        if(indexStyle > -1) indexMap.put(TAG_SUBTITLE_FORMAT_STYLE, indexStyle);
 
-        int indexText = findTagIndex(TAG_SUBTITLE_FORMAT_TEXT, tags);
-        if(indexText != -1) indexMap.put(TAG_SUBTITLE_FORMAT_TEXT, indexText);
+        int indexText = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_TEXT);
+        if(indexText > -1) indexMap.put(TAG_SUBTITLE_FORMAT_TEXT, indexText);
 
         return indexMap;
-    }
-
-    /** Returns index of the given String in the String array. */
-    private int findTagIndex(String ovaj, String elementi[]) {
-//        TODO probaj bez ove metode, nego koristi Arrays.binarySearch()
-        for(int i = 0; i < elementi.length; i++)
-            if(elementi[i].equals(ovaj)) return i;
-        return -1;
     }
 
 
