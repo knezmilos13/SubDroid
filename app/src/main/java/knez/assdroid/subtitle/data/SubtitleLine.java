@@ -5,36 +5,41 @@ import android.support.annotation.Nullable;
 
 import org.threeten.bp.LocalTime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SubtitleLine {
 
     private final Integer id = null; // TODO sta je ovo
-	private final int lineNumber;
-	@Nullable private final Integer layer;
-	@Nullable private final Integer marginL;
-	@Nullable private final Integer marginV;
-	@Nullable private final Integer marginR;
+    private final int lineNumber;
+    @Nullable private final Integer layer;
+    @Nullable private final Integer marginL;
+    @Nullable private final Integer marginV;
+    @Nullable private final Integer marginR;
     @NonNull private final LocalTime start;
     @NonNull private final LocalTime end;
-	@Nullable private final String style;
-	@Nullable private final String actorName;
-	@Nullable private final String effect;
-	@NonNull private final String text;
-	@Nullable private final Boolean isComment;
+    @Nullable private final String style;
+    @Nullable private final String actorName;
+    @Nullable private final String effect;
+    @NonNull private final String text;
+    @Nullable private final Boolean isComment;
+	@NonNull private final List<String> tags;
 
 	private SubtitleLine(@NonNull Builder builder) {
-		lineNumber = builder.lineNumber;
-		layer = builder.layer;
+        lineNumber = builder.lineNumber;
+        layer = builder.layer;
         marginL = builder.marginL;
-		marginV = builder.marginV;
-		marginR = builder.marginR;
-		start = builder.start;
-		end = builder.end;
-		style = builder.style;
-		actorName = builder.actorName;
-		effect = builder.effect;
-		text = builder.text;
-		isComment = builder.isComment;
-	}
+        marginV = builder.marginV;
+        marginR = builder.marginR;
+        start = builder.start;
+        end = builder.end;
+        style = builder.style;
+        actorName = builder.actorName;
+        effect = builder.effect;
+        text = builder.text;
+        isComment = builder.isComment;
+        tags = builder.tags;
+    }
 
     public Integer getId() { return id; }
     public int getLineNumber() { return lineNumber; }
@@ -49,33 +54,35 @@ public class SubtitleLine {
     @Nullable public String getEffect() { return effect; }
     @NonNull public String getText() { return text; }
     @Nullable public Boolean getComment() { return isComment; }
+	@NonNull public List<String> getTags() { return tags; }
 
 
-    // ------------------------------------------------------------------------------------- BUILDER
+	// ------------------------------------------------------------------------------------- BUILDER
 
-	@SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings("UnusedReturnValue")
     public static final class Builder {
 
-	    // Required elements
-		private int lineNumber;
+        // Required elements
+        private int lineNumber;
         private String text;
         private LocalTime start;
         private LocalTime end;
 
-		@Nullable private Integer layer;
-		@Nullable private Integer marginL;
-		@Nullable private Integer marginV;
-		@Nullable private Integer marginR;
-		@Nullable private String style;
-		@Nullable private String actorName;
-		@Nullable private String effect;
-		@Nullable private Boolean isComment;
+        @Nullable private Integer layer;
+        @Nullable private Integer marginL;
+        @Nullable private Integer marginV;
+        @Nullable private Integer marginR;
+        @Nullable private String style;
+        @Nullable private String actorName;
+        @Nullable private String effect;
+        @Nullable private Boolean isComment;
+        @NonNull private final List<String> tags = new ArrayList<>();
 
-		public Builder() {}
+        public Builder() {}
 
-		public void reset() {
-		    lineNumber = 0;
-		    layer = null;
+        public void reset() {
+            lineNumber = 0;
+            layer = null;
             marginL = null;
             marginV = null;
             marginR = null;
@@ -85,25 +92,27 @@ public class SubtitleLine {
             effect = null;
             text = null;
             isComment = null;
+            tags.clear();
         }
 
-		public Builder setLineNumber(int val) { lineNumber = val; return this; }
-		public Builder setLayer(@Nullable Integer val) { layer = val; return this; }
-		public Builder setMarginL(@Nullable Integer val) { marginL = val; return this; }
-		public Builder setMarginV(@Nullable Integer val) { marginV = val; return this; }
-		public Builder setMarginR(@Nullable Integer val) { marginR = val; return this; }
-		public Builder setStart(@Nullable LocalTime val) { start = val; return this; }
-		public Builder setEnd(@Nullable LocalTime val) { end = val; return this; }
-		public Builder setStyle(@Nullable String val) { style = val; return this; }
-		public Builder setActorName(@Nullable String val) { actorName = val; return this; }
-		public Builder setEffect(@Nullable String val) { effect = val; return this; }
-		public Builder setText(@Nullable String val) { text = val; return this; }
-		public Builder setIsComment(@Nullable Boolean val) { isComment = val; return this; }
+        public Builder setLineNumber(int val) { lineNumber = val; return this; }
+        public Builder setLayer(@Nullable Integer val) { layer = val; return this; }
+        public Builder setMarginL(@Nullable Integer val) { marginL = val; return this; }
+        public Builder setMarginV(@Nullable Integer val) { marginV = val; return this; }
+        public Builder setMarginR(@Nullable Integer val) { marginR = val; return this; }
+        public Builder setStart(@Nullable LocalTime val) { start = val; return this; }
+        public Builder setEnd(@Nullable LocalTime val) { end = val; return this; }
+        public Builder setStyle(@Nullable String val) { style = val; return this; }
+        public Builder setActorName(@Nullable String val) { actorName = val; return this; }
+        public Builder setEffect(@Nullable String val) { effect = val; return this; }
+        public Builder setText(@Nullable String val) { text = val; return this; }
+        public Builder setIsComment(@Nullable Boolean val) { isComment = val; return this; }
+        public Builder addTag(@NonNull String tag) { tags.add(tag); return this; }
 
-		public SubtitleLine build() {
-			return new SubtitleLine(this);
-		}
-	}
+        public SubtitleLine build() {
+            return new SubtitleLine(this);
+        }
+    }
 
 
 //	public ContentValues dajVrednostiZaBazu() {
@@ -152,8 +161,8 @@ public class SubtitleLine {
 //			+ K_EFFECT + " TEXT,"
 //			+ K_TEXT + " TEXT,"
 //			+ K_KOMENTAR + " INTEGER DEFAULT 0);";
-	
-	
+
+
 //	public static SubtitleLine kreirajIzKursora(Cursor kurs) {
 //		if(!indeksiSetovani) setujIndekse(kurs);
 //		SubtitleLine red = new SubtitleLine();

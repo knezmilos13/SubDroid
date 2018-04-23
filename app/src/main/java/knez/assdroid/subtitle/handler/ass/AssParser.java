@@ -22,8 +22,6 @@ import static knez.assdroid.subtitle.handler.ass.FormatConstants.*;
 public class AssParser implements SubtitleParser {
 
     @NonNull private final DateTimeFormatter timeFormatter;
-    // TODO: neka logika na kraju da li se dobro ucitalo ili ti neko potuiro neispravan fajl
-    // tipa ako nema subtitle odeljak ili je prazan
 
 	public AssParser() {
 	    this.timeFormatter = DateTimeFormatter.ofPattern("H:mm:ss.SS");
@@ -205,6 +203,22 @@ public class AssParser implements SubtitleParser {
                 subtitleLineBuilder.setIsComment(Boolean.FALSE);
                 line = line.substring(LINE_SUBTITLE_LINES_DIALOGUE.length()).trim();
             }
+            else if(line.startsWith(LINE_SUBTITLE_LINES_PICTURE)) {
+                subtitleLineBuilder.addTag(LINE_SUBTITLE_LINES_PICTURE);
+                line = line.substring(LINE_SUBTITLE_LINES_PICTURE.length()).trim();
+            }
+            else if(line.startsWith(LINE_SUBTITLE_LINES_SOUND)) {
+                subtitleLineBuilder.addTag(LINE_SUBTITLE_LINES_SOUND);
+                line = line.substring(LINE_SUBTITLE_LINES_SOUND.length()).trim();
+            }
+            else if(line.startsWith(LINE_SUBTITLE_LINES_MOVIE)) {
+                subtitleLineBuilder.addTag(LINE_SUBTITLE_LINES_MOVIE);
+                line = line.substring(LINE_SUBTITLE_LINES_MOVIE.length()).trim();
+            }
+            else if(line.startsWith(LINE_SUBTITLE_LINES_COMMAND)) {
+                subtitleLineBuilder.addTag(LINE_SUBTITLE_LINES_COMMAND);
+                line = line.substring(LINE_SUBTITLE_LINES_COMMAND.length()).trim();
+            }
             else {
                 parsingErrors.add(new ParsingError(
                         ParsingError.ErrorLocation.SUBTITLE_SECTION,
@@ -346,7 +360,7 @@ public class AssParser implements SubtitleParser {
             subtitleLines.add(subtitleLineBuilder.build());
         }
 
-//        subtitleContent. // TODO set subtitle lines
+        subtitleContent.setSubtitleLines(subtitleLines);
 
         return parsingErrors;
 	}

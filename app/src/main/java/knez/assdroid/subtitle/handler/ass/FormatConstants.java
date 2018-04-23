@@ -13,6 +13,10 @@ public interface FormatConstants {
     String LINE_SUBTITLE_LINES_FORMAT = "Format:";
     String LINE_SUBTITLE_LINES_COMMENT = "Comment:";
     String LINE_SUBTITLE_LINES_DIALOGUE = "Dialogue:";
+    String LINE_SUBTITLE_LINES_PICTURE = "Picture:";
+    String LINE_SUBTITLE_LINES_MOVIE = "Movie:";
+    String LINE_SUBTITLE_LINES_SOUND = "Sound:";
+    String LINE_SUBTITLE_LINES_COMMAND = "Command:";
 
     String TAG_SUBTITLE_FORMAT_LAYER = "Layer";
     String TAG_SUBTITLE_FORMAT_START = "Start";
