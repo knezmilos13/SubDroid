@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import knez.assdroid.subtitle.data.ParsingError;
+import knez.assdroid.subtitle.data.RawLinesSection;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.SubtitleParser;
+import solid.collections.Pair;
 
 import android.support.annotation.NonNull;
 
@@ -33,12 +35,14 @@ public class AssParser implements SubtitleParser {
 	}
 
     @Override @NonNull
-    public SubtitleContent parseSubtitle(@NonNull List<String> subtitleLines) {
-		SubtitleContent subtitleContent = new SubtitleContent();
+    public Pair<SubtitleContent, List<ParsingError>> parseSubtitle(@NonNull List<String> fileLines) {
+	    // ----- First: split all file lines into different sections
+
 		Section currentSection = null;
 		List<String> currentSectionLines = new ArrayList<>();
+		Map<Section, List<String>> allSections = new HashMap<>();
 
-        for(String line : subtitleLines) {
+        for(String line : fileLines) {
             line = line.trim();
 
             // simplify - remove empty & comment lines
@@ -46,7 +50,7 @@ public class AssParser implements SubtitleParser {
 
             if(line.startsWith("[")) {
                 if(currentSection != null)
-                    processSection(currentSection, currentSectionLines, subtitleContent);
+                    allSections.put(currentSection, currentSectionLines);
 
                 currentSection = determineSection(line);
                 currentSectionLines.clear();
@@ -57,9 +61,59 @@ public class AssParser implements SubtitleParser {
         }
 
         if(currentSection != null)
-            processSection(currentSection, currentSectionLines, subtitleContent);
+            allSections.put(currentSection, currentSectionLines);
 
-        return subtitleContent;
+
+        // ----- Parse each section in its own specific way
+
+        List<ParsingError> allParsingErrors = new ArrayList<>();
+        List<SubtitleLine> subtitleLines = new ArrayList<>();
+        List<RawLinesSection> rawLinesSections = new ArrayList<>();
+
+        if(!allSections.containsKey(Section.SUBTITLE_LINES)) {
+            allParsingErrors.add(new ParsingError(
+                    ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                    ParsingError.ErrorLevel.SECTION_INVALID));
+        } else {
+            Pair<List<SubtitleLine>, List<ParsingError>> parsingResult =
+                    parseSubtitleLines(allSections.get(Section.SUBTITLE_LINES));
+            subtitleLines.addAll(parsingResult.first);
+            allParsingErrors.addAll(parsingResult.second);
+        }
+
+        if(!allSections.containsKey(Section.SCRIPT_INFO)) {
+            // We can work without this section, but still best report that something is wrong
+            allParsingErrors.add(new ParsingError(
+                    ParsingError.ErrorLocation.NON_SUBTITLE_SECTION,
+                    ParsingError.ErrorLevel.SECTION_INVALID));
+        } else {
+            rawLinesSections.add(new RawLinesSection(
+                    allSections.get(Section.SCRIPT_INFO), Section.SCRIPT_INFO.toString()));
+        }
+
+        if(!allSections.containsKey(Section.STYLES)) {
+            // We can work without this section, but still best report that something is wrong
+            allParsingErrors.add(new ParsingError(
+                    ParsingError.ErrorLocation.NON_SUBTITLE_SECTION,
+                    ParsingError.ErrorLevel.SECTION_INVALID));
+        } else {
+            rawLinesSections.add(new RawLinesSection(
+                    allSections.get(Section.STYLES), Section.STYLES.toString()));
+        }
+
+        if(allSections.containsKey(Section.FONTS))
+            rawLinesSections.add(new RawLinesSection(
+                    allSections.get(Section.FONTS), Section.FONTS.toString()));
+
+        if(allSections.containsKey(Section.GRAPHICS))
+            rawLinesSections.add(new RawLinesSection(
+                    allSections.get(Section.GRAPHICS), Section.GRAPHICS.toString()));
+
+        if(allSections.containsKey(Section.UNKNOWN))
+            rawLinesSections.add(new RawLinesSection(
+                    allSections.get(Section.UNKNOWN), Section.UNKNOWN.toString()));
+
+        return new Pair<>(new SubtitleContent(subtitleLines, rawLinesSections), allParsingErrors);
     }
 
 
@@ -81,37 +135,6 @@ public class AssParser implements SubtitleParser {
             return Section.GRAPHICS;
         else
             return Section.UNKNOWN;
-    }
-
-    private void processSection(@NonNull Section currentSection,
-                                @NonNull List<String> currentSectionLines,
-                                @NonNull SubtitleContent subtitleContent) {
-        switch (currentSection) {
-            case SUBTITLE_LINES:
-                // TODO sta ces sa errorima koje vraca
-                parseSubtitleLines(currentSectionLines, subtitleContent);
-                break;
-            case SCRIPT_INFO:
-//                    return parsirajZaglavlje(linija);
-                // TODO
-                break;
-            case STYLES:
-//                    return parsirajStil(linija);
-                // TODO
-                break;
-            case UNKNOWN:
-                // TODO
-                break;
-            case FONTS:
-                // TODO
-                break;
-            case GRAPHICS:
-                // TODO
-                break;
-            default:
-                // TODO
-                break;
-        }
     }
 
     /**
@@ -160,39 +183,41 @@ public class AssParser implements SubtitleParser {
 
     // ---------------------------------------------------------------------- SUBTITLE LINES PARSING
 
-    private List<ParsingError> parseSubtitleLines(
-            @NonNull List<String> sectionLines, @NonNull SubtitleContent subtitleContent) {
+    private Pair<List<SubtitleLine>, List<ParsingError>> parseSubtitleLines(
+            @NonNull List<String> rawLines) {
 
         List<ParsingError> parsingErrors = new ArrayList<>();
+        List<SubtitleLine> subtitleLines = new ArrayList<>();
+        Pair<List<SubtitleLine>, List<ParsingError>> result =
+                new Pair<>(subtitleLines, parsingErrors);
 
         // First line in subtitle (events) section must be Format. This line defines the format of
         // the following subtitle lines.
-        if(sectionLines.size() == 0 || !sectionLines.get(0).startsWith(LINE_SUBTITLE_LINES_FORMAT)) {
+        if(rawLines.size() == 0 || !rawLines.get(0).startsWith(LINE_SUBTITLE_LINES_FORMAT)) {
             parsingErrors.add(new ParsingError(
                     ParsingError.ErrorLocation.SUBTITLE_SECTION,
                     ParsingError.ErrorLevel.SECTION_INVALID));
-            return parsingErrors;
+            return result;
         }
 
         // Text, start and end are the required elements. If any of them is missing from the format
         // specification, give up, since that means we are not capable of producing a working subtitle
-        Map<String, Integer> formatIndexes = getSubtitleContentIndexes(sectionLines.get(0));
+        Map<String, Integer> formatIndexes = getSubtitleContentIndexes(rawLines.get(0));
 	    if(!formatIndexes.containsKey(TAG_SUBTITLE_FORMAT_TEXT)
                 || !formatIndexes.containsKey(TAG_SUBTITLE_FORMAT_START)
                 || !formatIndexes.containsKey(TAG_SUBTITLE_FORMAT_END)) {
             parsingErrors.add(new ParsingError(
                     ParsingError.ErrorLocation.SUBTITLE_SECTION,
                     ParsingError.ErrorLevel.SECTION_INVALID));
-            return parsingErrors;
+            return result;
         }
 
-        sectionLines.remove(0);
+        rawLines.remove(0);
 
 
-        List<SubtitleLine> subtitleLines = new ArrayList<>();
         SubtitleLine.Builder subtitleLineBuilder = new SubtitleLine.Builder();
 
-        for(String line : sectionLines) {
+        for(String line : rawLines) {
             subtitleLineBuilder.reset();
 
             if (line.startsWith(LINE_SUBTITLE_LINES_COMMENT)) {
@@ -360,9 +385,7 @@ public class AssParser implements SubtitleParser {
             subtitleLines.add(subtitleLineBuilder.build());
         }
 
-        subtitleContent.setSubtitleLines(subtitleLines);
-
-        return parsingErrors;
+        return result;
 	}
 
 }
