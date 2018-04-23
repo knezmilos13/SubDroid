@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import knez.assdroid.common.AbstractRepo;
+import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.SubtitleContent;
@@ -15,6 +16,7 @@ import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
 import knez.assdroid.subtitle.handler.SubtitleParser;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
+import solid.collections.Pair;
 import timber.log.Timber;
 
 import android.database.Cursor;
@@ -98,8 +100,8 @@ public class SubtitleController extends AbstractRepo {
             return;
         }
 
-        // TODO: vidi kakve izuzetke baca ovaj pa hendlaj; ali tek nakon sto prodjes kroz logiku parsera detaljno
-			SubtitleContent subtitleContent = subtitleParser.parseSubtitle(fileContent);
+		Pair<SubtitleContent, List<ParsingError>> result = subtitleParser.parseSubtitle(fileContent);
+		// TODO: vidi kakve parsing errore je vratio, to raportiraj korisniku sve... mozda cak da bira sta ce?
         // TODO pa mu ubaci content u file
         // TODO u staroj implementaciji si cisto kreirao novi fajl, ali ovde ne moras nista
         // posto taman nisi nista izmenio dok nisi uspesno ucitao fajl, cisto javi nazad callbackom
