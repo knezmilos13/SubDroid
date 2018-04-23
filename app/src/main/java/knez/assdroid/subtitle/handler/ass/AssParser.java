@@ -167,21 +167,12 @@ public class AssParser implements SubtitleParser {
 
         List<ParsingError> parsingErrors = new ArrayList<>();
 
-	    if(sectionLines.size() == 0) {
-	        parsingErrors.add(new ParsingError(
-	                ParsingError.ErrorLocation.SUBTITLE_SECTION,
-                    ParsingError.ErrorLevel.SECTION_INVALID,
-                    ParsingError.ErrorType.MISSING_SECTION_CONTENT));
-            return parsingErrors;
-        }
-
         // First line in subtitle (events) section must be Format. This line defines the format of
         // the following subtitle lines.
-        if(!sectionLines.get(0).startsWith(LINE_SUBTITLE_LINES_FORMAT)) {
+        if(sectionLines.size() == 0 || !sectionLines.get(0).startsWith(LINE_SUBTITLE_LINES_FORMAT)) {
             parsingErrors.add(new ParsingError(
                     ParsingError.ErrorLocation.SUBTITLE_SECTION,
-                    ParsingError.ErrorLevel.SECTION_INVALID,
-                    ParsingError.ErrorType.INVALID_FORMAT));
+                    ParsingError.ErrorLevel.SECTION_INVALID));
             return parsingErrors;
         }
 
@@ -193,8 +184,7 @@ public class AssParser implements SubtitleParser {
                 || !formatIndexes.containsKey(TAG_SUBTITLE_FORMAT_END)) {
             parsingErrors.add(new ParsingError(
                     ParsingError.ErrorLocation.SUBTITLE_SECTION,
-                    ParsingError.ErrorLevel.SECTION_INVALID,
-                    ParsingError.ErrorType.INVALID_FORMAT));
+                    ParsingError.ErrorLevel.SECTION_INVALID));
             return parsingErrors;
         }
 
@@ -207,16 +197,19 @@ public class AssParser implements SubtitleParser {
         for(String line : sectionLines) {
             subtitleLineBuilder.reset();
 
-            // TODO video, itd - neke specijalne linije. ako mozes da ih izignorises recimo
             if (line.startsWith(LINE_SUBTITLE_LINES_COMMENT)) {
                 subtitleLineBuilder.setIsComment(Boolean.TRUE);
                 line = line.substring(LINE_SUBTITLE_LINES_COMMENT.length()).trim();
-            } else if (line.startsWith(LINE_SUBTITLE_LINES_DIALOGUE)) {
+            }
+            else if (line.startsWith(LINE_SUBTITLE_LINES_DIALOGUE)) {
                 subtitleLineBuilder.setIsComment(Boolean.FALSE);
                 line = line.substring(LINE_SUBTITLE_LINES_DIALOGUE.length()).trim();
-            } else {
-                // TODO: oznaci da si imao skroz nepoznatu liniju prevoda
-//                dodajProblemNepoznatRedPrevoda();
+            }
+            else {
+                parsingErrors.add(new ParsingError(
+                        ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                        ParsingError.ErrorLevel.LINE_INVALID,
+                        line));
                 continue;
             }
 
@@ -235,9 +228,14 @@ public class AssParser implements SubtitleParser {
                 }
             }
 
-            // ako nedostaje deo linije - dopuni praznim parcicima TODO kako je ovo moguce bre; ajde defanzivno jedino
-//            while (lineParts.size() < odeljakaPrevoda)
-//                lineParts.add("");
+            // A part of line is missing. Skip the line.
+            if(lineParts.size() < formatIndexes.size()) {
+                parsingErrors.add(new ParsingError(
+                        ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                        ParsingError.ErrorLevel.LINE_INVALID,
+                        line));
+                continue;
+            }
 
 
             // ---------- Required elements
@@ -250,7 +248,10 @@ public class AssParser implements SubtitleParser {
                 subtitleLineBuilder.setStart(
                         LocalTime.parse(lineParts.get(formatIndexes.get(TAG_SUBTITLE_FORMAT_START)), timeFormatter));
             } catch (Exception ex) {
-                // TODO: notify that the whole line is unusable because of this
+                parsingErrors.add(new ParsingError(
+                        ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                        ParsingError.ErrorLevel.LINE_INVALID,
+                        line));
                 continue;
             }
 
@@ -258,7 +259,10 @@ public class AssParser implements SubtitleParser {
                 subtitleLineBuilder.setEnd(
                         LocalTime.parse(lineParts.get(formatIndexes.get(TAG_SUBTITLE_FORMAT_END)), timeFormatter));
             } catch (Exception ex) {
-                // TODO: notify that the whole line is unusable because of this
+                parsingErrors.add(new ParsingError(
+                        ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                        ParsingError.ErrorLevel.LINE_INVALID,
+                        line));
                 continue;
             }
 
@@ -277,7 +281,10 @@ public class AssParser implements SubtitleParser {
                     layer = Integer.parseInt(
                             lineParts.get(formatIndexes.get(TAG_SUBTITLE_FORMAT_LAYER)));
                 } catch (Exception ex) {
-                    // TODO: stavi u greske
+                    parsingErrors.add(new ParsingError(
+                            ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                            ParsingError.ErrorLevel.VALUE_SANITIZED,
+                            line));
                     layer = VALUE_LAYER_DEFAULT;
                 }
                 subtitleLineBuilder.setLayer(layer);
@@ -289,7 +296,10 @@ public class AssParser implements SubtitleParser {
                     marginL = Integer.parseInt(
                             lineParts.get(formatIndexes.get(TAG_SUBTITLE_FORMAT_MARGIN_L)));
                 } catch (Exception ex) {
-                    // TODO: stavi u greske
+                    parsingErrors.add(new ParsingError(
+                            ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                            ParsingError.ErrorLevel.VALUE_SANITIZED,
+                            line));
                     marginL = VALUE_MARGIN_L_DEFAULT;
                 }
                 subtitleLineBuilder.setMarginL(marginL);
@@ -301,7 +311,10 @@ public class AssParser implements SubtitleParser {
                     marginR = Integer.parseInt(
                             lineParts.get(formatIndexes.get(TAG_SUBTITLE_FORMAT_MARGIN_R)));
                 } catch (Exception ex) {
-                    // TODO: stavi u greske
+                    parsingErrors.add(new ParsingError(
+                            ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                            ParsingError.ErrorLevel.VALUE_SANITIZED,
+                            line));
                     marginR = VALUE_MARGIN_R_DEFAULT;
                 }
                 subtitleLineBuilder.setMarginR(marginR);
@@ -313,7 +326,10 @@ public class AssParser implements SubtitleParser {
                     marginV = Integer.parseInt(
                             lineParts.get(formatIndexes.get(TAG_SUBTITLE_FORMAT_MARGIN_V)));
                 } catch (Exception ex) {
-                    // TODO: stavi u greske
+                    parsingErrors.add(new ParsingError(
+                            ParsingError.ErrorLocation.SUBTITLE_SECTION,
+                            ParsingError.ErrorLevel.VALUE_SANITIZED,
+                            line));
                     marginV = VALUE_MARGIN_V_DEFAULT;
                 }
                 subtitleLineBuilder.setMarginV(marginV);

@@ -1,23 +1,28 @@
 package knez.assdroid.subtitle.data;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public class ParsingError {
 
     public enum ErrorLocation { SUBTITLE_SECTION, NON_SUBTITLE_SECTION }
-    public enum ErrorLevel { FILE_INVALID, SECTION_INVALID, LINE_INVALID, LINE_SANITIZED;}
-    public enum ErrorType { MISSING_SECTION_CONTENT, INVALID_FORMAT }
+    public enum ErrorLevel { FILE_INVALID, SECTION_INVALID, LINE_INVALID, VALUE_SANITIZED;}
 
     @NonNull private final ErrorLocation errorLocation;
-    @NonNull private final ErrorType errorType;
     @NonNull private final ErrorLevel errorLevel;
+    @Nullable private final String invalidData;
+
+    public ParsingError(@NonNull ErrorLocation errorLocation,
+                        @NonNull ErrorLevel errorLevel) {
+        this(errorLocation, errorLevel, null);
+    }
 
     public ParsingError(@NonNull ErrorLocation errorLocation,
                         @NonNull ErrorLevel errorLevel,
-                        @NonNull ErrorType errorType) {
+                        @Nullable String invalidData) {
         this.errorLocation = errorLocation;
         this.errorLevel = errorLevel;
-        this.errorType = errorType;
+        this.invalidData = invalidData;
     }
 
 }
