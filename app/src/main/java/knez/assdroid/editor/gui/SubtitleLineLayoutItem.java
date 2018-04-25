@@ -103,9 +103,10 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         if(subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
             prviRed.setVisibility(View.VISIBLE);
             redniBroj1.setVisibility(View.VISIBLE);
-            redniBroj1.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
-            vremeOd.setText(subtitleLineVso.getSubtitleLine().getStart().format(subtitleTimeFormatter));
-            vremeDo.setText(subtitleLineVso.getSubtitleLine().getEnd().format(subtitleTimeFormatter));
+            // TODO: implementirati bar bazican, nekonfigurabilan prikaz
+//            redniBroj1.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
+//            vremeOd.setText(subtitleLineVso.getSubtitleLine().getStart().format(subtitleTimeFormatter));
+//            vremeDo.setText(subtitleLineVso.getSubtitleLine().getEnd().format(subtitleTimeFormatter));
         }  else {
             prviRed.setVisibility(View.GONE);
             redniBroj1.setVisibility(View.GONE);
@@ -116,10 +117,10 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     private void handleStyleAndActorLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
         if(subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
             drugiRed.setVisibility(View.VISIBLE);
-            actor.setText(subtitleLineVso.getSubtitleLine().getActorName());
-            style.setText(subtitleLineVso.getSubtitleLine().getStyle());
+//            actor.setText(subtitleLineVso.getSubtitleLine().getActorName());
+//            style.setText(subtitleLineVso.getSubtitleLine().getStyle());
             if(!subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
-                redniBroj2.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
+//                redniBroj2.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
                 redniBroj2.setVisibility(View.VISIBLE);
             } else {
                 redniBroj2.setVisibility(View.GONE);
@@ -132,7 +133,7 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     /** Sredjuje prikaz reda sa tekstom - da li se prikazuju tagovi, da li se hajlajtuje neki trazeni izraz
      *  i da li se prikazuje redni broj u trecem redu (ili je vec prikazan u prvom/drugom) */
     private void handleSubtitleLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        String tekstZaPrikaz = subtitleLineVso.getSubtitleLine().getText();
+        String tekstZaPrikaz = subtitleLineVso.getText();
         if(!subtitleLineVso.getSubtitleLineSettings().isShowTagContents())
             tekstZaPrikaz = ParserHelper.izbaciTagove(tekstZaPrikaz,
                     subtitleLineVso.getSubtitleLineSettings().getTagReplacement());
@@ -146,7 +147,7 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         if(!subtitleLineVso.getSubtitleLineSettings().isShowTimings()
                 && !subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
             redniBroj3.setVisibility(View.VISIBLE);
-            redniBroj3.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
+//            redniBroj3.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
         } else {
             redniBroj3.setVisibility(View.GONE);
         }

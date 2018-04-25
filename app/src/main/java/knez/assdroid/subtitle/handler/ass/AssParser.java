@@ -45,7 +45,7 @@ public class AssParser implements SubtitleParser {
 
             if(line.startsWith("[")) {
                 if(currentSection != null)
-                    allSections.put(currentSection, currentSectionLines);
+                    allSections.put(currentSection, new ArrayList<>(currentSectionLines));
 
                 currentSection = determineSection(line);
                 currentSectionLines.clear();

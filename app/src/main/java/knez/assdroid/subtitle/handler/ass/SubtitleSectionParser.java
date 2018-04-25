@@ -237,38 +237,38 @@ public class SubtitleSectionParser {
         String lineContent = line.substring(LINE_SUBTITLE_LINES_FORMAT.length());
         Map<String, Integer> indexMap = new HashMap<>();
 
-        String tags[] = lineContent.split(",");
-        for(int i = 0; i < tags.length; i++) tags[i] = tags[i].trim();
+        List<String> tags = Arrays.asList(lineContent.split(","));
+        for(int i = 0; i < tags.size(); i++) tags.set(i, tags.get(i).trim());
 
-        int indexEffect = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_EFFECT);
-        if(indexEffect > -1) indexMap.put(TAG_SUBTITLE_FORMAT_EFFECT, indexEffect);
+        int indexEffect = tags.indexOf(TAG_SUBTITLE_FORMAT_EFFECT);
+        if(indexEffect != -1) indexMap.put(TAG_SUBTITLE_FORMAT_EFFECT, indexEffect);
 
-        int indexEnd = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_END);
-        if(indexEnd > -1) indexMap.put(TAG_SUBTITLE_FORMAT_END, indexEnd);
+        int indexEnd = tags.indexOf(TAG_SUBTITLE_FORMAT_END);
+        if(indexEnd != -1) indexMap.put(TAG_SUBTITLE_FORMAT_END, indexEnd);
 
-        int indexLayer = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_LAYER);
-        if(indexLayer > -1) indexMap.put(TAG_SUBTITLE_FORMAT_LAYER, indexLayer);
+        int indexLayer = tags.indexOf(TAG_SUBTITLE_FORMAT_LAYER);
+        if(indexLayer != -1) indexMap.put(TAG_SUBTITLE_FORMAT_LAYER, indexLayer);
 
-        int indexMarginL = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_MARGIN_L);
-        if(indexMarginL > -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_L, indexMarginL);
+        int indexMarginL = tags.indexOf(TAG_SUBTITLE_FORMAT_MARGIN_L);
+        if(indexMarginL != -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_L, indexMarginL);
 
-        int indexMarginR = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_MARGIN_R);
-        if(indexMarginR > -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_R, indexMarginR);
+        int indexMarginR = tags.indexOf(TAG_SUBTITLE_FORMAT_MARGIN_R);
+        if(indexMarginR != -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_R, indexMarginR);
 
-        int indexMarginV = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_MARGIN_V);
-        if(indexMarginV > -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_V, indexMarginV);
+        int indexMarginV = tags.indexOf(TAG_SUBTITLE_FORMAT_MARGIN_V);
+        if(indexMarginV != -1) indexMap.put(TAG_SUBTITLE_FORMAT_MARGIN_V, indexMarginV);
 
-        int indexName = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_NAME);
-        if(indexName > -1) indexMap.put(TAG_SUBTITLE_FORMAT_NAME, indexName);
+        int indexName = tags.indexOf(TAG_SUBTITLE_FORMAT_NAME);
+        if(indexName != -1) indexMap.put(TAG_SUBTITLE_FORMAT_NAME, indexName);
 
-        int indexStart = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_START);
-        if(indexStart > -1) indexMap.put(TAG_SUBTITLE_FORMAT_START, indexStart);
+        int indexStart = tags.indexOf(TAG_SUBTITLE_FORMAT_START);
+        if(indexStart != -1) indexMap.put(TAG_SUBTITLE_FORMAT_START, indexStart);
 
-        int indexStyle = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_STYLE);
-        if(indexStyle > -1) indexMap.put(TAG_SUBTITLE_FORMAT_STYLE, indexStyle);
+        int indexStyle = tags.indexOf(TAG_SUBTITLE_FORMAT_STYLE);
+        if(indexStyle != -1) indexMap.put(TAG_SUBTITLE_FORMAT_STYLE, indexStyle);
 
-        int indexText = Arrays.binarySearch(tags, TAG_SUBTITLE_FORMAT_TEXT);
-        if(indexText > -1) indexMap.put(TAG_SUBTITLE_FORMAT_TEXT, indexText);
+        int indexText = tags.indexOf(TAG_SUBTITLE_FORMAT_TEXT);
+        if(indexText != -1) indexMap.put(TAG_SUBTITLE_FORMAT_TEXT, indexText);
 
         return indexMap;
     }

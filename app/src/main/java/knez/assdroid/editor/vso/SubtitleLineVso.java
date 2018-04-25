@@ -15,20 +15,22 @@ public class SubtitleLineVso extends IdentifiableImpl {
     // onda ti ne treba mozda ni settings recimo
 
     @NonNull private final SubtitleLineSettings subtitleLineSettings;
-    @NonNull private final SubtitleLine subtitleLine;
     @DrawableRes private final int backgroundDrawable;
+    @NonNull private final String text;
 
-    public SubtitleLineVso(@NonNull SubtitleLine subtitleLine,
-                           @NonNull SubtitleLineSettings subtitleLineSettings,
-                           @DrawableRes int backgroundDrawable) {
-        super(subtitleLine.getId());
-        this.subtitleLine = subtitleLine;
+    public SubtitleLineVso(
+            int id,
+            @NonNull SubtitleLineSettings subtitleLineSettings,
+            @DrawableRes int backgroundDrawable,
+            @NonNull String text) {
+        super(id);
         this.subtitleLineSettings = subtitleLineSettings;
         this.backgroundDrawable = backgroundDrawable;
+        this.text = text;
     }
 
-    @NonNull public SubtitleLine getSubtitleLine() { return subtitleLine; }
     @NonNull public SubtitleLineSettings getSubtitleLineSettings() { return subtitleLineSettings; }
     public int getBackgroundDrawable() { return backgroundDrawable; }
+    @NonNull public String getText() { return text; }
 
 }

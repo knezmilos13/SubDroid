@@ -148,15 +148,15 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	
 	/** Sklapa i prikazuje naslov ove aktivnosti koji zavisi od imena prevoda i njegovog statusa snimljenosti. */
 	private void osveziNaslov() {
-		String ceoNaslov = 
-				subtitleController.isPrevodMenjan()? getResources().getString(R.string.editor_prevod_menjan_znak) : "";
-		if(subtitleController.getImePrevoda().equals("")) {
-			ceoNaslov += getResources().getString(R.string.standard_untitled);
-		} else {
-			ceoNaslov += subtitleController.getImePrevoda();
-		}
-
-		setTitle(ceoNaslov);
+//		String ceoNaslov =
+//				subtitleController.isPrevodMenjan()? getResources().getString(R.string.editor_prevod_menjan_znak) : "";
+//		if(subtitleController.getImePrevoda().equals("")) {
+//			ceoNaslov += getResources().getString(R.string.standard_untitled);
+//		} else {
+//			ceoNaslov += subtitleController.getImePrevoda();
+//		}
+//
+//		setTitle(ceoNaslov);
 	}
 
 
@@ -171,24 +171,24 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	}
 	
 	private void ucitajRedove(int tekuci) {
-		prethodniRed = tekuci>1 ? subtitleController.dajRedPrevoda(tekuci - 1) : null;
-		tekuciRed = subtitleController.dajRedPrevoda(tekuci);
-		sledeciRed = subtitleController.postojiLiRedPrevoda(tekuci + 1)? subtitleController.dajRedPrevoda(tekuci + 1) : null;
+//		prethodniRed = tekuci>1 ? subtitleController.dajRedPrevoda(tekuci - 1) : null;
+//		tekuciRed = subtitleController.dajRedPrevoda(tekuci);
+//		sledeciRed = subtitleController.postojiLiRedPrevoda(tekuci + 1)? subtitleController.dajRedPrevoda(tekuci + 1) : null;
 	}
 	
 	/** Primenjuje izmene na tekucu liniju prevoda i osvezava naslov aktivnosti */
 	private void commitujIzmene() {
-		if(PodesavanjaPrevodilacUtil.isCommitKeepOriginalOn() && unos.getText().toString().equals("")) {
+//		if(PodesavanjaPrevodilacUtil.isCommitKeepOriginalOn() && unos.getText().toString().equals("")) {
 			// ako commit prazne linije ne menja nista, a jeste bila prazna linija... do nothing
-		} else {
+//		} else {
 //			tekuciRed.text = unos.getText().toString(); // TODO: nece da moze setText - immutable tebra
-			subtitleController.updateRedPrevoda(tekuciRed);
-			radjeneIzmeneOvde = true;
-			if(!subtitleController.isPrevodMenjan()) {
-				subtitleController.setPrevodMenjan(true);
-				osveziNaslov();
-			}
-		}
+//			subtitleController.updateRedPrevoda(tekuciRed);
+//			radjeneIzmeneOvde = true;
+//			if(!subtitleController.isPrevodMenjan()) {
+//				subtitleController.setPrevodMenjan(true);
+//				osveziNaslov();
+//			}
+//		}
 	}
 	
 	private void premotajNaSledeciRed() {
@@ -210,15 +210,15 @@ public class PrevodilacAktivnost extends Activity implements OnClickListener, On
 	}
 	
 	private void snimiPrevod() {
-		try {
-			subtitleController.snimiPrevod();
-		} catch (FileNotFoundException e) {
+//		try {
+//			subtitleController.snimiPrevod();
+//		} catch (FileNotFoundException e) {
 //			Loger.log(e);
-			e.printStackTrace();
-			//TODO ne postoji fajl... a ovo je save... da je saveas pa ajde
-			// u ovoj varijanti u prevodiocu moze da ga snimi negde na SD kao temp fajl i da ispise obavestenje
-		}
-		osveziNaslov();
+//			e.printStackTrace();
+//			//TODO ne postoji fajl... a ovo je save... da je saveas pa ajde
+//			// u ovoj varijanti u prevodiocu moze da ga snimi negde na SD kao temp fajl i da ispise obavestenje
+//		}
+//		osveziNaslov();
 	}
 	
 	// ----------------------------------------------------------------------------------------------------- Eventovi

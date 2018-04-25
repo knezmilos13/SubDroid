@@ -2,7 +2,11 @@ package knez.assdroid.common.injection;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Looper;
+import android.preference.PreferenceManager;
+
+import com.google.gson.Gson;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -16,8 +20,10 @@ import dagger.Module;
 import dagger.Provides;
 import knez.assdroid.App;
 import knez.assdroid.common.Navigator;
-import knez.assdroid.common.util.AppConfig;
+import knez.assdroid.common.StorageHelper;
+import knez.assdroid.common.gson.GsonFactory;
 import knez.assdroid.editor.EditorPresenter;
+import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
@@ -56,14 +62,37 @@ public class AppContextModule {
         return context.getContentResolver();
     }
 
+    @Provides @Singleton
+    SharedPreferences getSharedPreferences(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    @Provides @Singleton
+    GsonFactory getGsonFactory() {
+        return new GsonFactory();
+    }
+
+    @Provides @Singleton
+    Gson getGson(GsonFactory gsonFactory) {
+        return gsonFactory.getNewStandardGson().create();
+    }
+
+    @Provides @Singleton
+    StorageHelper getStorageHelper(SharedPreferences sharedPreferences, Gson gson) {
+        return new StorageHelper(sharedPreferences, gson);
+    }
+
+    @Provides @Singleton
+    SubtitleLineVsoFactory getSubtitleLineVsoFactory() {
+        return new SubtitleLineVsoFactory();
+    }
+
     @Provides
     EditorPresenter getEditorPresenter(
-            SubtitleController subtitleController, Navigator navigator, AppConfig appConfig) {
-        return new EditorPresenter(
-                subtitleController,
-                navigator,
-                appConfig.getTypingDelayMillis()
-        );
+            SubtitleController subtitleController, Navigator navigator,
+            SubtitleLineVsoFactory subtitleLineVsoFactory, StorageHelper storageHelper) {
+        return new EditorPresenter(subtitleController, navigator, subtitleLineVsoFactory,
+                storageHelper);
     }
 
     @Provides @Singleton

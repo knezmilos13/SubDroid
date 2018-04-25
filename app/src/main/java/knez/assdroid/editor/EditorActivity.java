@@ -7,10 +7,12 @@ import knez.assdroid.PrevodilacAktivnost;
 import knez.assdroid.R;
 import knez.assdroid.common.adapter.IdentifiableAdapter;
 import knez.assdroid.editor.adapter.SubtitleLineAdapterPack;
+import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.util.AndroidUtil;
 import knez.assdroid.util.gui.BgpEditText;
+import solid.collections.SolidList;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -190,7 +193,7 @@ public class EditorActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() { // TODO
+    public void onBackPressed() { // TODO - mada mozda ne moras nista, to ce sve da bude u detached
 //		if(editorControlsView.isInterfejsMinimiziran())
 //			editorControlsView.setInterfejsMinimiziran(false);
 //		else if(editorControlsView.isPrikazanPanel())
@@ -223,10 +226,46 @@ public class EditorActivity extends AppCompatActivity
     }
 
     @Override
+    public void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos) {
+        subtitleLinesAdapter.setItems(subtitleLineVsos);
+        updateCenterText();
+    }
+
+    @Override
+    public void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos,
+                                  @NonNull DiffUtil.DiffResult diffResult) {
+        subtitleLinesAdapter.setItemsDontNotify(subtitleLineVsos);
+        diffResult.dispatchUpdatesTo(subtitleLinesAdapter);
+        updateCenterText();
+    }
+
+    @Override
+    public void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings) {
+        // TODO
+    }
+
+    @Override
     public void removeAllCurrentSubtitleData() {
 	    subtitleLinesAdapter.clear();
 	    searchView.setText(""); // TODO dal ovo puca listener
     }
+
+
+    // ------------------------------------------------------------------------------------ INTERNAL
+
+    private void updateCenterText() {
+        // TODO vidi samo sad imas tipa no subtitle lines i no results kad je filtriranje ukljuceno
+//        if(adapter.getItemCount() == 0 && centerTextView.getVisibility() == View.GONE)
+//            FadeAnimationHelper.fadeView(true, centerTextView, false);
+//        else if(adapter.getItemCount() != 0 && centerTextView.getVisibility() == View.VISIBLE)
+//            FadeAnimationHelper.fadeView(false, centerTextView, false);
+    }
+
+
+
+
+
+
 
 
 

@@ -18,4 +18,6 @@ public class SubtitleContent {
         this.rawSections = rawSections;
     }
 
+    @NonNull public List<SubtitleLine> getSubtitleLines() { return subtitleLines; }
+
 }
