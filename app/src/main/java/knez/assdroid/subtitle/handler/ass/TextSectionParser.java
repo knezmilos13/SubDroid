@@ -18,11 +18,12 @@ import solid.collections.Pair;
 
 import static knez.assdroid.subtitle.handler.ass.FormatConstants.*;
 
-public class SubtitleSectionParser {
+/** Parses the actual textual part of the subtitle */
+public class TextSectionParser {
 
     @NonNull private final DateTimeFormatter timeFormatter;
 
-	public SubtitleSectionParser() {
+	public TextSectionParser() {
 	    this.timeFormatter = DateTimeFormatter.ofPattern("H:mm:ss.SS");
     }
 

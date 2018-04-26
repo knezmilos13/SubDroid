@@ -1,33 +1,24 @@
 package knez.assdroid.common.injection;
 
-import java.util.concurrent.ExecutorService;
-
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import knez.assdroid.subtitle.SubtitleController;
-import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
 import knez.assdroid.subtitle.handler.ass.AssFormatter;
 import knez.assdroid.subtitle.handler.ass.AssParser;
-import knez.assdroid.subtitle.handler.ass.SubtitleSectionParser;
-import knez.assdroid.util.FileHandler;
-import knez.assdroid.util.Threader;
-import solid.collections.SolidList;
-import timber.log.Timber;
+import knez.assdroid.subtitle.handler.ass.TextSectionParser;
 
 @Module
 public class SubtitleAssModule {
 
     @Provides @Singleton
-    AssParser getAssParser(SubtitleSectionParser subtitleSectionParser) {
-        return new AssParser(subtitleSectionParser);
+    AssParser getAssParser(TextSectionParser textSectionParser) {
+        return new AssParser(textSectionParser);
     }
 
     @Provides @Singleton
-    SubtitleSectionParser getSubtitleSectionParser() {
-        return new SubtitleSectionParser();
+    TextSectionParser getSubtitleSectionParser() {
+        return new TextSectionParser();
     }
 
     @Provides @Singleton

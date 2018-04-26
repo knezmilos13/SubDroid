@@ -18,10 +18,10 @@ import static knez.assdroid.subtitle.handler.ass.FormatConstants.*;
 
 public class AssParser implements SubtitleParser {
 
-    @NonNull private final SubtitleSectionParser subtitleSectionParser;
+    @NonNull private final TextSectionParser textSectionParser;
 
-    public AssParser(@NonNull SubtitleSectionParser subtitleSectionParser) {
-	    this.subtitleSectionParser = subtitleSectionParser;
+    public AssParser(@NonNull TextSectionParser textSectionParser) {
+	    this.textSectionParser = textSectionParser;
     }
 
 	@Override
@@ -71,7 +71,7 @@ public class AssParser implements SubtitleParser {
                     ParsingError.ErrorLevel.SECTION_INVALID));
         } else {
             Pair<List<SubtitleLine>, List<ParsingError>> parsingResult =
-                    subtitleSectionParser.parseSubtitleLines(allSections.get(Section.SUBTITLE_LINES));
+                    textSectionParser.parseSubtitleLines(allSections.get(Section.SUBTITLE_LINES));
             subtitleLines.addAll(parsingResult.first);
             allParsingErrors.addAll(parsingResult.second);
         }
