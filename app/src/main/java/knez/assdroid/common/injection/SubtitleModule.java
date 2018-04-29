@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import knez.assdroid.common.db.SubtitleContentDao;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
 import knez.assdroid.subtitle.handler.ass.AssFormatter;
@@ -22,12 +23,13 @@ public class SubtitleModule {
     @Provides @Singleton
     SubtitleController getSubtitleHandler(
             SubtitleHandlerRepository subtitleHandlerRepository,
+            SubtitleContentDao subtitleContentDao,
             FileHandler fileHandler,
             @Named("ioExecutor") ExecutorService executorService,
             @Named("mainThreader") Threader mainThreader,
             Timber.Tree logger) {
-        return new SubtitleController(
-                subtitleHandlerRepository, fileHandler, executorService, mainThreader, logger);
+        return new SubtitleController(subtitleHandlerRepository, fileHandler, subtitleContentDao,
+                executorService, mainThreader, logger);
     }
 
     @Provides @Singleton

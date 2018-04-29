@@ -19,5 +19,6 @@ public class SubtitleContent {
     }
 
     @NonNull public List<SubtitleLine> getSubtitleLines() { return subtitleLines; }
+    @NonNull public List<RawLinesSection> getRawSections() { return rawSections; }
 
 }

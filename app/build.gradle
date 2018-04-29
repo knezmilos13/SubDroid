@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'io.objectbox'
 
 android {
     compileSdkVersion 27
@@ -56,6 +57,7 @@ dependencies {
     implementation 'com.joanzapata.iconify:android-iconify-material:2.2.2'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'io.gsonfire:gson-fire:1.8.2'
+    debugImplementation 'com.facebook.stetho:stetho:1.5.0'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
