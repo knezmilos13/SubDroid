@@ -7,6 +7,8 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  COMMON STRINGS -->
 
     <string name="common_strings_untitled">Untitled</string>
+    <string name="common_strings_untitled_edited">Untitled*</string>
+    <string name="common_strings_title_edited">%1$s*</string>
 
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->

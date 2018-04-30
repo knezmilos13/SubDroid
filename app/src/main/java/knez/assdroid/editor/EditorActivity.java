@@ -13,6 +13,7 @@ import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.util.AndroidUtil;
 import knez.assdroid.util.gui.BgpEditText;
 import solid.collections.SolidList;
+import timber.log.Timber;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -39,6 +40,7 @@ public class EditorActivity extends AppCompatActivity
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
 
     private EditorMVP.PresenterInterface presenter;
+    private Timber.Tree logger;
     private IdentifiableAdapter subtitleLinesAdapter;
 
     // TODO: da probas start/stop umesto create/destroy?
@@ -69,7 +71,9 @@ public class EditorActivity extends AppCompatActivity
 
         setUpInterface();
 
+        logger = App.getAppComponent().getLogger();
         presenter = App.getAppComponent().getEditorPresenter();
+
         presenter.onAttach(this);
 	}
 
@@ -207,18 +211,28 @@ public class EditorActivity extends AppCompatActivity
     @Override
     public void showTitleUntitled(boolean currentSubtitleEdited) {
 	    ActionBar actionBar = getSupportActionBar();
-	    if(actionBar != null) actionBar.setTitle(R.string.common_strings_untitled);
-	    // TODO da li je edited
+	    if(actionBar == null) {
+	        logger.w("Action bar missing! Not supposed to happen!");
+	        return;
+        }
+
+        actionBar.setTitle(currentSubtitleEdited?
+                R.string.common_strings_untitled_edited : R.string.common_strings_untitled);
     }
 
     @Override
     public void showTitleForName(@NonNull String currentSubtitleFilename,
                                  boolean currentSubtitleEdited) {
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar == null) return;
+        if(actionBar == null) {
+            logger.w("Action bar missing! Not supposed to happen!");
+            return;
+        }
 
-        // TODO da li je edited
-        actionBar.setTitle(R.string.common_strings_untitled);
+        if(currentSubtitleEdited)
+            actionBar.setTitle(getString(R.string.common_strings_title_edited, currentSubtitleFilename));
+        else
+            actionBar.setTitle(currentSubtitleFilename);
     }
 
     @Override
