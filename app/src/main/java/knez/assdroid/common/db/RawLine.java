@@ -1,4 +1,4 @@
-package knez.assdroid.subtitle.data;
+package knez.assdroid.common.db;
 
 import android.support.annotation.NonNull;
 
@@ -26,8 +26,8 @@ public class RawLine {
     public long getId() {
         return id;
     }
-
     public void setId(long id) {
         this.id = id;
     }
+
 }

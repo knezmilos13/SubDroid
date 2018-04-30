@@ -39,7 +39,9 @@ public class SubtitleLine {
     @NonNull @Convert(converter = DbConverters.StringListConverter.class, dbType = String.class)
     private List<String> tags;
 
-	private SubtitleLine(@NonNull Builder builder) {
+    public SubtitleLine() {}
+
+    private SubtitleLine(@NonNull Builder builder) {
         lineNumber = builder.lineNumber;
         layer = builder.layer;
         marginL = builder.marginL;

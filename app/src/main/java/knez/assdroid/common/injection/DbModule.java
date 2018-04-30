@@ -7,8 +7,8 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.objectbox.BoxStore;
+import knez.assdroid.MyObjectBox;
 import knez.assdroid.common.db.SubtitleContentDao;
-import knez.assdroid.subtitle.data.MyObjectBox;
 
 @Module(includes = SubtitleAssModule.class)
 public class DbModule {

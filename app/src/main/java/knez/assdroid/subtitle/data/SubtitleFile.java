@@ -2,29 +2,30 @@ package knez.assdroid.subtitle.data;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import knez.assdroid.subtitle.handler.SubtitleContent;
 
 public class SubtitleFile {
 
     private boolean currentSubtitleEdited;
-    @NonNull private final Uri uriPath;
-    @NonNull private final String filename;
+    @Nullable private final Uri uriPath;
+    @Nullable private final String name;
     @NonNull private final SubtitleContent subtitleContent;
 
     public SubtitleFile(boolean currentSubtitleEdited,
-                        @NonNull Uri uriPath,
-                        @NonNull String filename,
+                        @Nullable Uri uriPath,
+                        @Nullable String name,
                         @NonNull SubtitleContent subtitleContent) {
         this.currentSubtitleEdited = currentSubtitleEdited;
         this.uriPath = uriPath;
-        this.filename = filename;
+        this.name = name;
         this.subtitleContent = subtitleContent;
     }
 
     public boolean isCurrentSubtitleEdited() { return currentSubtitleEdited; }
-    @NonNull public String getFilename() { return filename; }
-    @NonNull public Uri getUriPath() { return uriPath; }
+    @Nullable public String getName() { return name; }
+    @Nullable public Uri getUriPath() { return uriPath; }
     @NonNull public SubtitleContent getSubtitleContent() { return subtitleContent; }
 
 }

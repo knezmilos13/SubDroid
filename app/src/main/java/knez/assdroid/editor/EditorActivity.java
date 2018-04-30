@@ -205,18 +205,19 @@ public class EditorActivity extends AppCompatActivity
     // ------------------------------------------------------------------------------ VIEW INTERFACE
 
     @Override
-    public void showTitleUntitled() {
+    public void showTitleUntitled(boolean currentSubtitleEdited) {
 	    ActionBar actionBar = getSupportActionBar();
 	    if(actionBar != null) actionBar.setTitle(R.string.common_strings_untitled);
+	    // TODO da li je edited
     }
 
     @Override
-    public void showTitleForFilename(@NonNull String currentSubtitleFilename,
-                                     boolean currentSubtitleEdited) {
+    public void showTitleForName(@NonNull String currentSubtitleFilename,
+                                 boolean currentSubtitleEdited) {
         ActionBar actionBar = getSupportActionBar();
         if(actionBar == null) return;
 
-        // TODO
+        // TODO da li je edited
         actionBar.setTitle(R.string.common_strings_untitled);
     }
 

@@ -11,10 +11,10 @@ import solid.collections.SolidList;
 interface EditorMVP {
 
     interface ViewInterface {
-        void showTitleUntitled();
+        void showTitleUntitled(boolean currentSubtitleEdited);
         void removeAllCurrentSubtitleData();
-        void showTitleForFilename(@NonNull String currentSubtitleFilename,
-                                  boolean currentSubtitleEdited);
+        void showTitleForName(@NonNull String currentSubtitleFilename,
+                              boolean currentSubtitleEdited);
         void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename);
         void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos);
         void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos,

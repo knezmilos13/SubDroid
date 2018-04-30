@@ -85,8 +85,15 @@ public class EditorPresenter
 
         subtitleController.attachListener(this);
 
-        // TODO: vidi da li treba sta da ucitas; da li imas u bazi nesto i neki editovan fajl u opticaju
-        // TODO a ako nemas, kreiraj tipa prazan fajl, to trazi od kontrolera
+        if(subtitleController.getCurrentSubtitleFile() != null) {
+            showSubtitleFile(subtitleController.getCurrentSubtitleFile());
+        } else if(subtitleController.hasStoredSubtitle()) {
+            subtitleController.reloadCurrentSubtitleFile();
+        } else {
+            SubtitleFile newlyCreatedSubtitleFile = subtitleController.createNewSubtitleFile();
+            showSubtitleFile(newlyCreatedSubtitleFile);
+        }
+
     }
 
     @Override
@@ -106,11 +113,6 @@ public class EditorPresenter
 
 
     // --------------------------------------------------------------------------- USER & APP EVENTS
-
-//    @Override
-//    public void showItemDetails(int itemId) {
-//        navigator.startItemDetailsScreen(itemId);
-//    }
 
     @Override
     public void onSearchSubmitted(@NonNull final String text) {
@@ -132,10 +134,7 @@ public class EditorPresenter
             return;
         }
 
-        viewInterface.removeAllCurrentSubtitleData();
-        // TODO: ocisti linije koje mi sami drzimo ovde
-
-        subtitleController.loadSubtitle(data);
+        subtitleController.parseSubtitle(data);
     }
 
     @Override
@@ -162,20 +161,24 @@ public class EditorPresenter
     }
 
     @Override
-    public void onSubtitleFileLoaded(@NonNull SubtitleFile currentSubtitleFile,
+    public void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
                                      @NonNull List<ParsingError> parsingErrors) {
         if(viewInterface == null) return;
-
-        viewInterface.showTitleForFilename(
-                currentSubtitleFile.getFilename(),
-                currentSubtitleFile.isCurrentSubtitleEdited());
-
-        asyncCreateSubtitleLineVsos(currentSubtitleFile.getSubtitleContent().getSubtitleLines());
 
         // TODO: utvrdi da li su neke fatalne greske i prikazi nekakav dijalog
         for(ParsingError parsingError : parsingErrors) {
 
         }
+
+        viewInterface.removeAllCurrentSubtitleData();
+        // TODO: ocisti linije koje mi sami drzimo ovde
+
+        showSubtitleFile(subtitleFile);
+    }
+
+    @Override
+    public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {
+        showSubtitleFile(subtitleFile);
     }
 
 
@@ -187,6 +190,16 @@ public class EditorPresenter
                 SUB_LINE_DEFAULT_SHOW_TIMINGS, SUB_LINE_DEFAULT_SHOW_STYLE_ACTOR,
                 SUB_LINE_DEFAULT_SHOW_TAG_CONTENT, SUB_LINE_DEFAULT_TAG_REPLACEMENT,
                 SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP, SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP);
+    }
+
+    private void showSubtitleFile(@NonNull SubtitleFile subtitleFile) {
+        if(subtitleFile.getName() != null)
+            viewInterface.showTitleForName(
+                    subtitleFile.getName(), subtitleFile.isCurrentSubtitleEdited());
+        else
+            viewInterface.showTitleUntitled(subtitleFile.isCurrentSubtitleEdited());
+
+        asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 
     private void showResultsForQuery(@NonNull final String[] queryToShow) {

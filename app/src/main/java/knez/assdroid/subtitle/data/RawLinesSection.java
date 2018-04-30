@@ -9,8 +9,6 @@ import java.util.List;
  *  return these lines to the right position (if that is important format-wise) */
 public class RawLinesSection {
 
-    private int id;
-
     private List<String> lines;
 
     private String tag;
@@ -19,7 +17,7 @@ public class RawLinesSection {
         this.lines = lines;
         this.tag = tag;
     }
-// TODO solid list?
+// TODO solid list? also tag je "section name" ili tako nesto
     @NonNull public String getTag() { return tag; }
     public List<String> getLines() { return lines; }
 

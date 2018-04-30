@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import knez.assdroid.common.AbstractRepo;
+import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.db.SubtitleContentDao;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
@@ -19,7 +20,6 @@ import solid.collections.Pair;
 import timber.log.Timber;
 
 import android.net.Uri;
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -27,9 +27,19 @@ import android.support.annotation.WorkerThread;
 
 public class SubtitleController extends AbstractRepo {
 
+    private static final String STORAGE_KEY_SUBTITLE_STORED =
+            SubtitleController.class.getCanonicalName() + ".subtitle_stored";
+    private static final String STORAGE_KEY_SUBTITLE_NAME =
+            SubtitleController.class.getCanonicalName() + ".subtitle_name";
+    private static final String STORAGE_KEY_SUBTITLE_URI =
+            SubtitleController.class.getCanonicalName() + ".subtitle_uri";
+    private static final String STORAGE_KEY_SUBTITLE_EDITED =
+            SubtitleController.class.getCanonicalName() + ".subtitle_edited";
+
     @NonNull private final SubtitleHandlerRepository subtitleHandlerRepository;
     @NonNull private final FileHandler fileHandler;
     @NonNull private final SubtitleContentDao subtitleContentDao;
+    @NonNull private final StorageHelper storageHelper;
     @NonNull private final ExecutorService executorService;
     @NonNull private final Threader mainThreader;
     @NonNull private final Timber.Tree logger;
@@ -41,18 +51,19 @@ public class SubtitleController extends AbstractRepo {
     public SubtitleController(@NonNull SubtitleHandlerRepository subtitleHandlerRepository,
                               @NonNull FileHandler fileHandler,
                               @NonNull SubtitleContentDao subtitleContentDao,
+                              @NonNull StorageHelper storageHelper,
                               @NonNull ExecutorService executorService,
                               @NonNull Threader mainThreader,
                               @NonNull Timber.Tree logger) {
         this.subtitleHandlerRepository = subtitleHandlerRepository;
         this.fileHandler = fileHandler;
         this.subtitleContentDao = subtitleContentDao;
+        this.storageHelper = storageHelper;
         this.executorService = executorService;
         this.mainThreader = mainThreader;
         this.logger = logger;
     }
 
-    @AnyThread
     public void attachListener(Callback callback) {
         synchronized (callbacks) {
             if (callbacks.contains(callback)) return;
@@ -60,26 +71,47 @@ public class SubtitleController extends AbstractRepo {
         }
     }
 
-    @AnyThread
+    @Nullable
+    public SubtitleFile getCurrentSubtitleFile() {
+        return currentSubtitleFile;
+    }
+
+    public boolean hasStoredSubtitle() {
+        return storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
+    }
+
     public void detachListener(Callback callback) {
         callbacks.remove(callback);
     }
 
-    @AnyThread
     public boolean canLoadSubtitle(@NonNull String subtitleFilename) {
         return subtitleHandlerRepository.canOpenSubtitleFile(subtitleFilename);
     }
 
-    @AnyThread
-    public void loadSubtitle(@NonNull Uri subtitlePath) {
-        executorService.execute(() -> _loadSubtitle(subtitlePath));
+    public void parseSubtitle(@NonNull Uri subtitlePath) {
+        executorService.execute(() -> _parseSubtitle(subtitlePath));
+    }
+
+    public void reloadCurrentSubtitleFile() {
+        executorService.execute(this::_reloadCurrentSubtitleFile);
+    }
+
+    @NonNull
+    public SubtitleFile createNewSubtitleFile() {
+        SubtitleFile subtitleFile = new SubtitleFile(false, null, null,
+                new SubtitleContent(new ArrayList<>(), new ArrayList<>()));
+        currentSubtitleFile = subtitleFile;
+        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+        subtitleContentDao.clearSubtitle();
+
+        return subtitleFile;
     }
 
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
     @WorkerThread
-    private void _loadSubtitle(@NonNull Uri subtitlePath) {
+    private void _parseSubtitle(@NonNull Uri subtitlePath) {
         String subtitleFilename = fileHandler.getFileNameFromUri(subtitlePath);
 
         SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleFile(subtitleFilename);
@@ -103,13 +135,45 @@ public class SubtitleController extends AbstractRepo {
         SubtitleContent subtitleContent = result.first;
         List<ParsingError> parsingErrors = result.second;
 
-        currentSubtitleFile = new SubtitleFile(false, subtitlePath, subtitleFilename, result.first);
+        // Filename should be kept without the extension since the app itself is format-neutral
+        int lastDotIndex = subtitleFilename.lastIndexOf(".");
+        String subtitleName = subtitleFilename.substring(0, lastDotIndex);
+
+        currentSubtitleFile = new SubtitleFile(false, subtitlePath, subtitleName, result.first);
 
         subtitleContentDao.storeSubtitleContent(subtitleContent);
 
+        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
+        storageHelper.putString(STORAGE_KEY_SUBTITLE_NAME, subtitleName);
+        storageHelper.putString(STORAGE_KEY_SUBTITLE_URI, subtitlePath.toString());
+
 		fireCallbacks(callbacks,
-				callback -> callback.onSubtitleFileLoaded(currentSubtitleFile, parsingErrors),
+				callback -> callback.onSubtitleFileParsed(currentSubtitleFile, parsingErrors),
 				mainThreader);
+    }
+
+    @WorkerThread
+    private void _reloadCurrentSubtitleFile() {
+        boolean subtitleStored = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
+        if(!subtitleStored) { // Shouldn't happen - always ask controller if subtitle is stored first
+            logger.w("Performing reload subtitle file but no file stored! Creating a new file.");
+
+            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+            subtitleContentDao.clearSubtitle(); // just in case
+        }
+
+        String filename = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
+        Uri uriPath = Uri.parse(storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null));
+        boolean currentSubtitleEdited = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
+
+        SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
+        currentSubtitleFile = new SubtitleFile(
+                currentSubtitleEdited, uriPath, filename, subtitleContent);
+
+        fireCallbacks(callbacks,
+                callback -> callback.onSubtitleFileReloaded(currentSubtitleFile),
+                mainThreader);
     }
 
 
@@ -119,8 +183,9 @@ public class SubtitleController extends AbstractRepo {
     public interface Callback {
         void onInvalidSubtitleFormat(@NonNull String subtitleFilename);
         void onFileReadingFailed(@NonNull String subtitleFilename);
-		void onSubtitleFileLoaded(@NonNull SubtitleFile currentSubtitleFile,
-								  @NonNull List<ParsingError> parsingErrors);
+		void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
+                                  @NonNull List<ParsingError> parsingErrors);
+        void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile);
 	}
 
 }
