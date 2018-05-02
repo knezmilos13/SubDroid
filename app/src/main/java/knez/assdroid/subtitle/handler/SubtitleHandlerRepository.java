@@ -3,8 +3,6 @@ package knez.assdroid.subtitle.handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import knez.assdroid.subtitle.handler.SubtitleFormatter;
-import knez.assdroid.subtitle.handler.SubtitleParser;
 import solid.collections.SolidList;
 
 public class SubtitleHandlerRepository {
@@ -18,17 +16,18 @@ public class SubtitleHandlerRepository {
         this.formatters = formatters;
     }
 
-    public boolean canOpenSubtitleFile(@NonNull String subtitleFilename) {
+    public boolean canOpenSubtitleExtension(@NonNull String subtitleExtension) {
         for(SubtitleParser parser : parsers)
-            if(parser.canOpenSubtitleFile(subtitleFilename)) return true;
+            if(parser.canOpenSubtitleExtension(subtitleExtension)) return true;
         return false;
     }
 
-    /** Returns parser that can open the given file. If no parsers can open it, returns null */
+    /** Returns parser that can open a file with a given extension.
+     *  If no parsers can open it, returns null */
     @Nullable
-    public SubtitleParser getParserForSubtitleFile(@NonNull String subtitleFilename) {
+    public SubtitleParser getParserForSubtitleExtension(@NonNull String subtitleExtension) {
         for(SubtitleParser parser : parsers)
-            if(parser.canOpenSubtitleFile(subtitleFilename)) return parser;
+            if(parser.canOpenSubtitleExtension(subtitleExtension)) return parser;
         return null;
     }
 

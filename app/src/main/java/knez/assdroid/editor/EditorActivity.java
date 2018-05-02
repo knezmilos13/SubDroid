@@ -32,6 +32,7 @@ public class EditorActivity extends AppCompatActivity
         implements EditorMVP.ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
 
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
+    private static final int REQUEST_CODE_SAVE_SUBTITLE = 1235;
     private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
     private static final int REQUEST_CODE_SETTINGS = 501;
 
@@ -59,6 +60,9 @@ public class EditorActivity extends AppCompatActivity
 
     // TODO: zbog komplikacija sa navigatorom, nemas vise startactivity for result. Treba ga implementirati za settings
     // (ili implementirati proveru promena nakon svakog zatvaranja)
+
+    // TODO dodaj dugme za dodavanje nove linije prevoda (mada je malo besmisleno dok nemas edit tajminga)
+    // eventualno duplicate linije na long hold
 
 
     // --------------------------------------------------------------------------- LIFECYCLE & SETUP
@@ -130,13 +134,13 @@ public class EditorActivity extends AppCompatActivity
 //				kreirajNoviPrevod(); // TODO
 				break;
 			case R.id.meni_standard_load:
-				showFileSelector();
+				showFileOpenSelector();
 				break;
 			case R.id.meni_standard_podesavanja:
 				presenter.onShowSettingsClicked();
 				break;
 			case R.id.meni_standard_save:
-//				snimiPrevod(); // TODO
+				showFileSaveSelector();
 				break;
 			case R.id.meni_standard_help:
 			    presenter.onShowHelpClicked();
@@ -163,10 +167,23 @@ public class EditorActivity extends AppCompatActivity
 
         if(resultCode != RESULT_OK) return;
 
-        if(requestCode == REQUEST_CODE_OPEN_SUBTITLE && data != null && data.getData() != null) {
+        if(requestCode == REQUEST_CODE_OPEN_SUBTITLE) {
+            if(data == null) return;
+
             Uri uri = data.getData();
+            if(uri == null) return;
+
             String filename = AndroidUtil.getFileNameFromUri(this, uri);
             presenter.onFileSelectedForLoad(uri, filename);
+            return;
+        } else if(requestCode == REQUEST_CODE_SAVE_SUBTITLE) {
+            if(data == null) return;
+
+            Uri uri = data.getData();
+            if(uri == null) return;
+
+            String filename = AndroidUtil.getFileNameFromUri(this, uri);
+            presenter.onFileSelectedForSaving(uri, filename);
             return;
         }
     }
@@ -256,6 +273,11 @@ public class EditorActivity extends AppCompatActivity
 
     @Override
     public void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings) {
+        // TODO
+    }
+
+    @Override
+    public void showErrorWritingSubtitleInvalidFormat(@NonNull String filename) {
         // TODO
     }
 
@@ -554,11 +576,25 @@ public class EditorActivity extends AppCompatActivity
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
-    private void showFileSelector() {
+    private void showFileOpenSelector() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         startActivityForResult(intent, REQUEST_CODE_OPEN_SUBTITLE);
+    }
+
+    private void showFileSaveSelector() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+
+        String currentName = presenter.getCurrentSubtitleName();
+        if(currentName == null) currentName = getString(R.string.common_strings_untitled);
+        currentName += " (2).ass"; // TODO jednom kad snimis ovo valjda se azurira URI pa onda sledeci put kad snimis bude (2)(2)(2) itd... vidi save umesto save as
+
+        intent.putExtra(Intent.EXTRA_TITLE, currentName);
+
+        startActivityForResult(intent, REQUEST_CODE_SAVE_SUBTITLE);
     }
 
 }

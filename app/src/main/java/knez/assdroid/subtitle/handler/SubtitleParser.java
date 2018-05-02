@@ -10,7 +10,7 @@ import solid.collections.Pair;
 /** Can load subtitles from a file of a specific format */
 public interface SubtitleParser {
 
-    boolean canOpenSubtitleFile(@NonNull String subtitleFilename);
+    boolean canOpenSubtitleExtension(@NonNull String subtitleExtension);
 
     @NonNull
     Pair<SubtitleContent, List<ParsingError>> parseSubtitle(@NonNull List<String> subtitleLines);

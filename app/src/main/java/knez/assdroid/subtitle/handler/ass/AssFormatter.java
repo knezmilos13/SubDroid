@@ -1,91 +1,137 @@
 package knez.assdroid.subtitle.handler.ass;
 
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 
-import java.util.List;
+import org.threeten.bp.LocalTime;
+import org.threeten.bp.format.DateTimeFormatter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.SubtitleFormatter;
+
+import static knez.assdroid.subtitle.handler.ass.FormatConstants.*;
 
 public class AssFormatter implements SubtitleFormatter {
 
-	private static final String UTF_BOM = "\uFEFF";
+    @NonNull private final DateTimeFormatter timeFormatter;
 
-	// ------------------------------------------------------------------- Informacije za parsiranje prevoda
-	private static final String SEKCIJA_PREVOD = "[Events]";
-
-	private static final String SEKCIJA_PREVOD_DEFAULT_FORMAT =
-			"Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text";
-	private static final String SEKCIJA_PREVOD_RED_COMMENT = "Comment:";
-	private static final String SEKCIJA_PREVOD_RED_DIALOGUE = "Dialogue:";
-
-
-	// ------------------------------------------------------------------- Informacije za parsiranje stilova
-	private static final String SEKCIJA_STIL = "[V4+ Styles]";
-	//private static final String SEKCIJA_STIL_OLD = "[V4 Styles]"; ne treba - za poredjenje koristis lower case
-	private static final String SEKCIJA_STIL_LOWER_CASE = "[v4+ styles]";
-	private static final String SEKCIJA_STIL_OLD_LOWER_CASE = "[v4 styles]";
-
-	// ------------------------------------------------------------------- Informacije za parsiranje zaglavlja
-	private static final String SEKCIJA_ZAGLAVLJE = "[Script Info]";
-	private static final String SEKCIJA_ZAGLAVLJE_LOWER_CASE = "[script info]";
-
-
-	public AssFormatter() {
-
+    public AssFormatter() {
+        this.timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
     }
 
-	@Override
-	public boolean canSaveToSubtitleFormat(@NonNull String extension) {
-		return extension.toLowerCase().equals("ass");
-	}
+    @Override
+    public boolean canSaveToSubtitleFormat(@NonNull String extension) {
+        return extension.toLowerCase().equals("ass");
+    }
 
-	@Override @NonNull
-	public List<String> serializeSubtitle() {
-		return null;
-	}
+    @Override @NonNull
+    public List<String> serializeSubtitle(@NonNull SubtitleContent subtitleContent) {
+        List<String> result = new ArrayList<>();
 
+        Map<String, List<String>> rawLinesSections = subtitleContent.getRawSections();
 
+        result.add(SECTION_SCRIPT_INFO);
 
-//	public void snimiPrevod(String putanjaPrevoda, Cursor redoviZaglavlja, Cursor redoviStila, Cursor redoviPrevoda)
-//			throws FileNotFoundException {
-//		File fajl = new File(putanjaPrevoda);
-//		PrintWriter p = new PrintWriter(fajl);
-//
-//		p.print(UTF_BOM);
-//
-//		p.println(SEKCIJA_ZAGLAVLJE);
-//		while(redoviZaglavlja.moveToNext()) {
-//			p.println(RedZaglavlja.kreirajStringIzKursora(redoviZaglavlja));
-//		}
-//		p.println();
-//
-//		p.println(SEKCIJA_STIL);
-//		//TODO: ne stampas eksplicitno red za format stila - zajedno ti je na gomili sa ostalim
-//		// ali kad izmenis gore ucitavanje stila, onda menjaj i ovde stampanje stila
-//		while(redoviStila.moveToNext()) {
-//			p.println(RedStila.kreirajStringIzKursora(redoviStila)); //TODO: nece da moze. ili oce ako je AssRedStila
-//		}
-//		p.println();
-//
-//		p.println(SEKCIJA_PREVOD);
-//		p.println(SEKCIJA_PREVOD_DEFAULT_FORMAT);
-//		while(redoviPrevoda.moveToNext()) {
-//			SubtitleLine red = SubtitleLine.kreirajIzKursora(redoviPrevoda);
-//			p.printf("%s%d,%s,%s,%s,%s,%04d,%04d,%04d,%s,%s\n",
-//					(red.isComment ? SEKCIJA_PREVOD_RED_COMMENT : SEKCIJA_PREVOD_RED_DIALOGUE) + " ",
-//					red.layer,
-//					JavaUtil.formatirajVreme(red.start),
-//					JavaUtil.formatirajVreme(red.end),
-//					red.style,
-//					red.actorName,
-//					red.marginL,
-//					red.marginR,
-//					red.marginV,
-//					red.effect,
-//					red.text);
-//		}
-//		p.close();
-//	}
+        // TODO: vidi ove "tagove". Negde stavljas stringove koje koristis u parsiranju, negde stavljas
+        // ove enume koji su deo ass specifikacije; a kako ce to da skonta recimo neki drugi format?
+        List<String> infoLines = rawLinesSections.get(Section.SCRIPT_INFO.name());
+        if(infoLines == null || infoLines.isEmpty()) {
+            // TODO moraces da generises neku default konfiguraciju minimalnu
+        } else {
+            result.addAll(infoLines);
+            result.add(""); // newline for prettied formatting
+        }
+
+        List<String> styleLines = rawLinesSections.get(Section.STYLES.name());
+        if(styleLines == null || styleLines.isEmpty()) {
+            // TODO proveri u dokumentaciji - da li je stil sekcija obavezna ili ne? ako jeste digni SECTION_STYLE odozdo
+        } else {
+            result.add(SECTION_STYLE);
+            result.addAll(styleLines); // NOTE: style format line should already be present
+            result.add("");  // newline for prettied formatting
+        }
+
+        List<String> fontLines = rawLinesSections.get(Section.FONTS.name());
+        if(fontLines != null && !fontLines.isEmpty()) {
+            result.add(SECTION_FONTS);
+            result.addAll(fontLines);
+            result.add("");  // newline for prettied formatting
+        }
+
+        List<String> graphicsLines = rawLinesSections.get(Section.GRAPHICS.name());
+        if(graphicsLines != null && !graphicsLines.isEmpty()) {
+            result.add(SECTION_GRAPHICS);
+            result.addAll(graphicsLines);
+            result.add("");  // newline for prettied formatting
+        }
+
+        result.add(SECTION_SUBTITLE_LINES);
+        result.add(FORMAT_LINE_IN_SUBTITLE_SECTION_DEFAULT);
+
+        List<SubtitleLine> subtitleLines = subtitleContent.getSubtitleLines();
+        for(SubtitleLine subtitleLine : subtitleLines) {
+            StringBuilder builder = new StringBuilder();
+
+            if(subtitleLine.getIsComment() != null && subtitleLine.getIsComment())
+                builder.append(LINE_SUBTITLE_LINES_COMMENT);
+            else if(subtitleLine.getTags().size() == 0) {
+                builder.append(LINE_SUBTITLE_LINES_DIALOGUE);
+            } else {
+                if(subtitleLine.getTags().contains(LINE_SUBTITLE_LINES_COMMAND))
+                    builder.append(LINE_SUBTITLE_LINES_COMMAND);
+                else if(subtitleLine.getTags().contains(LINE_SUBTITLE_LINES_PICTURE))
+                    builder.append(LINE_SUBTITLE_LINES_PICTURE);
+                else if(subtitleLine.getTags().contains(LINE_SUBTITLE_LINES_MOVIE))
+                    builder.append(LINE_SUBTITLE_LINES_MOVIE);
+                else if(subtitleLine.getTags().contains(LINE_SUBTITLE_LINES_SOUND))
+                    builder.append(LINE_SUBTITLE_LINES_SOUND);
+                else // has unknown tags, probably intended for another format, just add normal line
+                    builder.append(LINE_SUBTITLE_LINES_DIALOGUE);
+            }
+
+            builder.append(" ");
+
+            Integer layer = subtitleLine.getLayer();
+            builder.append(layer == null? VALUE_LAYER_DEFAULT : layer).append(",");
+
+            builder.append(subtitleLine.getStart().format(timeFormatter)).append(",");
+            builder.append(subtitleLine.getEnd().format(timeFormatter)).append(",");
+
+            String style = subtitleLine.getStyle();
+            builder.append(style == null? VALUE_STYLE_DEFAULT : style).append(",");
+
+            String actor = subtitleLine.getActorName();
+            builder.append(actor == null? VALUE_ACTOR_DEFAULT : actor).append(",");
+
+            Integer marginL = subtitleLine.getMarginL();
+            builder.append(
+                    String.format(Locale.US, "%04d", marginL == null? VALUE_MARGIN_L_DEFAULT : marginL))
+                    .append(",");
+
+            Integer marginR = subtitleLine.getMarginL();
+            builder.append(
+                    String.format(Locale.US, "%04d", marginR == null? VALUE_MARGIN_R_DEFAULT : marginR))
+                    .append(",");
+
+            Integer marginV = subtitleLine.getMarginL();
+            builder.append(
+                    String.format(Locale.US, "%04d", marginV == null? VALUE_MARGIN_V_DEFAULT : marginV))
+                    .append(",");
+
+            String effect = subtitleLine.getEffect();
+            builder.append(effect == null? VALUE_EFFECT_DEFAULT : effect).append(",");
+
+            builder.append(subtitleLine.getText());
+
+            result.add(builder.toString());
+        }
+
+        return result;
+    }
 
 }

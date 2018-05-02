@@ -24,7 +24,7 @@ public class TextSectionParser {
     @NonNull private final DateTimeFormatter timeFormatter;
 
 	public TextSectionParser() {
-	    this.timeFormatter = DateTimeFormatter.ofPattern("H:mm:ss.SS");
+	    this.timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
     }
 
     Pair<List<SubtitleLine>, List<ParsingError>> parseSubtitleLines(

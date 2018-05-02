@@ -10,7 +10,6 @@ import java.util.Set;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
-import knez.assdroid.subtitle.data.RawLinesSection;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.SubtitleContent;
 
@@ -38,11 +37,12 @@ public class SubtitleContentDao {
         // TODO: ucitati na pocetku sve
         // TODO: omoguciti save/save as stagod
         RawLine rawLineEntity = new RawLine();
-        for(RawLinesSection rawSection : subtitleContent.getRawSections()) {
-            List<String> rawLines = rawSection.getLines();
+        Set<String> rawSectionsKeySet = subtitleContent.getRawSections().keySet();
+        for(String key : rawSectionsKeySet) {
+            List<String> rawLines = subtitleContent.getRawSections().get(key);
             for(String rawLine : rawLines) {
                 rawLineEntity.setLine(rawLine);
-                rawLineEntity.setTag(rawSection.getTag());
+                rawLineEntity.setTag(key);
                 rawLineEntity.setId(0);
                 boxRawLines.put(rawLineEntity);
             }
@@ -63,7 +63,7 @@ public class SubtitleContentDao {
 
         // Raw lines are stored flat in the database, so group them by section they belong to
 
-        Map<String, ArrayList<String>> rawLinesSectionsMap = new HashMap<>();
+        Map<String, List<String>> rawLinesSectionsMap = new HashMap<>();
         for(RawLine rawLine : rawLines) {
             String section = rawLine.getTag(); // TODO rename tag u section?
             if(!rawLinesSectionsMap.containsKey(section))
@@ -71,12 +71,7 @@ public class SubtitleContentDao {
             rawLinesSectionsMap.get(section).add(rawLine.getLine());
         }
 
-        List<RawLinesSection> rawLinesSectionList = new ArrayList<>(rawLinesSectionsMap.size());
-        Set<String> keySet = rawLinesSectionsMap.keySet();
-        for(String key : keySet)
-            rawLinesSectionList.add(new RawLinesSection(rawLinesSectionsMap.get(key), key));
-
-        return new SubtitleContent(subtitleLines, rawLinesSectionList);
+        return new SubtitleContent(subtitleLines, rawLinesSectionsMap);
     }
 
 

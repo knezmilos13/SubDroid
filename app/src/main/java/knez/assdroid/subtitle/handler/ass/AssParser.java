@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import knez.assdroid.subtitle.data.ParsingError;
-import knez.assdroid.subtitle.data.RawLinesSection;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.SubtitleParser;
@@ -25,8 +24,8 @@ public class AssParser implements SubtitleParser {
     }
 
 	@Override
-	public boolean canOpenSubtitleFile(@NonNull String subtitleFilename) {
-		return subtitleFilename.toLowerCase().endsWith(".ass");
+	public boolean canOpenSubtitleExtension(@NonNull String subtitleExtension) {
+		return subtitleExtension.toLowerCase().equals("ass");
 	}
 
     @Override @NonNull
@@ -63,7 +62,7 @@ public class AssParser implements SubtitleParser {
 
         List<ParsingError> allParsingErrors = new ArrayList<>();
         List<SubtitleLine> subtitleLines = new ArrayList<>();
-        List<RawLinesSection> rawLinesSections = new ArrayList<>();
+        Map<String, List<String>> rawLinesSections = new HashMap<>();
 
         if(!allSections.containsKey(Section.SUBTITLE_LINES)) {
             allParsingErrors.add(new ParsingError(
@@ -82,8 +81,8 @@ public class AssParser implements SubtitleParser {
                     ParsingError.ErrorLocation.NON_SUBTITLE_SECTION,
                     ParsingError.ErrorLevel.SECTION_INVALID));
         } else {
-            rawLinesSections.add(new RawLinesSection(
-                    allSections.get(Section.SCRIPT_INFO), Section.SCRIPT_INFO.toString()));
+            rawLinesSections.put(
+                    Section.SCRIPT_INFO.toString(), allSections.get(Section.SCRIPT_INFO));
         }
 
         if(!allSections.containsKey(Section.STYLES)) {
@@ -92,21 +91,17 @@ public class AssParser implements SubtitleParser {
                     ParsingError.ErrorLocation.NON_SUBTITLE_SECTION,
                     ParsingError.ErrorLevel.SECTION_INVALID));
         } else {
-            rawLinesSections.add(new RawLinesSection(
-                    allSections.get(Section.STYLES), Section.STYLES.toString()));
+            rawLinesSections.put(Section.STYLES.toString(), allSections.get(Section.STYLES));
         }
 
         if(allSections.containsKey(Section.FONTS))
-            rawLinesSections.add(new RawLinesSection(
-                    allSections.get(Section.FONTS), Section.FONTS.toString()));
+            rawLinesSections.put(Section.FONTS.toString(), allSections.get(Section.FONTS));
 
         if(allSections.containsKey(Section.GRAPHICS))
-            rawLinesSections.add(new RawLinesSection(
-                    allSections.get(Section.GRAPHICS), Section.GRAPHICS.toString()));
+            rawLinesSections.put(Section.GRAPHICS.toString(), allSections.get(Section.GRAPHICS));
 
         if(allSections.containsKey(Section.UNKNOWN))
-            rawLinesSections.add(new RawLinesSection(
-                    allSections.get(Section.UNKNOWN), Section.UNKNOWN.toString()));
+            rawLinesSections.put(Section.UNKNOWN.toString(), allSections.get(Section.UNKNOWN));
 
         return new Pair<>(new SubtitleContent(subtitleLines, rawLinesSections), allParsingErrors);
     }

@@ -3,22 +3,22 @@ package knez.assdroid.subtitle.handler;
 import android.support.annotation.NonNull;
 
 import java.util.List;
+import java.util.Map;
 
-import knez.assdroid.subtitle.data.RawLinesSection;
 import knez.assdroid.subtitle.data.SubtitleLine;
 
 public class SubtitleContent {
 
     @NonNull private final List<SubtitleLine> subtitleLines;
-    @NonNull private final List<RawLinesSection> rawSections;
+    @NonNull private final Map<String, List<String>> rawSections;
 
     public SubtitleContent(@NonNull List<SubtitleLine> subtitleLines,
-                           @NonNull List<RawLinesSection> rawSections) {
+                           @NonNull Map<String, List<String>> rawSections) {
         this.subtitleLines = subtitleLines;
         this.rawSections = rawSections;
     }
 
     @NonNull public List<SubtitleLine> getSubtitleLines() { return subtitleLines; }
-    @NonNull public List<RawLinesSection> getRawSections() { return rawSections; }
+    @NonNull public Map<String, List<String>> getRawSections() { return rawSections; }
 
 }

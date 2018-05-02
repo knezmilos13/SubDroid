@@ -2,6 +2,7 @@ package knez.assdroid.editor;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
 import knez.assdroid.editor.data.SubtitleLineSettings;
@@ -23,15 +24,19 @@ interface EditorMVP {
         /** Should activate/deactivate appropriate controls in the UI. The actual presentation of
          *  subtitle lines according to settings is not done here. */
         void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings);
+
+        void showErrorWritingSubtitleInvalidFormat(@NonNull String filename);
     }
 
     interface PresenterInterface {
         void onAttach(@NonNull EditorMVP.ViewInterface viewInterface);
         void onDetach();
         void onSearchSubmitted(@NonNull String text);
-        void onFileSelectedForLoad(@NonNull Uri data, @NonNull String filename);
+        void onFileSelectedForLoad(@NonNull Uri uri, @NonNull String filename);
         void onShowHelpClicked();
         void onShowSettingsClicked();
+        @Nullable String getCurrentSubtitleName();
+        void onFileSelectedForSaving(@NonNull Uri uri, @NonNull String filename);
     }
 
 }

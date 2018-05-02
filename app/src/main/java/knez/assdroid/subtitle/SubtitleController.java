@@ -3,6 +3,7 @@ package knez.assdroid.subtitle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -12,6 +13,7 @@ import knez.assdroid.common.db.SubtitleContentDao;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.handler.SubtitleContent;
+import knez.assdroid.subtitle.handler.SubtitleFormatter;
 import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
 import knez.assdroid.subtitle.handler.SubtitleParser;
 import knez.assdroid.util.FileHandler;
@@ -84,8 +86,12 @@ public class SubtitleController extends AbstractRepo {
         callbacks.remove(callback);
     }
 
-    public boolean canLoadSubtitle(@NonNull String subtitleFilename) {
-        return subtitleHandlerRepository.canOpenSubtitleFile(subtitleFilename);
+    public boolean canLoadExtension(@NonNull String subtitleExtension) {
+        return subtitleHandlerRepository.canOpenSubtitleExtension(subtitleExtension);
+    }
+
+    public boolean canWriteSubtitle(@NonNull String subtitleExtension) {
+        return subtitleHandlerRepository.canSaveToSubtitleFormat(subtitleExtension);
     }
 
     public void parseSubtitle(@NonNull Uri subtitlePath) {
@@ -96,10 +102,14 @@ public class SubtitleController extends AbstractRepo {
         executorService.execute(this::_reloadCurrentSubtitleFile);
     }
 
+    public void writeSubtitle(@NonNull Uri uri) {
+        executorService.execute(() -> _writeSubtitle(uri));
+    }
+
     @NonNull
     public SubtitleFile createNewSubtitleFile() {
         SubtitleFile subtitleFile = new SubtitleFile(false, null, null,
-                new SubtitleContent(new ArrayList<>(), new ArrayList<>()));
+                new SubtitleContent(new ArrayList<>(), new HashMap<>()));
         currentSubtitleFile = subtitleFile;
         storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
         subtitleContentDao.clearSubtitle();
@@ -113,8 +123,9 @@ public class SubtitleController extends AbstractRepo {
     @WorkerThread
     private void _parseSubtitle(@NonNull Uri subtitlePath) {
         String subtitleFilename = fileHandler.getFileNameFromUri(subtitlePath);
+        String subtitleExtension = subtitleFilename.substring(subtitleFilename.lastIndexOf(".")+1);
 
-        SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleFile(subtitleFilename);
+        SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
         if(subtitleParser == null) {
             fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormat(subtitleFilename),
                     mainThreader);
@@ -136,8 +147,7 @@ public class SubtitleController extends AbstractRepo {
         List<ParsingError> parsingErrors = result.second;
 
         // Filename should be kept without the extension since the app itself is format-neutral
-        int lastDotIndex = subtitleFilename.lastIndexOf(".");
-        String subtitleName = subtitleFilename.substring(0, lastDotIndex);
+        String subtitleName = subtitleFilename.substring(0, subtitleFilename.lastIndexOf("."));
 
         currentSubtitleFile = new SubtitleFile(false, subtitlePath, subtitleName, result.first);
 
@@ -176,6 +186,52 @@ public class SubtitleController extends AbstractRepo {
                 mainThreader);
     }
 
+    @WorkerThread
+    private void _writeSubtitle(@NonNull Uri destPath) {
+        if(currentSubtitleFile == null) {
+            return;
+            // TODO nije realisticno ali eto bas ako se desi neki fuckup
+        }
+
+        String destFilename = fileHandler.getFileNameFromUri(destPath);
+        String subtitleExtension = destFilename.substring(destFilename.lastIndexOf(".") + 1);
+
+        SubtitleFormatter subtitleFormatter =
+                subtitleHandlerRepository.getFormatterForSubtitleFormat(subtitleExtension);
+
+        if(subtitleFormatter == null) {
+            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormat(destFilename),
+                    mainThreader); // TODO ovo invalidSubtitleFormat ti je isto i za read i write, aj nekako to razdvoj malo
+            return;
+        }
+
+
+        // TODO: ovaj bi mogao da vraca tipa serialization errore kao onaj sto vraca parsing errore
+        List<String> serializedSubtitle =
+                subtitleFormatter.serializeSubtitle(currentSubtitleFile.getSubtitleContent());
+
+        try {
+            fileHandler.writeFileContent(destPath, serializedSubtitle);
+        } catch (IOException e) {
+            logger.e(e);
+            fireCallbacks(callbacks, callback -> callback.onFileWritingFailed(destFilename),
+                    mainThreader);
+            return;
+        }
+
+        currentSubtitleFile.setEdited(false);
+
+        // Filename should be kept without the extension since the app itself is format-neutral
+        String subtitleName = destFilename.substring(0, destFilename.lastIndexOf("."));
+        currentSubtitleFile.setName(subtitleName);
+
+        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
+        storageHelper.putString(STORAGE_KEY_SUBTITLE_NAME, subtitleName);
+
+        fireCallbacks(callbacks,
+                callback -> callback.onSubtitleFileSaved(currentSubtitleFile), mainThreader);
+    }
+
 
     // ------------------------------------------------------------------------------------- CLASSES
 
@@ -186,6 +242,8 @@ public class SubtitleController extends AbstractRepo {
 		void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
                                   @NonNull List<ParsingError> parsingErrors);
         void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile);
-	}
+        void onFileWritingFailed(@NonNull String destFilename);
+        void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile);
+    }
 
 }

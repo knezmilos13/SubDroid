@@ -9,6 +9,6 @@ public interface SubtitleFormatter {
 
     boolean canSaveToSubtitleFormat(@NonNull String extension);
 
-    @NonNull List<String> serializeSubtitle();
+    @NonNull List<String> serializeSubtitle(@NonNull SubtitleContent subtitleContent);
 
 }

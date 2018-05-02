@@ -4,7 +4,7 @@ public interface FormatConstants {
 
     String SECTION_SUBTITLE_LINES = "[Events]";
     String SECTION_STYLE = "[V4+ styles]";
-    String SECTION_STYLE_OLD = "[V4 styles]";
+    String SECTION_STYLE_OLD = "[V4 styles]"; // TODO da lepo zajebemo ovo? ne znam ni sta da radim sa njime. Konvertovati u + ako moze
     String SECTION_SCRIPT_INFO = "[Script info]";
     String SECTION_FONTS = "[Fonts]";
     String SECTION_GRAPHICS = "[Graphics]";
@@ -29,9 +29,17 @@ public interface FormatConstants {
     String TAG_SUBTITLE_FORMAT_EFFECT = "Effect";
     String TAG_SUBTITLE_FORMAT_TEXT = "Text";
 
+    String FORMAT_LINE_IN_SUBTITLE_SECTION_DEFAULT =
+            "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text";
+
     int VALUE_LAYER_DEFAULT = 0;
     int VALUE_MARGIN_L_DEFAULT = 0;
     int VALUE_MARGIN_R_DEFAULT = 0;
     int VALUE_MARGIN_V_DEFAULT = 0;
+    String VALUE_STYLE_DEFAULT = "Default";
+    String VALUE_ACTOR_DEFAULT = "";
+    String VALUE_EFFECT_DEFAULT = "";
+
+    String TIME_FORMAT = "H:mm:ss.SS";
 
 }

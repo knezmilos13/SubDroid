@@ -7,9 +7,12 @@ import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +44,22 @@ public class FileHandler {
             lines.set(0, lines.get(0).substring(1));
 
         return lines;
+    }
+
+    public void writeFileContent(@NonNull Uri destPath, @NonNull List<String> serializedSubtitle)
+            throws IOException {
+
+        OutputStream outputStream = contentResolver.openOutputStream(destPath);
+        if(outputStream == null) throw new IOException("Could not open stream to " + destPath);
+
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+            for(String line : serializedSubtitle) {
+                writer.write(line);
+                writer.write("\r\n");
+            }
+        }
+
+        outputStream.close();
     }
 
     public String getFileNameFromUri(@NonNull Uri uri) {

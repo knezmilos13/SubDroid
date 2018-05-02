@@ -128,13 +128,27 @@ public class EditorPresenter
     }
 
     @Override
-    public void onFileSelectedForLoad(@NonNull Uri data, @NonNull String filename) {
-        if(!subtitleController.canLoadSubtitle(filename)) {
+    public void onFileSelectedForLoad(@NonNull Uri uri, @NonNull String filename) {
+        String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
+
+        if(!subtitleController.canLoadExtension(subtitleExtension)) {
             viewInterface.showErrorLoadingSubtitleInvalidFormat(filename);
             return;
         }
 
-        subtitleController.parseSubtitle(data);
+        subtitleController.parseSubtitle(uri);
+    }
+
+    @Override
+    public void onFileSelectedForSaving(@NonNull Uri uri, @NonNull String filename) {
+        String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
+
+        if(!subtitleController.canWriteSubtitle(subtitleExtension)) {
+            viewInterface.showErrorWritingSubtitleInvalidFormat(filename);
+            return;
+        }
+
+        subtitleController.writeSubtitle(uri);
     }
 
     @Override
@@ -147,6 +161,13 @@ public class EditorPresenter
         navigator.showSettingsScreen();
     }
 
+    @Override @Nullable
+    public String getCurrentSubtitleName() {
+        SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
+        if(currentSubtitleFile == null) return null;
+        else return currentSubtitleFile.getName();
+    }
+
 
     // ------------------------------------------------------------------------------- REPO CALLBACK
 
@@ -157,6 +178,11 @@ public class EditorPresenter
 
     @Override
     public void onFileReadingFailed(@NonNull String subtitleFilename) {
+        // TODO prikazi poruku
+    }
+
+    @Override
+    public void onFileWritingFailed(@NonNull String destFilename) {
         // TODO prikazi poruku
     }
 
@@ -181,6 +207,12 @@ public class EditorPresenter
         showSubtitleFile(subtitleFile);
     }
 
+    @Override
+    public void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) {
+        if(viewInterface == null) return;
+        showSubtitleTitle(subtitleFile);
+    }
+
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
@@ -193,13 +225,19 @@ public class EditorPresenter
     }
 
     private void showSubtitleFile(@NonNull SubtitleFile subtitleFile) {
-        if(subtitleFile.getName() != null)
-            viewInterface.showTitleForName(
-                    subtitleFile.getName(), subtitleFile.isCurrentSubtitleEdited());
-        else
-            viewInterface.showTitleUntitled(subtitleFile.isCurrentSubtitleEdited());
+        showSubtitleTitle(subtitleFile);
 
         asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
+    }
+
+    private void showSubtitleTitle(@NonNull SubtitleFile subtitleFile) {
+        if(viewInterface == null) return;
+
+        if(subtitleFile.getName() != null)
+            viewInterface.showTitleForName(
+                    subtitleFile.getName(), subtitleFile.isEdited());
+        else
+            viewInterface.showTitleUntitled(subtitleFile.isEdited());
     }
 
     private void showResultsForQuery(@NonNull final String[] queryToShow) {
