@@ -9,7 +9,7 @@ import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import solid.collections.SolidList;
 
-interface EditorMVP {
+public interface EditorMVP {
 
     interface ViewInterface {
         void showTitleUntitled(boolean currentSubtitleEdited);
@@ -37,6 +37,7 @@ interface EditorMVP {
         void onShowSettingsClicked();
         @Nullable String getCurrentSubtitleName();
         void onFileSelectedForSaving(@NonNull Uri uri, @NonNull String filename);
+        void onSubtitleLineClicked(int id);
     }
 
 }

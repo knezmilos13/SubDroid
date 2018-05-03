@@ -10,7 +10,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/prevodilac_prethodna_linija"
+            android:id="@+id/translator_prev_line"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="prethodna recenica"
@@ -19,7 +19,7 @@
         <View style="@style/separator_fazon_lista" />
 
         <TextView
-            android:id="@+id/prevodilac_tekuca_linija"
+            android:id="@+id/translator_current_line"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="tekuca recenica tekuca recenica tekuca recenica"
@@ -29,14 +29,14 @@
         <View style="@style/separator_fazon_lista" />
 
         <TextView
-            android:id="@+id/prevodilac_sledeca_linija"
+            android:id="@+id/translator_next_line"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="sledeca recenica"
             android:textSize="15dp" />
 
         <EditText
-            android:id="@+id/prevodilac_unos"
+            android:id="@+id/translator_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_small"
@@ -52,7 +52,7 @@
             android:orientation="horizontal" >
 
             <Button
-                android:id="@+id/prevodilac_dugme_kopiraj"
+                android:id="@+id/translator_copy_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -60,7 +60,7 @@
                 android:textSize="12dp" />
 
             <Button
-                android:id="@+id/prevodilac_dugme_commit"
+                android:id="@+id/translator_commit_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -68,7 +68,7 @@
                 android:textSize="12dp" />
 
             <Button
-                android:id="@+id/prevodilac_dugme_commit_next"
+                android:id="@+id/trnanslator_commit_next_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

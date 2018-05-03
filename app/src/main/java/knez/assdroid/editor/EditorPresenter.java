@@ -152,6 +152,11 @@ public class EditorPresenter
     }
 
     @Override
+    public void onSubtitleLineClicked(int id) {
+        navigator.showTranslatorScreen(id);
+    }
+
+    @Override
     public void onShowHelpClicked() {
         navigator.showHelpScreen();
     }

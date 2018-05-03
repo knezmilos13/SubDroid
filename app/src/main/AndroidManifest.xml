@@ -55,7 +55,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="PrevodilacAktivnost"
+            android:name=".translator.TranslatorActivity"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity

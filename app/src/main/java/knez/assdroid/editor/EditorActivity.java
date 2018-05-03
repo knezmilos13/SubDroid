@@ -3,7 +3,7 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
-import knez.assdroid.PrevodilacAktivnost;
+import knez.assdroid.translator.TranslatorActivity;
 import knez.assdroid.R;
 import knez.assdroid.common.adapter.IdentifiableAdapter;
 import knez.assdroid.editor.adapter.SubtitleLineAdapterPack;
@@ -191,11 +191,7 @@ public class EditorActivity extends AppCompatActivity
     @Override
     public void onSubtitleLineClicked(@NonNull SubtitleLineVso subtitleLineVso,
                                       @NonNull SubtitleLineLayoutItem layoutItem) {
-        // TODO
-        //		boolean maknuo = prevodAdapter.getCursor().moveToPosition(position);
-//		if(!maknuo) return;
-//		SubtitleLine red = SubtitleLine.kreirajIzKursora(prevodAdapter.getCursor());
-//		prikaziEditor(red.lineNumber);
+	    presenter.onSubtitleLineClicked(subtitleLineVso.getId());
     }
 
     @Override
@@ -548,15 +544,15 @@ public class EditorActivity extends AppCompatActivity
 	// --------------------------------------------------------------------------------------- Startovanje aktivnosti
 
 	private void prikaziEditor(int lineNumber) {
-		Intent namera = new Intent(this,PrevodilacAktivnost.class);
-		namera.putExtra(PrevodilacAktivnost.INPUT_BROJ_REDA, lineNumber);
+		Intent namera = new Intent(this,TranslatorActivity.class);
+		namera.putExtra(TranslatorActivity.INPUT_LINE_ID, lineNumber);
 		startActivityForResult(namera, REQUEST_CODE_TRANSLATOR_ACTIVITY);
 	}
 
 //	private void onZatvorenPrevodilac(int resultCode, Intent data) {
 //		if(resultCode == RESULT_OK) {
-//			boolean menjanoTamo = data.getExtras().getBoolean(PrevodilacAktivnost.OUTPUT_RADJENE_IZMENE_OVDE);
-//			int zadnjiMenjanLine = data.getExtras().getInt(PrevodilacAktivnost.OUTPUT_ZADNJI_PREGLEDAN);
+//			boolean menjanoTamo = data.getExtras().getBoolean(TranslatorActivity.INSTANCE_STATE_HAD_CHANGES);
+//			int zadnjiMenjanLine = data.getExtras().getInt(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_ID);
 //
 //			// Iz nekog razloga oce da pukne ponekad ako nista ne menjas u prevodiocu ako se ne pozove
 //			// osveziListu... pa ono kao aj' onda sto ne bi zvao svaki put. Neki fazon sa kursorima baguje.

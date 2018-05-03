@@ -22,9 +22,12 @@ import knez.assdroid.App;
 import knez.assdroid.common.Navigator;
 import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.gson.GsonFactory;
+import knez.assdroid.editor.EditorMVP;
 import knez.assdroid.editor.EditorPresenter;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 import knez.assdroid.subtitle.SubtitleController;
+import knez.assdroid.translator.TranslatorMVP;
+import knez.assdroid.translator.TranslatorPresenter;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
 import timber.log.Timber;
@@ -88,7 +91,7 @@ public class AppContextModule {
     }
 
     @Provides
-    EditorPresenter getEditorPresenter(
+    EditorMVP.PresenterInterface getEditorPresenter(
             SubtitleController subtitleController, Navigator navigator,
             SubtitleLineVsoFactory subtitleLineVsoFactory, StorageHelper storageHelper) {
         return new EditorPresenter(subtitleController, navigator, subtitleLineVsoFactory,
@@ -100,5 +103,9 @@ public class AppContextModule {
         return new FileHandler(contentResolver);
     }
 
+    @Provides
+    TranslatorMVP.PresenterInterface getTranslatorPresenter(SubtitleController subtitleController) {
+        return new TranslatorPresenter(subtitleController);
+    }
 
 }

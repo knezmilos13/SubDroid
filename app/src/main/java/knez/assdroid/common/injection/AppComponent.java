@@ -11,8 +11,11 @@ import dagger.Component;
 import knez.assdroid.App;
 import knez.assdroid.common.Navigator;
 import knez.assdroid.common.util.AppConfig;
+import knez.assdroid.editor.EditorMVP;
 import knez.assdroid.editor.EditorPresenter;
 import knez.assdroid.subtitle.SubtitleController;
+import knez.assdroid.translator.TranslatorMVP;
+import knez.assdroid.translator.TranslatorPresenter;
 import timber.log.Timber;
 
 @Singleton
@@ -32,7 +35,8 @@ public interface AppComponent {
     Timber.Tree getLogger();
     RefWatcher getRefWatcher();
     Navigator getNavigator();
-    EditorPresenter getEditorPresenter();
+    EditorMVP.PresenterInterface getEditorPresenter();
+    TranslatorMVP.PresenterInterface getTranslatorPresenter();
     SubtitleController getSubtitleHandler();
     Context getContext(); // TODO: ko koristi ovo da predje na druge klase
 
