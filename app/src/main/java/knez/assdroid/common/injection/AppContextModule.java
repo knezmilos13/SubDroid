@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import knez.assdroid.App;
-import knez.assdroid.common.Navigator;
 import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.gson.GsonFactory;
 import knez.assdroid.editor.EditorMVP;
@@ -51,13 +50,6 @@ public class AppContextModule {
     @Provides @Singleton
     Timber.Tree getLogger() {
         return Timber.asTree();
-    }
-
-    // TODO: ako implementiras non-singleton scope, onda mozes da napravis ne-singleton navigator
-    // koji ce kao parametar da prima Activity koji ces da obezbedis na svakom ekranu ponaosob
-    @Provides @Singleton
-    Navigator getNavigator(Context context) {
-        return new Navigator(context);
     }
 
     @Provides @Singleton
@@ -92,10 +84,9 @@ public class AppContextModule {
 
     @Provides
     EditorMVP.PresenterInterface getEditorPresenter(
-            SubtitleController subtitleController, Navigator navigator,
-            SubtitleLineVsoFactory subtitleLineVsoFactory, StorageHelper storageHelper) {
-        return new EditorPresenter(subtitleController, navigator, subtitleLineVsoFactory,
-                storageHelper);
+            SubtitleController subtitleController, SubtitleLineVsoFactory subtitleLineVsoFactory,
+            StorageHelper storageHelper) {
+        return new EditorPresenter(subtitleController, subtitleLineVsoFactory, storageHelper);
     }
 
     @Provides @Singleton

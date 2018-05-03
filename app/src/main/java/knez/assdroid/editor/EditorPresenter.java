@@ -10,7 +10,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import knez.assdroid.common.Navigator;
 import knez.assdroid.common.StorageHelper;
 import knez.assdroid.editor.adapter.SubtitleLineDiffCallback;
 import knez.assdroid.editor.data.SubtitleLineSettings;
@@ -35,7 +34,6 @@ public class EditorPresenter
     private static final int SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP = 12;
 
     @NonNull private final SubtitleController subtitleController;
-    @NonNull private final Navigator navigator;
     @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
     @NonNull private final StorageHelper storageHelper;
 
@@ -57,11 +55,9 @@ public class EditorPresenter
 
     public EditorPresenter(
             @NonNull SubtitleController subtitleController,
-            @NonNull Navigator navigator,
             @NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
             @NonNull StorageHelper storageHelper) {
         this.subtitleController = subtitleController;
-        this.navigator = navigator;
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
         this.storageHelper = storageHelper;
     }
@@ -153,17 +149,20 @@ public class EditorPresenter
 
     @Override
     public void onSubtitleLineClicked(int id) {
-        navigator.showTranslatorScreen(id);
+        if(viewInterface == null) return;
+        viewInterface.showTranslatorScreen(id);
     }
 
     @Override
     public void onShowHelpClicked() {
-        navigator.showHelpScreen();
+        if(viewInterface == null) return;
+        viewInterface.showHelpScreen();
     }
 
     @Override
     public void onShowSettingsClicked() {
-        navigator.showSettingsScreen();
+        if(viewInterface == null) return;
+        viewInterface.showSettingsScreen();
     }
 
     @Override @Nullable

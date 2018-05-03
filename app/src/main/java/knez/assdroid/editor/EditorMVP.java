@@ -26,6 +26,10 @@ public interface EditorMVP {
         void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings);
 
         void showErrorWritingSubtitleInvalidFormat(@NonNull String filename);
+
+        void showSettingsScreen();
+        void showHelpScreen();
+        void showTranslatorScreen(int lineId);
     }
 
     interface PresenterInterface {

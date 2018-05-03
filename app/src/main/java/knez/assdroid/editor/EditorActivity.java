@@ -3,6 +3,8 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
+import knez.assdroid.help.KategorijeHelpaAktivnost;
+import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
 import knez.assdroid.translator.TranslatorActivity;
 import knez.assdroid.R;
 import knez.assdroid.common.adapter.IdentifiableAdapter;
@@ -34,7 +36,7 @@ public class EditorActivity extends AppCompatActivity
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
     private static final int REQUEST_CODE_SAVE_SUBTITLE = 1235;
     private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
-    private static final int REQUEST_CODE_SETTINGS = 501;
+    private static final int REQUEST_CODE_SETTINGS_ACTIVITY = 501;
 
     @BindView(R.id.editor_subtitle_list) protected RecyclerView itemListRecycler;
     @BindView(R.id.editor_search_view) protected BgpEditText searchView;
@@ -157,7 +159,7 @@ public class EditorActivity extends AppCompatActivity
 //			case REQUEST_CODE_TRANSLATOR_ACTIVITY:
 //				onZatvorenPrevodilac(resultCode, data);
 //				break;
-//			case REQUEST_CODE_SETTINGS:
+//			case REQUEST_CODE_SETTINGS_ACTIVITY:
 //				boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
 //				if(izmenjen) prevodAdapter.notifyDataSetChanged();
 //				primeniPerzistentnaPodesavanjaNaKontrole();
@@ -281,6 +283,25 @@ public class EditorActivity extends AppCompatActivity
     public void removeAllCurrentSubtitleData() {
 	    subtitleLinesAdapter.clear();
 	    searchView.setText(""); // TODO dal ovo puca listener
+    }
+
+    @Override
+    public void showSettingsScreen() {
+        Intent settingsIntent = new Intent(this, KategorijePodesavanjaAktivnost.class); // TODO
+        startActivityForResult(settingsIntent, REQUEST_CODE_SETTINGS_ACTIVITY);
+    }
+
+    @Override
+    public void showHelpScreen() {
+        Intent helpIntent = new Intent(this, KategorijeHelpaAktivnost.class); // TODO
+        startActivity(helpIntent);
+    }
+
+    @Override
+    public void showTranslatorScreen(int lineId) {
+        Intent translatorIntent = new Intent(this, TranslatorActivity.class);
+        translatorIntent.putExtra(TranslatorActivity.INPUT_LINE_ID, lineId);
+        startActivityForResult(translatorIntent, REQUEST_CODE_TRANSLATOR_ACTIVITY);
     }
 
 
