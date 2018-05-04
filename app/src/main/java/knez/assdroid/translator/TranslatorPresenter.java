@@ -2,9 +2,11 @@ package knez.assdroid.translator;
 
 import android.support.annotation.NonNull;
 
+import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.subtitle.SubtitleController;
 
-public class TranslatorPresenter implements TranslatorMVP.PresenterInterface {
+public class TranslatorPresenter extends CommonSubtitlePresenter
+        implements TranslatorMVP.PresenterInterface {
 
     @NonNull private final SubtitleController subtitleController;
 
@@ -23,18 +25,21 @@ public class TranslatorPresenter implements TranslatorMVP.PresenterInterface {
     @Override
     public void onAttach(@NonNull TranslatorMVP.ViewInterface viewInterface,
                          int lineId, boolean hadChanges) {
+        super.onAttach(viewInterface);
         this.viewInterface = viewInterface;
         this.lineId = lineId;
         this.hadChanges = hadChanges;
 
-//        subtitleController.attachListener(this);
+//        subtitleController.attachListener(this); // TODO odvojen listener
 
+        // TODO: vidi prvo jel postoji titl, ako ne postoji, to je neka greksa
+        showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
 //        namestiRed(brojReda);
-//        osveziNaslov();
     }
 
     @Override
     public void onDetach() {
+        super.onDetach();
         viewInterface = null;
 //        subtitleController.detachListener(this);
     }

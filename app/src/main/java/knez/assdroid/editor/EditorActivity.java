@@ -3,6 +3,7 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
+import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.help.KategorijeHelpaAktivnost;
 import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
 import knez.assdroid.translator.TranslatorActivity;
@@ -15,14 +16,11 @@ import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.util.AndroidUtil;
 import knez.assdroid.util.gui.BgpEditText;
 import solid.collections.SolidList;
-import timber.log.Timber;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class EditorActivity extends AppCompatActivity
+public class EditorActivity extends CommonSubtitleActivity
         implements EditorMVP.ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
 
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
@@ -43,17 +41,11 @@ public class EditorActivity extends AppCompatActivity
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
 
     private EditorMVP.PresenterInterface presenter;
-    private Timber.Tree logger;
     private IdentifiableAdapter subtitleLinesAdapter;
 
     // TODO: da probas start/stop umesto create/destroy?
-    // TODO: po pokretanju aplikacije ucitati zadnje sve kako je bilo
-    // TODO: po okretanju aplikacije sve da je kako je bilo
     // TODO:
-    // osposobi editor activity sa 0 featurea, samo da moze da se pokrene
-    // zatim da moze da ucita titlove
-    // pa da otvori sledeci ekran? mozda?
-    // i da tamo edituje i vrati
+    // da tamo edituje i vrati
     // pa tek onda razmisljaj kako ces ona podesavanja silna sta da se vidi i tako to
     // to sve mozes i u neki drawer sa leve strane, najlakse tako
     // 2. subtitle line settings objekat snimaj u bundle i ucitavaj
@@ -77,7 +69,6 @@ public class EditorActivity extends AppCompatActivity
 
         setUpInterface();
 
-        logger = App.getAppComponent().getLogger();
         presenter = App.getAppComponent().getEditorPresenter();
 
         presenter.onAttach(this);
@@ -155,17 +146,13 @@ public class EditorActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//		switch(requestCode) {
-//			case REQUEST_CODE_TRANSLATOR_ACTIVITY:
-//				onZatvorenPrevodilac(resultCode, data);
-//				break;
 //			case REQUEST_CODE_SETTINGS_ACTIVITY:
 //				boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
 //				if(izmenjen) prevodAdapter.notifyDataSetChanged();
 //				primeniPerzistentnaPodesavanjaNaKontrole();
 //				primeniFullscreen(panelView.isFullscreenOn());
 //				break;
-//		} // TODO
+// TODO
 
         if(resultCode != RESULT_OK) return;
 
@@ -187,6 +174,23 @@ public class EditorActivity extends AppCompatActivity
             String filename = AndroidUtil.getFileNameFromUri(this, uri);
             presenter.onFileSelectedForSaving(uri, filename);
             return;
+        } else if(requestCode == REQUEST_CODE_TRANSLATOR_ACTIVITY) {
+            // TODO
+//            boolean hadChanges = data.getBooleanExtra(TranslatorActivity.INSTANCE_STATE_HAD_CHANGES, false);
+//			int zadnjiMenjanLine = data.getExtras().getInt(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_ID);
+//
+//			// Iz nekog razloga oce da pukne ponekad ako nista ne menjas u prevodiocu ako se ne pozove
+//			// osveziListu... pa ono kao aj' onda sto ne bi zvao svaki put. Neki fazon sa kursorima baguje.
+//			osveziListu();
+//			osveziNaslov();
+//
+//			centrirajPrikazListeNa(zadnjiMenjanLine);
+//
+//			// Kad se vratis iz prevodioca neka ne bude ukljucen filter (posto oce nesto da pukne ponekad)
+//			if(panelView.isUkljucenFilter()) {
+//				panelView.setUkljucenFilter(false);
+//				prevodAdapter.clearTrazeniTekst();
+//			}
         }
     }
 
@@ -222,33 +226,6 @@ public class EditorActivity extends AppCompatActivity
 
 
     // ------------------------------------------------------------------------------ VIEW INTERFACE
-
-    @Override
-    public void showTitleUntitled(boolean currentSubtitleEdited) {
-	    ActionBar actionBar = getSupportActionBar();
-	    if(actionBar == null) {
-	        logger.w("Action bar missing! Not supposed to happen!");
-	        return;
-        }
-
-        actionBar.setTitle(currentSubtitleEdited?
-                R.string.common_strings_untitled_edited : R.string.common_strings_untitled);
-    }
-
-    @Override
-    public void showTitleForName(@NonNull String currentSubtitleFilename,
-                                 boolean currentSubtitleEdited) {
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar == null) {
-            logger.w("Action bar missing! Not supposed to happen!");
-            return;
-        }
-
-        if(currentSubtitleEdited)
-            actionBar.setTitle(getString(R.string.common_strings_title_edited, currentSubtitleFilename));
-        else
-            actionBar.setTitle(currentSubtitleFilename);
-    }
 
     @Override
     public void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename) {
@@ -564,30 +541,10 @@ public class EditorActivity extends AppCompatActivity
 
 	// --------------------------------------------------------------------------------------- Startovanje aktivnosti
 
-	private void prikaziEditor(int lineNumber) {
-		Intent namera = new Intent(this,TranslatorActivity.class);
-		namera.putExtra(TranslatorActivity.INPUT_LINE_ID, lineNumber);
-		startActivityForResult(namera, REQUEST_CODE_TRANSLATOR_ACTIVITY);
-	}
-
-//	private void onZatvorenPrevodilac(int resultCode, Intent data) {
-//		if(resultCode == RESULT_OK) {
-//			boolean menjanoTamo = data.getExtras().getBoolean(TranslatorActivity.INSTANCE_STATE_HAD_CHANGES);
-//			int zadnjiMenjanLine = data.getExtras().getInt(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_ID);
-//
-//			// Iz nekog razloga oce da pukne ponekad ako nista ne menjas u prevodiocu ako se ne pozove
-//			// osveziListu... pa ono kao aj' onda sto ne bi zvao svaki put. Neki fazon sa kursorima baguje.
-//			osveziListu();
-//			osveziNaslov();
-//
-//			centrirajPrikazListeNa(zadnjiMenjanLine);
-//
-//			// Kad se vratis iz prevodioca neka ne bude ukljucen filter (posto oce nesto da pukne ponekad)
-//			if(panelView.isUkljucenFilter()) {
-//				panelView.setUkljucenFilter(false);
-//				prevodAdapter.clearTrazeniTekst();
-//			}
-//		}
+//	private void prikaziEditor(int lineNumber) {
+//		Intent namera = new Intent(this,TranslatorActivity.class);
+//		namera.putExtra(TranslatorActivity.INPUT_LINE_ID, lineNumber);
+//		startActivityForResult(namera, REQUEST_CODE_TRANSLATOR_ACTIVITY);
 //	}
 
 

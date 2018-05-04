@@ -7,14 +7,11 @@ import butterknife.OnEditorAction;
 import butterknife.OnTextChanged;
 import knez.assdroid.App;
 import knez.assdroid.R;
-import knez.assdroid.help.HelpEditorAkt;
-import knez.assdroid.podesavanja.PodesavanjaPrevodilacAktivnost;
-import knez.assdroid.podesavanja.PodesavanjaPrevodilacUtil;
-import timber.log.Timber;
+import knez.assdroid.common.mvp.CommonSubtitleActivity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -23,7 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class TranslatorActivity extends Activity implements TranslatorMVP.ViewInterface {
+public class TranslatorActivity extends CommonSubtitleActivity implements TranslatorMVP.ViewInterface {
 
     public static final String INPUT_LINE_ID =
             TranslatorActivity.class.getCanonicalName() + "input_line_id";
@@ -48,7 +45,6 @@ public class TranslatorActivity extends Activity implements TranslatorMVP.ViewIn
     private static final int ID_AKTIVNOSTI_PODESAVANJA = 1;
 
     private TranslatorMVP.PresenterInterface presenter;
-    private Timber.Tree logger;
 
 
 // TODO ukloni navigatora
@@ -60,8 +56,6 @@ public class TranslatorActivity extends Activity implements TranslatorMVP.ViewIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translator);
         ButterKnife.bind(this);
-
-        logger = App.getAppComponent().getLogger();
 
         int lineId;
         boolean hadChanges;
@@ -106,14 +100,13 @@ public class TranslatorActivity extends Activity implements TranslatorMVP.ViewIn
 
     // ------------------------------------------------------------------------ USER & SYSYEM EVENTS
 
-    // TODO
     @Override
     public void onBackPressed() {
-//        Intent output = new Intent();
-//        output.putExtra(INSTANCE_STATE_HAD_CHANGES, radjeneIzmeneOvde);
-//        output.putExtra(OUTPUT_LAST_VIEWED_LINE_ID, tekuciRed.getLineNumber());
-//        setResult(RESULT_OK, output);
-//        finish();
+        Intent output = new Intent();
+        output.putExtra(INSTANCE_STATE_HAD_CHANGES, presenter.hasHadChangesToSubtitleMade());
+        output.putExtra(OUTPUT_LAST_VIEWED_LINE_ID, presenter.getCurrentLineId());
+        setResult(RESULT_OK, output);
+        finish();
     }
 
     @OnClick(R.id.translator_prev_line)
@@ -180,7 +173,7 @@ public class TranslatorActivity extends Activity implements TranslatorMVP.ViewIn
     }
 
     @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
 //        switch (item.getItemId()) {
 //            case R.id.meni_standard_podesavanja:
 //                prikaziPodesavanja();
@@ -219,19 +212,6 @@ public class TranslatorActivity extends Activity implements TranslatorMVP.ViewIn
 //        if(PodesavanjaPrevodilacUtil.isAlwaysCopyOn() && inputView.getText().toString().equals("")) {
 //            inputView.setText(tekuciRed.getText());
 //        }
-    }
-
-    /** Sklapa i prikazuje naslov ove aktivnosti koji zavisi od imena prevoda i njegovog statusa snimljenosti. */
-    private void osveziNaslov() {
-//		String ceoNaslov =
-//				subtitleController.isPrevodMenjan()? getResources().getString(R.string.editor_prevod_menjan_znak) : "";
-//		if(subtitleController.getImePrevoda().equals("")) {
-//			ceoNaslov += getResources().getString(R.string.standard_untitled);
-//		} else {
-//			ceoNaslov += subtitleController.getImePrevoda();
-//		}
-//
-//		setTitle(ceoNaslov);
     }
 
 

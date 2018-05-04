@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knez.assdroid.common.StorageHelper;
+import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.editor.adapter.SubtitleLineDiffCallback;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
@@ -21,7 +22,7 @@ import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import solid.collections.SolidList;
 
-public class EditorPresenter
+public class EditorPresenter extends CommonSubtitlePresenter
         implements EditorMVP.PresenterInterface, SubtitleController.Callback {
 
     private static final String STORAGE_KEY_SUBTITLE_LINE_SETTINGS = "subtitle_line_settings";
@@ -67,6 +68,7 @@ public class EditorPresenter
 
     @Override
     public void onAttach(@NonNull EditorMVP.ViewInterface viewInterface) {
+        super.onAttach(viewInterface);
         this.viewInterface = viewInterface;
 
         subtitleLineSettings = storageHelper.readJson(
@@ -94,6 +96,8 @@ public class EditorPresenter
 
     @Override
     public void onDetach() {
+        super.onDetach();
+
         if(diffUtilTask != null) {
             diffUtilTask.cancel(true);
             diffUtilTask = null;
@@ -232,16 +236,6 @@ public class EditorPresenter
         showSubtitleTitle(subtitleFile);
 
         asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
-    }
-
-    private void showSubtitleTitle(@NonNull SubtitleFile subtitleFile) {
-        if(viewInterface == null) return;
-
-        if(subtitleFile.getName() != null)
-            viewInterface.showTitleForName(
-                    subtitleFile.getName(), subtitleFile.isEdited());
-        else
-            viewInterface.showTitleUntitled(subtitleFile.isEdited());
     }
 
     private void showResultsForQuery(@NonNull final String[] queryToShow) {

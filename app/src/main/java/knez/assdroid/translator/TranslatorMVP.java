@@ -2,9 +2,11 @@ package knez.assdroid.translator;
 
 import android.support.annotation.NonNull;
 
+import knez.assdroid.common.mvp.CommonSubtitleMVP;
+
 public interface TranslatorMVP {
 
-    interface ViewInterface {
+    interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
     }
 
     interface PresenterInterface {

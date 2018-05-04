@@ -5,17 +5,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
+import knez.assdroid.common.mvp.CommonSubtitleActivity;
+import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import solid.collections.SolidList;
 
 public interface EditorMVP {
 
-    interface ViewInterface {
-        void showTitleUntitled(boolean currentSubtitleEdited);
+    interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
         void removeAllCurrentSubtitleData();
-        void showTitleForName(@NonNull String currentSubtitleFilename,
-                              boolean currentSubtitleEdited);
         void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename);
         void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos);
         void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos,
