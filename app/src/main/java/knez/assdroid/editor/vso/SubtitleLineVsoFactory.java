@@ -18,7 +18,7 @@ public class SubtitleLineVsoFactory {
         List<SubtitleLineVso> vsos = new ArrayList<>();
         for(SubtitleLine subtitleLine : subtitleLines) {
             vsos.add(new SubtitleLineVso(
-                    subtitleLine.getLineNumber(), subtitleLineSettings, 0, subtitleLine.getText()));
+                    subtitleLine.getId(), subtitleLineSettings, 0, subtitleLine.getText()));
         }
 
         return vsos;

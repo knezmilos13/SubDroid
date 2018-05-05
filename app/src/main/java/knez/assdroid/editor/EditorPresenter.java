@@ -152,7 +152,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public void onSubtitleLineClicked(int id) {
+    public void onSubtitleLineClicked(long id) {
         if(viewInterface == null) return;
         viewInterface.showTranslatorScreen(id);
     }

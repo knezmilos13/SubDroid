@@ -19,7 +19,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
     @NonNull private final String text;
 
     public SubtitleLineVso(
-            int id,
+            long id,
             @NonNull SubtitleLineSettings subtitleLineSettings,
             @DrawableRes int backgroundDrawable,
             @NonNull String text) {

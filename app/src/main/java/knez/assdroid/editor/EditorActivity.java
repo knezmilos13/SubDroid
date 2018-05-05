@@ -177,7 +177,7 @@ public class EditorActivity extends CommonSubtitleActivity
         } else if(requestCode == REQUEST_CODE_TRANSLATOR_ACTIVITY) {
             // TODO
 //            boolean hadChanges = data.getBooleanExtra(TranslatorActivity.INSTANCE_STATE_HAD_CHANGES, false);
-//			int zadnjiMenjanLine = data.getExtras().getInt(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_ID);
+//			int zadnjiMenjanLine = data.getExtras().getInt(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_NUMBER);
 //
 //			// Iz nekog razloga oce da pukne ponekad ako nista ne menjas u prevodiocu ako se ne pozove
 //			// osveziListu... pa ono kao aj' onda sto ne bi zvao svaki put. Neki fazon sa kursorima baguje.
@@ -275,7 +275,7 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void showTranslatorScreen(int lineId) {
+    public void showTranslatorScreen(long lineId) {
         Intent translatorIntent = new Intent(this, TranslatorActivity.class);
         translatorIntent.putExtra(TranslatorActivity.INPUT_LINE_ID, lineId);
         startActivityForResult(translatorIntent, REQUEST_CODE_TRANSLATOR_ACTIVITY);

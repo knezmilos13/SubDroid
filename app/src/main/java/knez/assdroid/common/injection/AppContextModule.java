@@ -95,8 +95,9 @@ public class AppContextModule {
     }
 
     @Provides
-    TranslatorMVP.PresenterInterface getTranslatorPresenter(SubtitleController subtitleController) {
-        return new TranslatorPresenter(subtitleController);
+    TranslatorMVP.PresenterInterface getTranslatorPresenter(
+            SubtitleController subtitleController, Timber.Tree logger) {
+        return new TranslatorPresenter(subtitleController, logger);
     }
 
 }

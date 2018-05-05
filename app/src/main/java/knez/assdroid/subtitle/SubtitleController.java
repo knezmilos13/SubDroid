@@ -12,6 +12,7 @@ import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.db.SubtitleContentDao;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
+import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.SubtitleFormatter;
 import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
@@ -115,6 +116,27 @@ public class SubtitleController extends AbstractRepo {
         subtitleContentDao.clearSubtitle();
 
         return subtitleFile;
+    }
+
+    @Nullable
+    public SubtitleLine getLineForId(long id) {
+        if(currentSubtitleFile == null) return null;
+
+        List<SubtitleLine> subtitleLines = currentSubtitleFile.getSubtitleContent().getSubtitleLines();
+        for(SubtitleLine subtitleLine : subtitleLines)
+            if(subtitleLine.getId() == id) return subtitleLine;
+        return null;
+    }
+
+    @Nullable
+    public SubtitleLine getLineForNumber(int number) {
+        if(currentSubtitleFile == null || number < 1) return null;
+
+        List<SubtitleLine> subtitleLines = currentSubtitleFile.getSubtitleContent().getSubtitleLines();
+        int requestedIndex = number - 1; // line number starts with 1, logically speaking
+
+        if(subtitleLines.size() <= requestedIndex) return null;
+        else return subtitleLines.get(requestedIndex);
     }
 
 

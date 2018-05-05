@@ -28,7 +28,7 @@ public interface EditorMVP {
 
         void showSettingsScreen();
         void showHelpScreen();
-        void showTranslatorScreen(int lineId);
+        void showTranslatorScreen(long lineId);
     }
 
     interface PresenterInterface {
@@ -40,7 +40,7 @@ public interface EditorMVP {
         void onShowSettingsClicked();
         @Nullable String getCurrentSubtitleName();
         void onFileSelectedForSaving(@NonNull Uri uri, @NonNull String filename);
-        void onSubtitleLineClicked(int id);
+        void onSubtitleLineClicked(long id);
     }
 
 }

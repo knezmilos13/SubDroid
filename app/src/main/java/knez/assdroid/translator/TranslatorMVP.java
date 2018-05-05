@@ -1,23 +1,28 @@
 package knez.assdroid.translator;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 
 public interface TranslatorMVP {
 
     interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
+        void closeScreen();
+        void showSubtitleTexts(@NonNull String currentLineText, @Nullable String previousLineText,
+                               @Nullable String nextLineText);
+        void resetInputField(@NonNull String hint);
     }
 
     interface PresenterInterface {
-        void onAttach(@NonNull ViewInterface viewInterface, int lineId, boolean hadChanges);
+        void onAttach(@NonNull ViewInterface viewInterface, long lineId, boolean hadChanges);
         void onDetach();
         void onPrevLineRequested();
         void onNextLineRequested();
         void onCommitRequested();
         void onCommitAndNextRequested();
         void onCopyCurrentLineToInputRequested();
-        int getCurrentLineId();
+        long getCurrentLineId();
         boolean hasHadChangesToSubtitleMade();
     }
 

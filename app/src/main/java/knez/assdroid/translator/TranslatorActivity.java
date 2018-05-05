@@ -11,7 +11,8 @@ import knez.assdroid.common.mvp.CommonSubtitleActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -31,9 +32,9 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
             TranslatorActivity.class.getCanonicalName() + "had_changes";
 
     // TODO ovi dugmici ti ni ne trebaju
-    @BindView(R.id.translator_prev_line) protected TextView prevLineLabel;
-    @BindView(R.id.translator_current_line) protected TextView currentLineLabel;
-    @BindView(R.id.translator_next_line) protected TextView nextLineLabel;
+    @BindView(R.id.translator_prev_line) protected TextView prevLineTextView;
+    @BindView(R.id.translator_current_line) protected TextView currentLineTextView;
+    @BindView(R.id.translator_next_line) protected TextView nextLineTextView;
     @BindView(R.id.translator_input) protected EditText inputView;
     @BindView(R.id.translator_copy_button) protected Button copyButton;
     @BindView(R.id.translator_commit_button) protected Button commitButton;
@@ -57,19 +58,19 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
         setContentView(R.layout.activity_translator);
         ButterKnife.bind(this);
 
-        int lineId;
+        long lineId;
         boolean hadChanges;
         if(savedInstanceState != null) {
-            lineId = savedInstanceState.getInt(INSTANCE_STATE_CURRENT_LINE_ID, 0);
+            lineId = savedInstanceState.getLong(INSTANCE_STATE_CURRENT_LINE_ID, 0L);
             hadChanges = savedInstanceState.getBoolean(INSTANCE_STATE_HAD_CHANGES, false);
         }
         else if(getIntent().getExtras() != null) {
-            lineId = getIntent().getIntExtra(INPUT_LINE_ID, 0);
+            lineId = getIntent().getLongExtra(INPUT_LINE_ID, 0L);
             hadChanges = false;
         }
         else {
             logger.w("%s did not receive any input data nor has a instance state!", getClass().getCanonicalName());
-            lineId = 0;
+            lineId = 0L;
             hadChanges = false;
         }
 
@@ -86,7 +87,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(INSTANCE_STATE_CURRENT_LINE_ID, presenter.getCurrentLineId());
+        outState.putLong(INSTANCE_STATE_CURRENT_LINE_ID, presenter.getCurrentLineId());
         outState.putBoolean(INSTANCE_STATE_HAD_CHANGES, presenter.hasHadChangesToSubtitleMade());
         super.onSaveInstanceState(outState);
     }
@@ -174,7 +175,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
+//        switch (item.getItemId()) { // TODO vidi prebaci u nadklasu
 //            case R.id.meni_standard_podesavanja:
 //                prikaziPodesavanja();
 //                break;
@@ -191,31 +192,27 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
     }
 
 
-    // ----------------------------------------------------------------------------------- Interfejs
+    // ------------------------------------------------------------------------------ VIEW INTERFACE
 
-    /** Prikazuje tekst tekuce ucitanih redova u odgovarajucim labelama. */
-    private void prikaziRedove() {
-//        prevLineLabel.setText(prethodniRed == null? " " : prethodniRed.getText());
-//        currentLineLabel.setText(tekuciRed.getText());
-//        nextLineLabel.setText(sledeciRed == null? " " : sledeciRed.getText());
+    @Override
+    public void closeScreen() {
+        onBackPressed();
     }
 
-    /** Primenjuje podesavanja koja se odnose na prikaz polja za inputView. */
-    private void primeniUnosPodesavanja() {
-//        if(PodesavanjaPrevodilacUtil.isPrevodilacHintOn() && inputView.getText().toString().equals("")) {
-//            inputView.setHint(tekuciRed.getText()); //pazi da iza hinta imas setText inace mozda nece raditi
-//            inputView.setText("");
-//        } else {
-//            inputView.setHint(null);
-//        }
-//
-//        if(PodesavanjaPrevodilacUtil.isAlwaysCopyOn() && inputView.getText().toString().equals("")) {
-//            inputView.setText(tekuciRed.getText());
-//        }
+    @Override
+    public void showSubtitleTexts(@NonNull String currentLineText,
+                                  @Nullable String previousLineText,
+                                  @Nullable String nextLineText) {
+        currentLineTextView.setText(currentLineText);
+        prevLineTextView.setText(previousLineText == null? "" : previousLineText);
+        nextLineTextView.setText(nextLineText == null? "" : nextLineText);
     }
 
-
-
+    @Override
+    public void resetInputField(@NonNull String hint) {
+        inputView.setHint(hint);
+        inputView.setText("");
+    }
 
 
 

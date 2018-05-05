@@ -2,13 +2,13 @@ package knez.assdroid.common.data;
 
 public abstract class IdentifiableImpl implements Identifiable {
 
-    private final int id;
+    private final long id;
 
-    public IdentifiableImpl(int id) {
+    public IdentifiableImpl(long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
