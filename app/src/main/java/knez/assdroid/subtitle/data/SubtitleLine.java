@@ -131,6 +131,7 @@ public class SubtitleLine {
             start = subtitleLine.getStart();
             end = subtitleLine.getEnd();
             style = subtitleLine.getStyle();
+            actorName = subtitleLine.getActorName();
             effect = subtitleLine.getEffect();
             text = subtitleLine.getText();
             isComment = subtitleLine.getIsComment();
