@@ -49,6 +49,8 @@ public class SubtitleController extends AbstractRepo {
 
     @NonNull private final List<Callback> callbacks = Collections.synchronizedList(new ArrayList<>());
 
+    // TODO sinhronizovan pristup subtajtl fajlu... preko nekog objekta drugog posto ovja moze biti null
+
     @Nullable private SubtitleFile currentSubtitleFile;
 
     public SubtitleController(@NonNull SubtitleHandlerRepository subtitleHandlerRepository,
@@ -137,6 +139,25 @@ public class SubtitleController extends AbstractRepo {
 
         if(subtitleLines.size() <= requestedIndex) return null;
         else return subtitleLines.get(requestedIndex);
+    }
+
+    public void updateLine(@NonNull SubtitleLine updatedLine) {
+        if(currentSubtitleFile == null)
+            throw new IllegalStateException("No subtitle file! Can not update line!");
+
+        SubtitleLine lineToUpdate = getLineForId(updatedLine.getId());
+        if(lineToUpdate == null)
+            throw new IllegalStateException("Subtitle line not found! Can not update!");
+
+        subtitleContentDao.updateSubtitleLine(lineToUpdate);
+
+        List<SubtitleLine> subtitleLines = currentSubtitleFile.getSubtitleContent().getSubtitleLines();
+        subtitleLines.set(updatedLine.getLineNumber() - 1, updatedLine);
+
+        currentSubtitleFile.setEdited(true);
+
+        // TODO ako se ne poklapaju i ID i line number stare i izmenjene linije, imas problem
+        // TODO i oces da javis listenerima da se promenila linija?
     }
 
 

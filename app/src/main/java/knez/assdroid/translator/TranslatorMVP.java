@@ -12,6 +12,9 @@ public interface TranslatorMVP {
         void showSubtitleTexts(@NonNull String currentLineText, @Nullable String previousLineText,
                                @Nullable String nextLineText);
         void resetInputField(@NonNull String hint);
+        void setInputText(@NonNull String text);
+
+        @NonNull String getTranslationText();
     }
 
     interface PresenterInterface {

@@ -214,20 +214,14 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
         inputView.setText("");
     }
 
+    @Override
+    public void setInputText(@NonNull String text) {
+        inputView.setText(text);
+    }
 
-
-    // TODO
-
-    // ---------------------------------------------------------------------- Startovanje aktivnosti
-
-//    private void prikaziPodesavanja() {
-//        Intent namera = new Intent(this,PodesavanjaPrevodilacAktivnost.class);
-//        startActivityForResult(namera, ID_AKTIVNOSTI_PODESAVANJA);
-//    }
-//
-//    private void prikaziHelp() {
-//        Intent namera = new Intent(this,HelpEditorAkt.class);
-//        startActivity(namera);
-//    }
+    @Override @NonNull
+    public String getTranslationText() {
+        return inputView.getText().toString();
+    }
 
 }

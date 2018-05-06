@@ -13,6 +13,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         implements TranslatorMVP.PresenterInterface {
 
     @NonNull private final SubtitleController subtitleController;
+    @NonNull private final SubtitleLine.Builder subtitleLineBuilder;
     @NonNull private final Timber.Tree logger;
 
     private TranslatorMVP.ViewInterface viewInterface;
@@ -25,8 +26,10 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     public TranslatorPresenter(
             @NonNull SubtitleController subtitleController,
+            @NonNull SubtitleLine.Builder subtitleLineBuilder,
             @NonNull Timber.Tree logger) {
         this.subtitleController = subtitleController;
+        this.subtitleLineBuilder = subtitleLineBuilder;
         this.logger = logger;
     }
 
@@ -58,7 +61,20 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         }
 
         showSubtitleTitle(subtitleFile);
-        showActiveSubtitleLine(lineId);
+
+        SubtitleLine tempCurrentLine = subtitleController.getLineForId(lineId);
+        if(tempCurrentLine == null) {
+            logger.e("Translator activity started, but no lines available!");
+            viewInterface.closeScreen();
+            return;
+        }
+
+        currentLine = tempCurrentLine;
+        previousLine = subtitleController.getLineForNumber(currentLine.getLineNumber() - 1);
+        nextLine = subtitleController.getLineForNumber(currentLine.getLineNumber() + 1);
+
+        showActiveSubtitleLines();
+        viewInterface.resetInputField(currentLine.getText());
     }
 
     @Override
@@ -73,29 +89,64 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onPrevLineRequested() {
-        premotajNaPrethodniRed(); // TODO
+        if(viewInterface == null) return;
+        if(previousLine == null) return;
+
+        nextLine = currentLine;
+        currentLine = previousLine;
+        previousLine = subtitleController.getLineForNumber(currentLine.getLineNumber() - 1);
+
+        showActiveSubtitleLines();
+        viewInterface.resetInputField(currentLine.getText());
     }
 
+    // TODO dugmici next/prev takodje mogu da se dodaju; takodje vidi tipa enter sta radi
     @Override
     public void onNextLineRequested() {
-        premotajNaSledeciRed(); // TODO
+        if(viewInterface == null) return;
+        if(nextLine == null) return;
+
+        previousLine = currentLine;
+        currentLine = nextLine;
+        nextLine = subtitleController.getLineForNumber(currentLine.getLineNumber() + 1);
+
+        showActiveSubtitleLines();
+        viewInterface.resetInputField(currentLine.getText());
     }
 
     @Override
     public void onCommitRequested() {
-//        commitujIzmene(); // TODO
-//        prikaziRedove();
+        if(viewInterface == null) return;
+
+        String translationText = viewInterface.getTranslationText();
+        // TODO: ovde ces tipa uzeti i druge razne vrednosti, npr. tajminge, pa sve u bilder dole
+
+        subtitleLineBuilder.takeValuesFrom(currentLine);
+        subtitleLineBuilder.setText(translationText);
+
+        SubtitleLine updatedLine = subtitleLineBuilder.build();
+        if(currentLine.isIdenticalTo(updatedLine)) return; // no changes then
+
+        subtitleController.updateLine(updatedLine);
+
+        currentLine = updatedLine;
+
+        showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
+        showActiveSubtitleLines();
+
+        hadChanges = true;
     }
 
     @Override
     public void onCommitAndNextRequested() {
-        commitujIzmene(); // TODO
-        premotajNaSledeciRed();
+        onCommitRequested();
+        onNextLineRequested();
     }
 
     @Override
     public void onCopyCurrentLineToInputRequested() {
-//        inputView.setText(tekuciRed.getText()); // TODO
+        if(viewInterface == null) return;
+        viewInterface.setInputText(currentLine.getText());
     }
 
     @Override
@@ -111,18 +162,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
-    private void showActiveSubtitleLine(long lineId) {
-        SubtitleLine tempCurrentLine = subtitleController.getLineForId(lineId);
-        if(tempCurrentLine == null) {
-            logger.e("Translator activity started, but no lines available!");
-            viewInterface.closeScreen();
-            return;
-        }
-        currentLine = tempCurrentLine;
-
-        previousLine = lineId > 1? subtitleController.getLineForNumber(currentLine.getLineNumber() - 1) : null;
-        nextLine = subtitleController.getLineForNumber(currentLine.getLineNumber() + 1);
-
+    private void showActiveSubtitleLines() {
         if(viewInterface == null) return;
 
         viewInterface.showSubtitleTexts(
@@ -130,58 +170,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
                 previousLine == null? null : previousLine.getText(),
                 nextLine == null? null : nextLine.getText());
 
-        viewInterface.resetInputField(currentLine.getText());
-    }
-
-
-
-
-
-    // TODO sve ispod
-
-    /** Primenjuje izmene na tekucu liniju prevoda i osvezava naslov aktivnosti */
-    private void commitujIzmene() {
-//		if(PodesavanjaPrevodilacUtil.isCommitKeepOriginalOn() && inputView.getText().toString().equals("")) {
-        // ako commit prazne linije ne menja nista, a jeste bila prazna linija... do nothing
-//		} else {
-//			tekuciRed.text = inputView.getText().toString(); // TODO: nece da moze setText - immutable tebra
-//			subtitleController.updateRedPrevoda(tekuciRed);
-//			radjeneIzmeneOvde = true;
-//			if(!subtitleController.isPrevodMenjan()) {
-//				subtitleController.setPrevodMenjan(true);
-//				osveziNaslov();
-//			}
-//		}
-    }
-
-    private void premotajNaSledeciRed() {
-//        if(sledeciRed != null)
-//            showActiveSubtitleLine(sledeciRed.getLineNumber());
-//        else
-//            osveziTekuciRed();
-    }
-
-    private void premotajNaPrethodniRed() {
-//        if(prethodniRed != null)
-//            showActiveSubtitleLine(prethodniRed.getLineNumber());
-//        else
-//            osveziTekuciRed();
-    }
-
-    private void osveziTekuciRed() {
-//        currentLineTextView.setText(tekuciRed.getText());
-    }
-
-    private void snimiPrevod() {
-//		try {
-//			subtitleController.snimiPrevod();
-//		} catch (FileNotFoundException e) {
-//			Loger.log(e);
-//			e.printStackTrace();
-//			//TODO ne postoji fajl... a ovo je save... da je saveas pa ajde
-//			// u ovoj varijanti u prevodiocu moze da ga snimi negde na SD kao temp fajl i da ispise obavestenje
-//		}
-//		osveziNaslov();
+        // TODO: ovde svasta nesto kada bude bilo, tipa tajminzi?
     }
 
 }

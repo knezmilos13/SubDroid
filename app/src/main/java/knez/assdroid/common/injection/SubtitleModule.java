@@ -10,6 +10,7 @@ import dagger.Provides;
 import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.db.SubtitleContentDao;
 import knez.assdroid.subtitle.SubtitleController;
+import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
 import knez.assdroid.subtitle.handler.ass.AssFormatter;
 import knez.assdroid.subtitle.handler.ass.AssParser;
@@ -41,6 +42,11 @@ public class SubtitleModule {
                 SolidList.list(assParser),
                 SolidList.list(assFormatter)
         );
+    }
+
+    @Provides
+    SubtitleLine.Builder getSubtitleLineBuilder() {
+        return new SubtitleLine.Builder();
     }
 
 }

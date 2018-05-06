@@ -43,6 +43,8 @@ public class EditorActivity extends CommonSubtitleActivity
     private EditorMVP.PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
 
+    // TODO: zvezdica kad je editovan fajl da bude ispred imena jer se ne vidi nista
+
     // TODO: da probas start/stop umesto create/destroy?
     // TODO:
     // da tamo edituje i vrati

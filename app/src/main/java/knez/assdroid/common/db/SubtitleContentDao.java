@@ -74,22 +74,8 @@ public class SubtitleContentDao {
         return new SubtitleContent(subtitleLines, rawLinesSectionsMap);
     }
 
-
-    // ------------------------------------------------------------------------------------ INTERNAL
-
-//    @NonNull
-//    private Dao<RawLinesSectionEntity, Integer> getRawLineSectionsDao() throws SQLException {
-//        return databaseHelper.getDao(RawLinesSectionEntity.class);
-//    }
-//
-//    @NonNull
-//    private Dao<RawLine, Integer> getRawLineDao() throws SQLException {
-//        return databaseHelper.getDao(RawLine.class);
-//    }
-//
-//    @NonNull
-//    private Dao<SubtitleLine, Integer> getSubtitleLineDao() throws SQLException {
-//        return databaseHelper.getDao(SubtitleLine.class);
-//    }
+    public void updateSubtitleLine(@NonNull SubtitleLine subtitleLine) {
+        boxStore.boxFor(SubtitleLine.class).put(subtitleLine);
+    }
 
 }

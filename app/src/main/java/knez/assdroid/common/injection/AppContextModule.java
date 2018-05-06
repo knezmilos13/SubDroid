@@ -25,6 +25,7 @@ import knez.assdroid.editor.EditorMVP;
 import knez.assdroid.editor.EditorPresenter;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 import knez.assdroid.subtitle.SubtitleController;
+import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.translator.TranslatorMVP;
 import knez.assdroid.translator.TranslatorPresenter;
 import knez.assdroid.util.FileHandler;
@@ -96,8 +97,9 @@ public class AppContextModule {
 
     @Provides
     TranslatorMVP.PresenterInterface getTranslatorPresenter(
-            SubtitleController subtitleController, Timber.Tree logger) {
-        return new TranslatorPresenter(subtitleController, logger);
+            SubtitleController subtitleController, SubtitleLine.Builder subLineBuilder,
+            Timber.Tree logger) {
+        return new TranslatorPresenter(subtitleController, subLineBuilder, logger);
     }
 
 }

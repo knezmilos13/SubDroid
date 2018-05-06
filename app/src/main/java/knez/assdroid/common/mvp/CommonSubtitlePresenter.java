@@ -1,6 +1,7 @@
 package knez.assdroid.common.mvp;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import knez.assdroid.subtitle.data.SubtitleFile;
 
@@ -21,8 +22,9 @@ public class CommonSubtitlePresenter implements CommonSubtitleMVP.PresenterInter
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
-    protected void showSubtitleTitle(@NonNull SubtitleFile subtitleFile) {
+    protected void showSubtitleTitle(@Nullable SubtitleFile subtitleFile) {
         if(viewInterface == null) return;
+        if(subtitleFile == null) return;
 
         if(subtitleFile.getName() != null)
             viewInterface.showTitleForName(
