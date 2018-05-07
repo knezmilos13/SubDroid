@@ -13,8 +13,8 @@ public interface TranslatorMVP {
                                @Nullable String nextLineText);
         void resetInputField(@NonNull String hint);
         void setInputText(@NonNull String text);
-
         @NonNull String getTranslationText();
+        void showCurrentLineEdited(boolean currentLineEdited);
     }
 
     interface PresenterInterface {
@@ -27,6 +27,7 @@ public interface TranslatorMVP {
         void onCopyCurrentLineToInputRequested();
         long getCurrentLineId();
         boolean hasHadChangesToSubtitleMade();
+        void onTextChanged(@NonNull String text);
     }
 
 }

@@ -19,6 +19,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     private TranslatorMVP.ViewInterface viewInterface;
     private long lineId;
     private boolean hadChanges;
+    private boolean currentLineEdited; // TODO trebace za instance state - ili da sacuvas prezenter onda ?
 
     private SubtitleLine currentLine;
     @Nullable private SubtitleLine previousLine;
@@ -75,6 +76,8 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
+        currentLineEdited = true;
+        viewInterface.showCurrentLineEdited(true);
     }
 
     @Override
@@ -98,9 +101,11 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
+
+        currentLineEdited = true;
+        viewInterface.showCurrentLineEdited(true);
     }
 
-    // TODO dugmici next/prev takodje mogu da se dodaju; takodje vidi tipa enter sta radi
     @Override
     public void onNextLineRequested() {
         if(viewInterface == null) return;
@@ -112,6 +117,9 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
+
+        currentLineEdited = true;
+        viewInterface.showCurrentLineEdited(true);
     }
 
     @Override
@@ -135,6 +143,9 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         showActiveSubtitleLines();
 
         hadChanges = true;
+
+        currentLineEdited = false;
+        viewInterface.showCurrentLineEdited(false);
     }
 
     @Override
@@ -147,6 +158,9 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     public void onCopyCurrentLineToInputRequested() {
         if(viewInterface == null) return;
         viewInterface.setInputText(currentLine.getText());
+
+        currentLineEdited = false;
+        viewInterface.showCurrentLineEdited(false);
     }
 
     @Override
@@ -157,6 +171,16 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @Override
     public boolean hasHadChangesToSubtitleMade() {
         return hadChanges;
+    }
+
+    @Override
+    public void onTextChanged(@NonNull String text) {
+        boolean linesSame = currentLine.getText().equals(text);
+        if(currentLineEdited && linesSame) currentLineEdited = false;
+        else if(!currentLineEdited && !linesSame) currentLineEdited = true;
+        else return; // no changes
+
+        if(viewInterface != null) viewInterface.showCurrentLineEdited(currentLineEdited);
     }
 
 

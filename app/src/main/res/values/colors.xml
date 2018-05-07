@@ -14,6 +14,14 @@
     <color name="gray_7_quite_light">#ebebeb</color>
     <color name="gray_8_lightest">#f7f7f7</color>
 
+    <color name="translator_commit_indicator">@color/accent</color>
+
+
+
+
+
+
+
     <color name="standard_bg_color">#ff000000</color>
     <color name="gray">#ffff0000</color>
     <color name="global_providna">#00000000</color>

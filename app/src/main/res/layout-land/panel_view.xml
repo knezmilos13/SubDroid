@@ -56,7 +56,7 @@
         </LinearLayout>
 
         <View
-            style="@style/separator_fazon_lista"
+            style="@style/translator_subtitle_line_separator"
             android:layout_marginBottom="@dimen/padding_small"
             android:layout_marginTop="@dimen/padding_tiny" />
 

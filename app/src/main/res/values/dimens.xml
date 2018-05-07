@@ -15,6 +15,14 @@
     <dimen name="recycler_center_text_size">16dp</dimen>
 
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TRANSLATOR ACTIVITY -->
+
+    <dimen name="translator_commit_indicator_dimension">20dp</dimen>
+    <dimen name="translator_main_button_dimension">60dp</dimen>
+
+
+
+
     <!-- TODO ove sutnuti ispod -->
 
     <dimen name="padding_tiny">4dp</dimen>

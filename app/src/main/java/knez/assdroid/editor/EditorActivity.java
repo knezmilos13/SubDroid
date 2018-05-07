@@ -60,6 +60,7 @@ public class EditorActivity extends CommonSubtitleActivity
     // TODO dodaj dugme za dodavanje nove linije prevoda (mada je malo besmisleno dok nemas edit tajminga)
     // eventualno duplicate linije na long hold
 
+    // TODO: tablet and horizontal variant
 
     // --------------------------------------------------------------------------- LIFECYCLE & SETUP
 
