@@ -162,7 +162,6 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
         presenter.onCommitAndNextRequested();
     }
 
-    // TODO treba da premota kursor na kraj
     @OnClick(R.id.translator_copy_button)
     protected void onCopyClicked() {
         presenter.onCopyCurrentLineToInputRequested();
@@ -255,6 +254,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
     @Override
     public void setInputText(@NonNull String text) {
         inputView.setText(text);
+        inputView.setSelection(text.length());
     }
 
     @Override @NonNull
