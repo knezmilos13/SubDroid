@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="@dimen/standard_content_padding"
+    android:scrollbarStyle="outsideOverlay"
     tools:context=".translator.TranslatorActivity">
 
     <RelativeLayout
