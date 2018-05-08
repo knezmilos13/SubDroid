@@ -1,4 +1,4 @@
-package knez.assdroid.gui;
+package knez.assdroid.util.gui;
 
 import knez.assdroid.R;
 import android.app.AlertDialog;

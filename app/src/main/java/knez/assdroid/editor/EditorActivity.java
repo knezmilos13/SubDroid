@@ -42,7 +42,10 @@ public class EditorActivity extends CommonSubtitleActivity
     private EditorMVP.PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
 
+    /// TODO: sve osim teksta je sjebano (duplirano)
+
     // TODO: zvezdica kad je editovan fajl da bude ispred imena jer se ne vidi nista
+    // TODO takodje imenovanje ti je fucked up sa onim (2)... probaj da dozvolis save? tj. overwrite
 
     // TODO: da probas start/stop umesto create/destroy?
     // TODO:

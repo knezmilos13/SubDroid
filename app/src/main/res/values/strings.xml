@@ -44,12 +44,7 @@
     
     	<!-- Podesavanja Global -->
     <string name="podesavanja_global_kategorija_interfejs">Interface</string>
-    <string name="podesavanja_global_fullscreen_tip_naslov">Hide in fullscreen</string>
-    <string name="podesavanja_global_fullscreen_tip_status_bar">Status bar</string>
-    <string name="podesavanja_global_fullscreen_tip_title_bar">Title bar</string>
-    <string name="podesavanja_global_fullscreen_tip_both">Status &amp; title bar</string>
-    <string name="podesavanja_global_fullscreen_tip_default">@string/podesavanja_global_fullscreen_tip_both</string>
-    
+
     	<!-- Podesavanja Prevodilac -->
     <string name="podesavanja_prevodilac">Translator</string>
     <string name="podesavanja_prevodilac_naslov">Translator Settings</string>

@@ -1,7 +1,7 @@
 package knez.assdroid.podesavanja;
 
 import knez.assdroid.R;
-import knez.assdroid.gui.ResetEditTextPreference;
+import knez.assdroid.util.gui.ResetEditTextPreference;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;

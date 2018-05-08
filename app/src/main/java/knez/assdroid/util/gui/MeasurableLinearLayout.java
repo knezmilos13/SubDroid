@@ -1,4 +1,4 @@
-package knez.assdroid.gui;
+package knez.assdroid.util.gui;
 
 import android.content.Context;
 import android.util.AttributeSet;

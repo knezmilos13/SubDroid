@@ -12,7 +12,6 @@
     <bool name="panel_view_default_tajming">true</bool>
     <bool name="panel_view_default_tagovi">false</bool>
     <bool name="panel_view_default_stajl">false</bool>
-    <bool name="panel_view_default_fullscreen">false</bool>
     <bool name="panel_view_default_filter_highlight">true</bool>
     <bool name="panel_view_default_filter_match_case">false</bool>
 </resources>
