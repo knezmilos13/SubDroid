@@ -46,8 +46,6 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
 
     private TranslatorMVP.PresenterInterface presenter;
 
-    // TODO enter ima bag, odradi se dva puta za redom nekako
-
 
     // ------------------------------------------------------------------------------ Zivotni ciklus
 
@@ -80,6 +78,9 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
     }
 
     private void setUpViews() {
+        // hack - allows enter to work as ime action even though the field is multiline
+        inputView.setHorizontallyScrolling(false);
+
         commitIndicatorView.setImageDrawable(
                 new IconDrawable(this, MaterialIcons.md_edit)
                         .sizePx(getResources().getDimensionPixelSize(
@@ -167,23 +168,11 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
         presenter.onCopyCurrentLineToInputRequested();
     }
 
-// TODO proveri jel ti treba ovo
-//    @Override
-//    public boolean onKey(View v, int keyCode, KeyEvent event) {
-//        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-//            switch (keyCode) {
-//                case KeyEvent.KEYCODE_DPAD_CENTER:
-//                case KeyEvent.KEYCODE_ENTER:
-//                    commitujIzmene();
-//                    premotajNaSledeciRed();
-//                    return true;
-//            }
-//        }
-//        return false;
-//    }
-
     @OnEditorAction(R.id.translator_input)
     protected boolean onInputEditorAction(TextView v, int actionId, KeyEvent event) {
+        if(event == null) return false; // wtf
+        if(event.getAction() != KeyEvent.ACTION_DOWN) return false;
+
         presenter.onCommitAndNextRequested();
         return true;
     }

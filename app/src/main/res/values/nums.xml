@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
+    <integer name="translator_input_max_lines">3</integer>
+
+
     <integer name="editor_kontrole_min_transp_default">70</integer>
     <integer name="editor_kontrole_min_transp">0</integer>
     <integer name="editor_kontrole_max_transp">100</integer>

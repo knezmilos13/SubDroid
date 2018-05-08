@@ -71,8 +71,7 @@
             android:layout_marginTop="@dimen/padding_small"
             android:gravity="top|start"
             android:inputType="textMultiLine"
-            android:imeOptions="actionNext"
-            android:lines="3" />
+            android:imeOptions="actionNext"/>
 
         <LinearLayout
             android:layout_width="match_parent"
