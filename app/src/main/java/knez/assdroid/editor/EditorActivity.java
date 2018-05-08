@@ -14,6 +14,7 @@ import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.util.AndroidUtil;
 import knez.assdroid.util.gui.BgpEditText;
+import knez.assdroid.util.gui.FadeAnimationHelper;
 import solid.collections.SolidList;
 
 import android.content.Intent;
@@ -25,6 +26,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 public class EditorActivity extends CommonSubtitleActivity
@@ -248,11 +250,14 @@ public class EditorActivity extends CommonSubtitleActivity
     // ------------------------------------------------------------------------------------ INTERNAL
 
     private void updateCenterText() {
-        // TODO vidi samo sad imas tipa no subtitle lines i no results kad je filtriranje ukljuceno
-//        if(adapter.getItemCount() == 0 && centerTextView.getVisibility() == View.GONE)
-//            FadeAnimationHelper.fadeView(true, centerTextView, false);
-//        else if(adapter.getItemCount() != 0 && centerTextView.getVisibility() == View.VISIBLE)
-//            FadeAnimationHelper.fadeView(false, centerTextView, false);
+        if(subtitleLinesAdapter.getItemCount() == 0 && centerTextView.getVisibility() == View.GONE) {
+            centerTextView.setText(searchView.getText().length() > 0?
+                    R.string.editor_subtitle_list_no_results_for_query
+                    : R.string.editor_subtitle_list_no_lines_in_file);
+            FadeAnimationHelper.fadeView(true, centerTextView, false);
+        }
+        else if(subtitleLinesAdapter.getItemCount() != 0 && centerTextView.getVisibility() == View.VISIBLE)
+            FadeAnimationHelper.fadeView(false, centerTextView, false);
     }
 
 
