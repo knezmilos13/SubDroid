@@ -170,8 +170,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
 
     @OnEditorAction(R.id.translator_input)
     protected boolean onInputEditorAction(TextView v, int actionId, KeyEvent event) {
-        if(event == null) return false; // wtf
-        if(event.getAction() != KeyEvent.ACTION_DOWN) return false;
+        if(event != null && event.getAction() != KeyEvent.ACTION_DOWN) return false;
 
         presenter.onCommitAndNextRequested();
         return true;
