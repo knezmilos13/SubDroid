@@ -80,6 +80,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
     private void setUpViews() {
         // hack - allows enter to work as ime action even though the field is multiline
         inputView.setHorizontallyScrolling(false);
+        inputView.setMaxLines(200); // 200 is a random value not likely to be hit ever
 
         commitIndicatorView.setImageDrawable(
                 new IconDrawable(this, MaterialIcons.md_edit)
