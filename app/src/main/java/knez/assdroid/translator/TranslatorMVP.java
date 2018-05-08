@@ -17,7 +17,7 @@ public interface TranslatorMVP {
         void showCurrentLineEdited(boolean currentLineEdited);
     }
 
-    interface PresenterInterface {
+    interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
         void onAttach(@NonNull ViewInterface viewInterface, long lineId, boolean hadChanges);
         void onDetach();
         void onPrevLineRequested();

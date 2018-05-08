@@ -58,6 +58,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
             @NonNull StorageHelper storageHelper) {
+        super(subtitleController);
         this.subtitleController = subtitleController;
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
         this.storageHelper = storageHelper;
@@ -140,40 +141,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public void onFileSelectedForSaving(@NonNull Uri uri, @NonNull String filename) {
-        String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
-
-        if(!subtitleController.canWriteSubtitle(subtitleExtension)) {
-            viewInterface.showErrorWritingSubtitleInvalidFormat(filename);
-            return;
-        }
-
-        subtitleController.writeSubtitle(uri);
-    }
-
-    @Override
     public void onSubtitleLineClicked(long id) {
         if(viewInterface == null) return;
         viewInterface.showTranslatorScreen(id);
-    }
-
-    @Override
-    public void onShowHelpClicked() {
-        if(viewInterface == null) return;
-        viewInterface.showHelpScreen();
-    }
-
-    @Override
-    public void onShowSettingsClicked() {
-        if(viewInterface == null) return;
-        viewInterface.showSettingsScreen();
-    }
-
-    @Override @Nullable
-    public String getCurrentSubtitleName() {
-        SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
-        if(currentSubtitleFile == null) return null;
-        else return currentSubtitleFile.getName();
     }
 
 

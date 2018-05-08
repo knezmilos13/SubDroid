@@ -29,6 +29,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLine.Builder subtitleLineBuilder,
             @NonNull Timber.Tree logger) {
+        super(subtitleController);
         this.subtitleController = subtitleController;
         this.subtitleLineBuilder = subtitleLineBuilder;
         this.logger = logger;

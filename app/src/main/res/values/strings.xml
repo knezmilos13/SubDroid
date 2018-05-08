@@ -10,6 +10,10 @@
     <string name="common_strings_untitled_edited">Untitled*</string>
     <string name="common_strings_title_edited">%1$s*</string>
 
+    <string name="common_save_subtitle">Save subtitle</string>
+    <string name="common_settings">Settings</string>
+    <string name="common_help">Help</string>
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
 
@@ -18,7 +22,8 @@
     <string name="editor_subtitle_list_no_lines_in_file">No lines in subtitle file</string>
     <string name="editor_subtitle_search_hint">Search in subtitle file</string>
 
-
+    <string name="editor_create_new_subtitle">Create new subtitle</string>
+    <string name="editor_load_subtitle">Load subtitle</string>
 
 
 
@@ -26,12 +31,8 @@
 
     <string name="standard_exit">Exit</string>
     <string name="standard_podesavanja">Settings</string>
-    <string name="standard_ucitaj_fajl">Load subtitle</string>
-    <string name="standard_kreiraj_fajl">Create new subtitle</string>
-    <string name="standard_save">Save</string>
     <string name="standard_save_as">Save As…</string>
-    <string name="standard_help">Help</string>
-    
+
     
     <!-- Podesavanja -->
     <string name="podesavanja_global">Global</string>

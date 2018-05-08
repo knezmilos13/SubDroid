@@ -1,33 +1,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     
     <item
-        android:id="@+id/meni_standard_create"
+        android:id="@+id/menu_item_create_subtitle"
         android:orderInCategory="1"
-        android:icon="@drawable/ic_menu_compose"
-        android:title="@string/standard_kreiraj_fajl"/>
+        android:title="@string/editor_create_new_subtitle"/>
     
     <item
-        android:id="@+id/meni_standard_load"
+        android:id="@+id/menu_item_load_subtitle"
         android:orderInCategory="2"
-        android:icon="@drawable/ic_menu_search"
-        android:title="@string/standard_ucitaj_fajl"/>
-     
-     <item
-        android:id="@+id/meni_standard_save"
+        android:title="@string/editor_load_subtitle"/>
+
+    <item
+        android:id="@+id/menu_item_save_subtitle"
         android:orderInCategory="3"
-        android:icon="@drawable/ic_menu_save"
-        android:title="@string/standard_save"/>
-     
-     <item
-        android:id="@+id/meni_standard_podesavanja"
+        android:title="@string/common_save_subtitle"/>
+
+    <item
+        android:id="@+id/menu_item_settings"
         android:orderInCategory="4"
-        android:icon="@drawable/ic_menu_preferences"
-        android:title="@string/standard_podesavanja"/>
-     
-     <item
-        android:id="@+id/meni_standard_help"
+        android:title="@string/common_settings"/>
+
+    <item
+        android:id="@+id/menu_item_help"
         android:orderInCategory="5"
-        android:icon="@drawable/ic_menu_help"
-        android:title="@string/standard_help"/>
+        android:title="@string/common_help"/>
 
 </menu>

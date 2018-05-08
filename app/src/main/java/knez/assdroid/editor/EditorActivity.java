@@ -4,8 +4,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
-import knez.assdroid.help.KategorijeHelpaAktivnost;
-import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
+import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.translator.TranslatorActivity;
 import knez.assdroid.R;
 import knez.assdroid.common.adapter.IdentifiableAdapter;
@@ -32,9 +31,7 @@ public class EditorActivity extends CommonSubtitleActivity
         implements EditorMVP.ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
 
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
-    private static final int REQUEST_CODE_SAVE_SUBTITLE = 1235;
     private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
-    private static final int REQUEST_CODE_SETTINGS_ACTIVITY = 501;
 
     @BindView(R.id.editor_subtitle_list) protected RecyclerView itemListRecycler;
     @BindView(R.id.editor_search_view) protected BgpEditText searchView;
@@ -76,6 +73,11 @@ public class EditorActivity extends CommonSubtitleActivity
 
         presenter.onAttach(this);
 	}
+
+    @Override
+    protected CommonSubtitleMVP.PresenterInterface getPresenter() {
+        return presenter;
+    }
 
     @Override
     protected void onResume() {
@@ -126,40 +128,22 @@ public class EditorActivity extends CommonSubtitleActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.meni_standard_create:
+			case R.id.menu_item_create_subtitle:
 //				kreirajNoviPrevod(); // TODO
 				break;
-			case R.id.meni_standard_load:
+			case R.id.menu_item_load_subtitle:
 				showFileOpenSelector();
 				break;
-			case R.id.meni_standard_podesavanja:
-				presenter.onShowSettingsClicked();
-				break;
-			case R.id.meni_standard_save:
-				showFileSaveSelector();
-				break;
-			case R.id.meni_standard_help:
-			    presenter.onShowHelpClicked();
-				break;
 			default:
-				return false;
+				return super.onOptionsItemSelected(item);
 		}
 		return true;
 	}
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//			case REQUEST_CODE_SETTINGS_ACTIVITY:
-//				boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
-//				if(izmenjen) prevodAdapter.notifyDataSetChanged();
-//				primeniPerzistentnaPodesavanjaNaKontrole();
-//				primeniFullscreen(panelView.isFullscreenOn());
-//				break;
-// TODO
-
-        if(resultCode != RESULT_OK) return;
-
         if(requestCode == REQUEST_CODE_OPEN_SUBTITLE) {
+            if(resultCode != RESULT_OK) return;
             if(data == null) return;
 
             Uri uri = data.getData();
@@ -167,15 +151,6 @@ public class EditorActivity extends CommonSubtitleActivity
 
             String filename = AndroidUtil.getFileNameFromUri(this, uri);
             presenter.onFileSelectedForLoad(uri, filename);
-            return;
-        } else if(requestCode == REQUEST_CODE_SAVE_SUBTITLE) {
-            if(data == null) return;
-
-            Uri uri = data.getData();
-            if(uri == null) return;
-
-            String filename = AndroidUtil.getFileNameFromUri(this, uri);
-            presenter.onFileSelectedForSaving(uri, filename);
             return;
         } else if(requestCode == REQUEST_CODE_TRANSLATOR_ACTIVITY) {
             // TODO
@@ -195,6 +170,8 @@ public class EditorActivity extends CommonSubtitleActivity
 //				prevodAdapter.clearTrazeniTekst();
 //			}
         }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -255,26 +232,9 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void showErrorWritingSubtitleInvalidFormat(@NonNull String filename) {
-        // TODO
-    }
-
-    @Override
     public void removeAllCurrentSubtitleData() {
 	    subtitleLinesAdapter.clear();
 	    searchView.setText(""); // TODO dal ovo puca listener
-    }
-
-    @Override
-    public void showSettingsScreen() {
-        Intent settingsIntent = new Intent(this, KategorijePodesavanjaAktivnost.class); // TODO
-        startActivityForResult(settingsIntent, REQUEST_CODE_SETTINGS_ACTIVITY);
-    }
-
-    @Override
-    public void showHelpScreen() {
-        Intent helpIntent = new Intent(this, KategorijeHelpaAktivnost.class); // TODO
-        startActivity(helpIntent);
     }
 
     @Override
@@ -390,166 +350,6 @@ public class EditorActivity extends CommonSubtitleActivity
 //		super.onPrepareDialog(id, dialog);
 //	}
 
-	// ---------------------------------------------------------------------------------------------------- Interfejs
-
-	/** Ucitava kursor sa svim redovima prevoda i koristi ga da prikaze sve u listi. */
-//	private void osveziListu() {
-//		Cursor kurs = subHandler.ucitajSveRedovePrevoda();
-//		stopManagingCursor(prevodAdapter.getCursor());
-//		startManagingCursor(kurs);
-//		prevodAdapter.changeCursor(kurs);
-//	}
-	/** Ucitava kursor sa trazenim redovima prevoda i koristi ga da ih prikaze u listi. */
-//	private void osveziListu(String filterTekst, boolean matchCase) {
-//		Cursor kurs = subHandler.ucitajRedovePrevoda(filterTekst, matchCase);
-//		stopManagingCursor(prevodAdapter.getCursor());
-//		startManagingCursor(kurs);
-//		prevodAdapter.changeCursor(kurs);
-//	}
-
-//	private void osveziNaslov() {
-//		String ceoNaslov = subHandler.isPrevodMenjan()? getResources().getString(R.string.editor_prevod_menjan_znak) : "";
-//		if(subHandler.getImePrevoda().equals("")) {
-//			ceoNaslov += getResources().getString(R.string.standard_untitled);
-//		} else {
-//			ceoNaslov += subHandler.getImePrevoda();
-//		}
-//
-//		setTitle(ceoNaslov);
-//	}
-
-	/** Menja stanje adaptera zavisno od podesavanja snimljenih u preferencama. Vraca true
-	 * ako je stanje stvarno izmenjeno, posle cega bi trebalo pozvati notifyDataSetChanged. */
-//	private boolean primeniPerzistentnaPodesavanjaNaAdapter() {
-//		boolean promenjenPrikazListe = false;
-//		String tagZnak = PodesavanjaEditorUtil.getMinimizedCharTag();
-//		if(prevodAdapter.getTagZamena()==null || !prevodAdapter.getTagZamena().equals(tagZnak)) {
-//			prevodAdapter.setTagZamena(tagZnak);
-//			promenjenPrikazListe = true;
-//		}
-//
-//		int fontTekst = PodesavanjaEditorUtil.getTextFontSize();
-//		if(prevodAdapter.getTekstSize() != fontTekst) {
-//			prevodAdapter.setTekstSize(fontTekst);
-//			promenjenPrikazListe = true;
-//		}
-//		int fontOstalo = PodesavanjaEditorUtil.getOstaloFontSize();
-//		if(prevodAdapter.getOstaloSize() != fontOstalo) {
-//			prevodAdapter.setOstaloSize(fontOstalo);
-//			promenjenPrikazListe = true;
-//		}
-//
-//		return promenjenPrikazListe;
-//	}
-
-	/** Menja stanje kontrola zavisno od podesavanja snimljenih u preferencama. */
-//	private void primeniPerzistentnaPodesavanjaNaKontrole() {
-//		int transparentnost = PodesavanjaEditorUtil.getMinimizedTransparentnost();
-//		if(editorControlsView.getTransparentnost() != transparentnost) {
-//			editorControlsView.setTransparentnost(transparentnost);
-//		}
-//	}
-
-	/** Lista ce biti skrolovana tako da red prevoda sa zadatim brojem linije ispliva kao drugi na njoj. */
-//	private void centrirajPrikazListeNa(int zadnjiMenjanLine) {
-//		int pozicija = prevodAdapter.dajPozicijuZaLineNumber(zadnjiMenjanLine);
-//		if(pozicija == -1) return;
-//
-////		getListView().setSelection(pozicija >= 1? pozicija-1 : pozicija); // TODO
-//	}
-
-	/** Siri listu da zauzme ceo prostor ekrana (zovi kad minimiziras kontrole). */
-//	private void rasiriListu() {
-//		zadnjaDimenzija = zadnjaRotacija = -1;
-//		LayoutParams parametriL = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-//		LayoutParams parametriZ = new LayoutParams(0, 0);
-//		zauzimacProstora.setLayoutParams(parametriZ);
-////		getListView().setLayoutParams(parametriL); // TODO
-//	}
-
-//	private int zadnjaDimenzija = -1, zadnjaRotacija = -1;
-//	/** Skuplja listu tako da nijedan njen deo ne bude ispod osnovnog reda sa kontrolama. */
-//	private void skupiListu(int sirina,int visina,int rotacija) {
-//		int sirinaViewa = sirina > visina? visina : sirina;
-//		if(sirina <= 0 || visina <= 0 || rotacija <= 0 || (sirinaViewa == zadnjaDimenzija && rotacija == zadnjaRotacija))
-//			return;
-//
-//		zadnjaDimenzija = sirinaViewa;
-//		zadnjaRotacija = rotacija;
-//
-//		LayoutParams parametriZ = null;
-//		LayoutParams parametriL = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-//		switch (rotacija) {
-//		case EditorControlsView.POZICIJA_GORE:
-//			parametriZ = new LayoutParams(LayoutParams.MATCH_PARENT, sirinaViewa);
-//			parametriZ.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//			parametriL.addRule(RelativeLayout.BELOW, R.id.editor_zauzimac);
-//			break;
-//		case EditorControlsView.POZICIJA_DESNO:
-//			parametriZ = new LayoutParams(sirinaViewa, LayoutParams.MATCH_PARENT);
-//			parametriZ.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-//			parametriL.addRule(RelativeLayout.LEFT_OF, R.id.editor_zauzimac);
-//			break;
-//		case EditorControlsView.POZICIJA_DOLE:
-//			parametriZ = new LayoutParams(LayoutParams.MATCH_PARENT, sirinaViewa);
-//			parametriZ.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-//			parametriL.addRule(RelativeLayout.ABOVE, R.id.editor_zauzimac);
-//			break;
-//		case EditorControlsView.POZICIJA_LEVO:
-//			parametriZ = new LayoutParams(sirinaViewa, LayoutParams.MATCH_PARENT);
-//			parametriZ.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-//			parametriL.addRule(RelativeLayout.RIGHT_OF, R.id.editor_zauzimac);
-//			break;
-//		}
-//		zauzimacProstora.setLayoutParams(parametriZ);
-////		getListView().setLayoutParams(parametriL); // TODO
-//	}
-
-//	private void izfiltrirajListu(String tekst, boolean filterMatchCase, boolean highlight) {
-//		if(highlight)
-//			prevodAdapter.setTrazeniTekst(tekst, filterMatchCase);
-//		else
-//			prevodAdapter.clearTrazeniTekst();
-//		osveziListu(tekst, filterMatchCase);
-//	}
-
-//	/** Gasi odredjene elemente interfejsa za situacije kada kreiras/ucitas novi prevod. */
-//	private void resetujInterfejsZaNoviPrevod() {
-//		if(panelView.isUkljucenFilter())
-//			panelView.setUkljucenFilter(false);
-//	}
-
-	// ---------------------------------------------------------------------------------------- Manipulacija prevodom
-
-//	private void kreirajNoviPrevod() {
-//		subHandler.kreirajNoviPrevod();
-//		osveziListu();
-//		osveziNaslov();
-//		resetujInterfejsZaNoviPrevod();
-//	}
-
-
-
-//	private void snimiPrevod() {
-//		try {
-//			subHandler.snimiPrevod();
-//		} catch (FileNotFoundException e) {
-//			Loger.log(e);
-//			e.printStackTrace();
-//			//TODO ne postoji fajl... a ovo je save... da je saveas pa ajde
-//		}
-//		osveziNaslov();
-//	}
-
-
-	// --------------------------------------------------------------------------------------- Startovanje aktivnosti
-
-//	private void prikaziEditor(int lineNumber) {
-//		Intent namera = new Intent(this,TranslatorActivity.class);
-//		namera.putExtra(TranslatorActivity.INPUT_LINE_ID, lineNumber);
-//		startActivityForResult(namera, REQUEST_CODE_TRANSLATOR_ACTIVITY);
-//	}
-
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
@@ -558,20 +358,6 @@ public class EditorActivity extends CommonSubtitleActivity
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         startActivityForResult(intent, REQUEST_CODE_OPEN_SUBTITLE);
-    }
-
-    private void showFileSaveSelector() {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-
-        String currentName = presenter.getCurrentSubtitleName();
-        if(currentName == null) currentName = getString(R.string.common_strings_untitled);
-        currentName += " (2).ass"; // TODO jednom kad snimis ovo valjda se azurira URI pa onda sledeci put kad snimis bude (2)(2)(2) itd... vidi save umesto save as
-
-        intent.putExtra(Intent.EXTRA_TITLE, currentName);
-
-        startActivityForResult(intent, REQUEST_CODE_SAVE_SUBTITLE);
     }
 
 }

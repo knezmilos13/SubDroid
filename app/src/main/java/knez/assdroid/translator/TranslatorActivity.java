@@ -7,6 +7,7 @@ import butterknife.OnEditorAction;
 import knez.assdroid.App;
 import knez.assdroid.R;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
+import knez.assdroid.common.mvp.CommonSubtitleMVP;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +17,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -77,6 +77,11 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
         presenter.onAttach(this, lineId, hadChanges);
     }
 
+    @Override
+    protected CommonSubtitleMVP.PresenterInterface getPresenter() {
+        return presenter;
+    }
+
     private void setUpViews() {
         // hack - allows enter to work as ime action even though the field is multiline
         inputView.setHorizontallyScrolling(false);
@@ -123,7 +128,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
     }
 
 
-    // ------------------------------------------------------------------------ USER & SYSYEM EVENTS
+    // ------------------------------------------------------------------------ USER & SYSTEM EVENTS
 
     @Override
     public void onBackPressed() {
@@ -191,31 +196,6 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
             presenter.onTextChanged(text);
         }
     };
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(requestCode == ID_AKTIVNOSTI_PODESAVANJA) { // TODO
-//            primeniUnosPodesavanja();
-//        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) { // TODO vidi prebaci u nadklasu
-//            case R.id.meni_standard_podesavanja:
-//                prikaziPodesavanja();
-//                break;
-//            case R.id.meni_standard_save:
-//                snimiPrevod();
-//                break;
-//            case R.id.meni_standard_help:
-//                prikaziHelp();
-//                break;
-//            default:
-//                return false;
-//        }
-        return true;
-    }
 
 
     // ------------------------------------------------------------------------------ VIEW INTERFACE
