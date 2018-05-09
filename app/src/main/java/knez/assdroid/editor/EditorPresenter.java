@@ -31,7 +31,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private static final boolean SUB_LINE_DEFAULT_SHOW_STYLE_ACTOR = true;
     private static final boolean SUB_LINE_DEFAULT_SHOW_TAG_CONTENT = false;
     private static final String SUB_LINE_DEFAULT_TAG_REPLACEMENT = "田";
-    private static final int SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP = 14;
+    private static final int SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP = 15;
     private static final int SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP = 12;
 
     @NonNull private final SubtitleController subtitleController;
@@ -331,7 +331,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         @Override
         protected void onPostExecute(SolidList<SubtitleLineVso> result) {
-            Callback actualCallback = callback.get();
+            Callback actualCallback = callback.get(); // TODO: THIS IS NULL OFTEN!
                 if(actualCallback != null) actualCallback.onVsoFactoryTaskCompleted(result);
         }
 

@@ -8,10 +8,9 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import org.threeten.bp.format.DateTimeFormatter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,28 +22,17 @@ import knez.assdroid.subtitle.ParserHelper;
 
 public class SubtitleLineLayoutItem extends FrameLayout {
 
-    // TODO rename all this shit
-    @BindView(R.id.stavka_prevod_prvi_red) protected View prviRed;
-    @BindView(R.id.stavka_prevod_drugi_red) protected View drugiRed;
-    @BindView(R.id.stavka_prevod_redni_broj_1) protected TextView redniBroj1;
-    @BindView(R.id.stavka_prevod_redni_broj_2) protected TextView redniBroj2;
-    @BindView(R.id.stavka_prevod_redni_broj_3) protected TextView redniBroj3;
-    @BindView(R.id.stavka_prevod_vreme_od) protected TextView vremeOd;
-    @BindView(R.id.stavka_prevod_vreme_crtica) protected TextView labelaCrtica;
-    @BindView(R.id.stavka_prevod_vreme_do) protected TextView vremeDo;
-    @BindView(R.id.stavka_prevod_tekst_actor) protected TextView labelaActor;
-    @BindView(R.id.stavka_prevod_actor) protected TextView actor;
-    @BindView(R.id.stavka_prevod_tekst_stil) protected TextView labelaStil;
-    @BindView(R.id.stavka_prevod_stil) protected TextView style;
-    @BindView(R.id.stavka_prevod_tekst) protected TextView tekst;
+    @BindView(R.id.subtitle_line_line_number) protected TextView lineNumberView;
+    @BindView(R.id.subtitle_line_timings) protected TextView timingsView;
+    @BindView(R.id.subtitle_line_actor) protected TextView actorView;
+    @BindView(R.id.subtitle_line_style) protected TextView styleView;
+    @BindView(R.id.subtitle_line_text) protected TextView subtitleTextView;
 
     @Nullable private Callback listener;
     @Nullable private SubtitleLineVso subtitleLineVso;
-    @NonNull private final DateTimeFormatter subtitleTimeFormatter;
 
-    public SubtitleLineLayoutItem(Context context, @NonNull DateTimeFormatter dateTimeFormatter) {
+    public SubtitleLineLayoutItem(Context context) {
         super(context);
-        this.subtitleTimeFormatter = dateTimeFormatter;
         init();
     }
 
@@ -65,14 +53,17 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     }
 
     protected void init() {
-        inflate(getContext(), R.layout.item_subtitle_line, this);
+        View view = inflate(getContext(), R.layout.item_subtitle_line, this);
         ButterKnife.bind(this);
+
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
 
     // --------------------------------------------------------------------------------- USER EVENTS
 
-    @OnClick(R.id.item_subtitle_line)
+    @OnClick(R.id.subtitle_line_item)
     protected void onItemClicked() {
         if (subtitleLineVso != null && listener != null)
             listener.onSubtitleLineClicked(subtitleLineVso, this);
@@ -84,6 +75,8 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     public void showItem(@NonNull SubtitleLineVso vso) {
         this.subtitleLineVso = vso;
 
+        lineNumberView.setText(getResources().getString(
+                R.string.subtitle_line_number, subtitleLineVso.getLineNumber()));
         handleTimingLineDisplay(subtitleLineVso);
         handleStyleAndActorLineDisplay(subtitleLineVso);
         handleSubtitleLineDisplay(subtitleLineVso);
@@ -101,65 +94,52 @@ public class SubtitleLineLayoutItem extends FrameLayout {
 
     private void handleTimingLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
         if(subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
-            prviRed.setVisibility(View.VISIBLE);
-            redniBroj1.setVisibility(View.VISIBLE);
-            // TODO: implementirati bar bazican, nekonfigurabilan prikaz
-//            redniBroj1.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
-//            vremeOd.setText(subtitleLineVso.getSubtitleLine().getStart().format(subtitleTimeFormatter));
-//            vremeDo.setText(subtitleLineVso.getSubtitleLine().getEnd().format(subtitleTimeFormatter));
+            timingsView.setVisibility(View.VISIBLE);
+            timingsView.setText(getResources().getString(R.string.subtitle_line_timings,
+                    subtitleLineVso.getStart(), subtitleLineVso.getEnd()));
         }  else {
-            prviRed.setVisibility(View.GONE);
-            redniBroj1.setVisibility(View.GONE);
+            timingsView.setVisibility(View.GONE);
         }
     }
 
     /** Shows or hides the second of the three lines with subtitle data (style/actor in particular). */
     private void handleStyleAndActorLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
         if(subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
-            drugiRed.setVisibility(View.VISIBLE);
-//            actor.setText(subtitleLineVso.getSubtitleLine().getActorName());
-//            style.setText(subtitleLineVso.getSubtitleLine().getStyle());
-            if(!subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
-//                redniBroj2.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
-                redniBroj2.setVisibility(View.VISIBLE);
-            } else {
-                redniBroj2.setVisibility(View.GONE);
-            }
+            styleView.setVisibility(View.VISIBLE);
+            actorView.setVisibility(View.VISIBLE);
+            styleView.setText(getResources().getString(
+                    R.string.subtitle_line_style, subtitleLineVso.getStyle()));
+            actorView.setText(getResources().getString(
+                    R.string.subtitle_line_actor, subtitleLineVso.getActorName()));
         } else {
-            drugiRed.setVisibility(View.GONE);
+            styleView.setVisibility(View.GONE);
+            actorView.setVisibility(View.GONE);
         }
     }
 
     /** Sredjuje prikaz reda sa tekstom - da li se prikazuju tagovi, da li se hajlajtuje neki trazeni izraz
      *  i da li se prikazuje redni broj u trecem redu (ili je vec prikazan u prvom/drugom) */
     private void handleSubtitleLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
+        // TODO ovo isto bi trebalo da bude vec sredjeno unapred; a kad tako napravis onda ti nece
+        // trebati pola podesavanja, pa mozes da ih setujes i rucno? Mada lakse je mozda kroz zajednicki objekat vako kako jeste
         String tekstZaPrikaz = subtitleLineVso.getText();
         if(!subtitleLineVso.getSubtitleLineSettings().isShowTagContents())
             tekstZaPrikaz = ParserHelper.izbaciTagove(tekstZaPrikaz,
                     subtitleLineVso.getSubtitleLineSettings().getTagReplacement());
 
-        // TODO highligh/pretraga fazon
+        // TODO highlight
 //        if(trazeniTekst != null && !trazeniTekst.equals(""))
-//            holder.tekst.setText(hajlajtujTekst(tekstZaPrikaz));
+//            holder.subtitleTextView.setText(hajlajtujTekst(tekstZaPrikaz));
 //        else
-            tekst.setText(tekstZaPrikaz);
-
-        if(!subtitleLineVso.getSubtitleLineSettings().isShowTimings()
-                && !subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
-            redniBroj3.setVisibility(View.VISIBLE);
-//            redniBroj3.setText("#" + subtitleLineVso.getSubtitleLine().getLineNumber());
-        } else {
-            redniBroj3.setVisibility(View.GONE);
-        }
+            subtitleTextView.setText(tekstZaPrikaz);
     }
 
     private void setFontSizes(@NonNull SubtitleLineSettings settings) {
-        TextView tv[] = { redniBroj1, redniBroj2, redniBroj3, vremeOd, vremeDo, actor, style,
-                labelaCrtica, labelaStil, labelaActor };
+        TextView tv[] = {lineNumberView, timingsView, actorView, styleView};
         for(TextView view : tv)
-            view.setTextSize(TypedValue.COMPLEX_UNIT_DIP, settings.getSubtitleTextSizeDp());
+            view.setTextSize(TypedValue.COMPLEX_UNIT_DIP, settings.getOtherTextSizeDp());
 
-        tekst.setTextSize(TypedValue.COMPLEX_UNIT_DIP, settings.getOtherTextSizeDp());
+        subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, settings.getSubtitleTextSizeDp());
     }
 
 

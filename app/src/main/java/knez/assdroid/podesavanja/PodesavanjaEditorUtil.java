@@ -34,7 +34,7 @@ public class PodesavanjaEditorUtil {
 		
 		int velicina;
 		if(sVelicina == null) {
-			velicina = Math.round(apkont.getResources().getDimension(R.dimen.standard_font_text_size));
+			velicina = Math.round(apkont.getResources().getDimension(R.dimen.subtitle_line_demo_text_font_size)); // TODO zbudzeno
 		} else {
 			velicina = Integer.parseInt(sVelicina);
 		}
@@ -48,7 +48,7 @@ public class PodesavanjaEditorUtil {
 		
 		int velicina;
 		if(sVelicina == null) {
-			velicina = Math.round(apkont.getResources().getDimension(R.dimen.standard_font_ostalo_size));
+			velicina = Math.round(apkont.getResources().getDimension(R.dimen.subtitle_line_demo_other_font_size)); // TODO zbudzeno
 		} else {
 			velicina = Integer.parseInt(sVelicina);
 		}

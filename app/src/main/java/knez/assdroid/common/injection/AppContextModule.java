@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 
+import org.threeten.bp.format.DateTimeFormatter;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -34,6 +36,8 @@ import timber.log.Timber;
 
 @Module
 public class AppContextModule {
+
+    // TODO grupisati bolje ove stvari? activity scope?
 
     @Provides @Singleton
     Context providesContext(App app) {
@@ -79,8 +83,14 @@ public class AppContextModule {
     }
 
     @Provides @Singleton
-    SubtitleLineVsoFactory getSubtitleLineVsoFactory() {
-        return new SubtitleLineVsoFactory();
+    SubtitleLineVsoFactory getSubtitleLineVsoFactory(
+            @Named("subtitleTimeFormatter") DateTimeFormatter subtitleTimeFormatter) {
+        return new SubtitleLineVsoFactory(subtitleTimeFormatter);
+    }
+
+    @Provides @Named("subtitleTimeFormatter")
+    DateTimeFormatter getSubtitleTimeFormatter() {
+        return DateTimeFormatter.ofPattern("H:mm:ss.SS");
     }
 
     @Provides

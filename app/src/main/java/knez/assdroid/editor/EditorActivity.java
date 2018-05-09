@@ -14,6 +14,7 @@ import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.util.AndroidUtil;
 import knez.assdroid.util.gui.BgpEditText;
+import knez.assdroid.util.gui.DividerItemDecoration;
 import knez.assdroid.util.gui.FadeAnimationHelper;
 import solid.collections.SolidList;
 
@@ -41,8 +42,6 @@ public class EditorActivity extends CommonSubtitleActivity
 
     private EditorMVP.PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
-
-    /// TODO: sve osim teksta je sjebano (duplirano)
 
     // TODO: zvezdica kad je editovan fajl da bude ispred imena jer se ne vidi nista
     // TODO takodje imenovanje ti je fucked up sa onim (2)... probaj da dozvolis save? tj. overwrite
@@ -119,6 +118,8 @@ public class EditorActivity extends CommonSubtitleActivity
 
         itemListRecycler.setLayoutManager(linearLayoutManager);
         itemListRecycler.setAdapter(subtitleLinesAdapter);
+        itemListRecycler.addItemDecoration(
+                new DividerItemDecoration(this, R.drawable.list_item_divider, false, false));
     }
 
     @Override
@@ -278,22 +279,22 @@ public class EditorActivity extends CommonSubtitleActivity
 	// ---------------------------------------------------------------------------------------- Eventovi - panel View
 
 //	@Override
-//	public void onPritisnutoFilter(String tekst, boolean ukljucen, boolean matchCase, boolean highlight) {
+//	public void onPritisnutoFilter(String subtitleTextView, boolean ukljucen, boolean matchCase, boolean highlight) {
 //		if(!ukljucen) {
 //			osveziListu();
 //			prevodAdapter.clearTrazeniTekst();
 //		} else {
-//			if(tekst == null || tekst.equals(""))
+//			if(subtitleTextView == null || subtitleTextView.equals(""))
 //				// tek ukljucen - a prazno polje - ne treba nista da menjas ni da trazis osvezavanje
 //				return;
-//			izfiltrirajListu(tekst, matchCase, highlight);
+//			izfiltrirajListu(subtitleTextView, matchCase, highlight);
 //		}
 //	}
 
 //	@Override
-//	public void onUnetTekstZaPretragu(String tekst, boolean matchCase, boolean highlight) {
+//	public void onUnetTekstZaPretragu(String subtitleTextView, boolean matchCase, boolean highlight) {
 //		if(panelView.isUkljucenFilter()) {
-//			izfiltrirajListu(tekst, matchCase, highlight);
+//			izfiltrirajListu(subtitleTextView, matchCase, highlight);
 //		}
 //	}
 //	@Override

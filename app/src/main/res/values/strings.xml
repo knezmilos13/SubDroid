@@ -14,6 +14,8 @@
     <string name="common_settings">Settings</string>
     <string name="common_help">Help</string>
 
+    <string name="dev_lorem_123_chars">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</string>
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
 
@@ -23,6 +25,16 @@
 
     <string name="editor_create_new_subtitle">Create new subtitle</string>
     <string name="editor_load_subtitle">Load subtitle</string>
+
+    <string name="subtitle_line_number">#%1$d</string>
+    <string name="subtitle_line_timings">%1$s — %2$s</string>
+    <string name="subtitle_line_style">Style: %1$s</string>
+    <string name="subtitle_line_actor">Actor: %1$s</string>
+
+
+
+
+
 
 
 
@@ -106,9 +118,6 @@
     
     
     <!-- Prevod -->
-    <string name="prevod_style_">Style:</string>
-    <string name="prevod_actor_">Actor:</string>
-    <string name="prevod_znak_izmedju_od_do"> — </string>
     <string name="prevod_znak_redni_broj">#</string>
     
     
