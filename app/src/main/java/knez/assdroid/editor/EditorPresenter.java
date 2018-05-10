@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -209,6 +208,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     private void showResultsForQuery(@NonNull final String[] queryToShow) {
+        if(viewInterface == null) return;
 //        if(diffUtilTask != null) diffUtilTask.cancel(true);
 
         // TODO: cekaj kako ovo ima logike? ako je query 0 treba da prikazes sve, a sto ne bi morao da diffjes?
@@ -274,7 +274,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     private static class DiffUtilTask extends AsyncTask<Void, Void, DiffUtil.DiffResult> {
 
-        @NonNull private final WeakReference<Callback> callback;
+        @NonNull private final Callback callback;
         @NonNull private final SubtitleLineDiffCallback diffCallback;
         @NonNull private final SolidList<SubtitleLineVso> newFilteredResults;
 
@@ -283,7 +283,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
                      @NonNull final Callback callback) {
             this.diffCallback = diffCallback;
             this.newFilteredResults = newFilteredResults;
-            this.callback = new WeakReference<>(callback);
+            this.callback = callback;
         }
 
         @Override
@@ -293,9 +293,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         @Override
         protected void onPostExecute(DiffUtil.DiffResult result) {
-            Callback actualCallback = callback.get();
-            if(actualCallback != null)
-                actualCallback.onDiffUtilTaskCompleted(result, newFilteredResults);
+            callback.onDiffUtilTaskCompleted(result, newFilteredResults);
         }
 
         @Override protected void onPreExecute() {}
@@ -310,7 +308,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private static class VsoFactoryTask
             extends AsyncTask<SolidList<SubtitleLine>, Void, SolidList<SubtitleLineVso>> {
 
-        @NonNull private final WeakReference<Callback> callback;
+        @NonNull private final Callback callback;
         @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
         @NonNull private final SubtitleLineSettings subtitleLineSettings;
 
@@ -319,7 +317,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
                        @NonNull Callback callback) {
             this.subtitleLineVsoFactory = subtitleLineVsoFactory;
             this.subtitleLineSettings = subtitleLineSettings;
-            this.callback = new WeakReference<>(callback);
+            this.callback = callback;
         }
 
         @SuppressWarnings("unchecked") // something about safe varargs
@@ -331,8 +329,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         @Override
         protected void onPostExecute(SolidList<SubtitleLineVso> result) {
-            Callback actualCallback = callback.get(); // TODO: THIS IS NULL OFTEN!
-                if(actualCallback != null) actualCallback.onVsoFactoryTaskCompleted(result);
+            callback.onVsoFactoryTaskCompleted(result);
         }
 
         @Override protected void onPreExecute() {}
