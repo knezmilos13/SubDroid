@@ -30,6 +30,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class EditorActivity extends CommonSubtitleActivity
         implements EditorMVP.ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
 
@@ -42,6 +44,7 @@ public class EditorActivity extends CommonSubtitleActivity
 
     private EditorMVP.PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
+    private LinearLayoutManager linearLayoutManager;
 
     // TODO: zvezdica kad je editovan fajl da bude ispred imena jer se ne vidi nista
     // TODO takodje imenovanje ti je fucked up sa onim (2)... probaj da dozvolis save? tj. overwrite
@@ -114,7 +117,7 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     private void setUpList() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager = new LinearLayoutManager(this);
 
         itemListRecycler.setLayoutManager(linearLayoutManager);
         itemListRecycler.setAdapter(subtitleLinesAdapter);
@@ -147,37 +150,29 @@ public class EditorActivity extends CommonSubtitleActivity
 	}
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if(requestCode == REQUEST_CODE_OPEN_SUBTITLE) {
             if(resultCode != RESULT_OK) return;
-            if(data == null) return;
+            if(intent == null) return;
 
-            Uri uri = data.getData();
+            Uri uri = intent.getData();
             if(uri == null) return;
 
             String filename = AndroidUtil.getFileNameFromUri(this, uri);
             presenter.onFileSelectedForLoad(uri, filename);
             return;
         } else if(requestCode == REQUEST_CODE_TRANSLATOR_ACTIVITY) {
-            // TODO
-//            boolean hadChanges = data.getBooleanExtra(TranslatorActivity.INSTANCE_STATE_HAD_CHANGES, false);
-//			int zadnjiMenjanLine = data.getExtras().getInt(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_NUMBER);
-//
-//			// Iz nekog razloga oce da pukne ponekad ako nista ne menjas u prevodiocu ako se ne pozove
-//			// osveziListu... pa ono kao aj' onda sto ne bi zvao svaki put. Neki fazon sa kursorima baguje.
-//			osveziListu();
-//			osveziNaslov();
-//
-//			centrirajPrikazListeNa(zadnjiMenjanLine);
-//
-//			// Kad se vratis iz prevodioca neka ne bude ukljucen filter (posto oce nesto da pukne ponekad)
-//			if(panelView.isUkljucenFilter()) {
-//				panelView.setUkljucenFilter(false);
-//				prevodAdapter.clearTrazeniTekst();
-//			}
+            ArrayList<Integer> editedLineNumbers =
+                    intent.getIntegerArrayListExtra(TranslatorActivity.OUTPUT_EDITED_LINE_NUMBERS);
+            if(editedLineNumbers.size() > 0) presenter.onSubtitleEditedExternally(editedLineNumbers);
+
+            int lastViewedLineNumber =
+                    intent.getIntExtra(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_NUMBER, 0);
+            if(lastViewedLineNumber != 0)
+                linearLayoutManager.scrollToPositionWithOffset(lastViewedLineNumber - 1, 0);
         }
 
-        super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, intent);
     }
 
     @Override
@@ -248,6 +243,11 @@ public class EditorActivity extends CommonSubtitleActivity
         Intent translatorIntent = new Intent(this, TranslatorActivity.class);
         translatorIntent.putExtra(TranslatorActivity.INPUT_LINE_ID, lineId);
         startActivityForResult(translatorIntent, REQUEST_CODE_TRANSLATOR_ACTIVITY);
+    }
+
+    @Override
+    public void updateSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos) {
+        for(SubtitleLineVso vso : subtitleLineVsos) subtitleLinesAdapter.updateItem(vso);
     }
 
 

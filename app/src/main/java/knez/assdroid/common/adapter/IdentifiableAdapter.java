@@ -180,6 +180,16 @@ public class IdentifiableAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return null;
     }
 
+    public void updateItem(Identifiable item) {
+        for(int i = 0; i < allItems.size(); i++) {
+            if(allItems.get(i).getId() == item.getId()) {
+                allItems.set(i, item);
+                notifyItemChanged(i);
+                return;
+            }
+        }
+    }
+
     public void clear() {
         if(allItems.size() == 0) return;
 

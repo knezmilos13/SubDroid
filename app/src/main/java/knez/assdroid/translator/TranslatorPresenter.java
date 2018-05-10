@@ -3,6 +3,9 @@ package knez.assdroid.translator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
@@ -17,13 +20,13 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @NonNull private final Timber.Tree logger;
 
     private TranslatorMVP.ViewInterface viewInterface;
-    private long lineId;
     private boolean hadChanges;
     private boolean currentLineEdited; // TODO trebace za instance state - ili da sacuvas prezenter onda ?
 
     private SubtitleLine currentLine;
     @Nullable private SubtitleLine previousLine;
     @Nullable private SubtitleLine nextLine;
+    @NonNull private final Set<Integer> editedLineNumbers = new HashSet<>(); // TODO save instance state
 
     public TranslatorPresenter(
             @NonNull SubtitleController subtitleController,
@@ -49,7 +52,6 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
                          long lineId, boolean hadChanges) {
         super.onAttach(viewInterface);
         this.viewInterface = viewInterface;
-        this.lineId = lineId;
         this.hadChanges = hadChanges;
 
 //        subtitleController.attachListener(this); // TODO odvojen listener - ili implementiraj sve u nadklasi? kao prazne implementacije?
@@ -128,7 +130,6 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         if(viewInterface == null) return;
 
         String translationText = viewInterface.getTranslationText();
-        // TODO: ovde ces tipa uzeti i druge razne vrednosti, npr. tajminge, pa sve u bilder dole
 
         subtitleLineBuilder.takeValuesFrom(currentLine);
         subtitleLineBuilder.setText(translationText);
@@ -136,6 +137,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         SubtitleLine updatedLine = subtitleLineBuilder.build();
         if(currentLine.isIdenticalTo(updatedLine)) return; // no changes then
 
+        editedLineNumbers.add(currentLine.getLineNumber());
         subtitleController.updateLine(updatedLine);
 
         currentLine = updatedLine;
@@ -165,13 +167,18 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public long getCurrentLineId() {
-        return lineId;
+    public int getCurrentLineNumber() {
+        return currentLine.getLineNumber();
     }
 
     @Override
     public boolean hasHadChangesToSubtitleMade() {
         return hadChanges;
+    }
+
+    @Override
+    public Set<Integer> getEditedLineNumbers() {
+        return editedLineNumbers;
     }
 
     @Override

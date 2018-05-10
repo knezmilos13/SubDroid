@@ -25,6 +25,8 @@ import android.widget.TextView;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.MaterialIcons;
 
+import java.util.ArrayList;
+
 public class TranslatorActivity extends CommonSubtitleActivity implements TranslatorMVP.ViewInterface {
 
     public static final String INPUT_LINE_ID =
@@ -32,11 +34,13 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
 
     private static final String INSTANCE_STATE_CURRENT_LINE_ID =
             TranslatorActivity.class.getCanonicalName() + ".current_line_id";
-    public static final String INSTANCE_STATE_HAD_CHANGES =
+    private static final String INSTANCE_STATE_HAD_CHANGES =
             TranslatorActivity.class.getCanonicalName() + "had_changes";
 
-    public static final String OUTPUT_LAST_VIEWED_LINE_ID =
-            TranslatorActivity.class.getCanonicalName() + "output_last_viewed_line_id";
+    public static final String OUTPUT_LAST_VIEWED_LINE_NUMBER =
+            TranslatorActivity.class.getCanonicalName() + "output_last_viewed_line_number";
+    public static final String OUTPUT_EDITED_LINE_NUMBERS =
+            TranslatorActivity.class.getCanonicalName() + "output_edited_line_numbers";
 
     @BindView(R.id.translator_prev_line) protected TextView prevLineTextView;
     @BindView(R.id.translator_current_line) protected TextView currentLineTextView;
@@ -116,7 +120,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putLong(INSTANCE_STATE_CURRENT_LINE_ID, presenter.getCurrentLineId());
+        outState.putLong(INSTANCE_STATE_CURRENT_LINE_ID, presenter.getCurrentLineNumber());
         outState.putBoolean(INSTANCE_STATE_HAD_CHANGES, presenter.hasHadChangesToSubtitleMade());
         super.onSaveInstanceState(outState);
     }
@@ -133,8 +137,9 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
     @Override
     public void onBackPressed() {
         Intent output = new Intent();
-        output.putExtra(INSTANCE_STATE_HAD_CHANGES, presenter.hasHadChangesToSubtitleMade());
-        output.putExtra(OUTPUT_LAST_VIEWED_LINE_ID, presenter.getCurrentLineId());
+        output.putExtra(OUTPUT_LAST_VIEWED_LINE_NUMBER, presenter.getCurrentLineNumber());
+        output.putIntegerArrayListExtra(OUTPUT_EDITED_LINE_NUMBERS,
+                new ArrayList<>(presenter.getEditedLineNumbers()));
         setResult(RESULT_OK, output);
         finish();
     }

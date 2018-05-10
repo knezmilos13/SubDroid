@@ -47,10 +47,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
     // na samo nekim podesavanjima
 
     @Nullable private DiffUtilTask diffUtilTask = null;
-    @Nullable private VsoFactoryTask vsoFactoryTask = null;
+    @Nullable private VsoFactoryTask createAllVsosTask = null;
 
     @NonNull private String[] currentSearchQuery = new String[0];
-    @NonNull private SolidList<SubtitleLineVso> allSubtitleLineVsos = SolidList.empty();
+    @NonNull private List<SubtitleLineVso> allSubtitleLineVsos = new ArrayList<>();
     @NonNull private SolidList<SubtitleLineVso> filteredSubtitleLineVsos = SolidList.empty();
 
     public EditorPresenter(
@@ -102,9 +102,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
             diffUtilTask.cancel(true);
             diffUtilTask = null;
         }
-        if(vsoFactoryTask != null) {
-            vsoFactoryTask.cancel(true);
-            vsoFactoryTask = null;
+        if(createAllVsosTask != null) {
+            createAllVsosTask.cancel(true);
+            createAllVsosTask = null;
         }
 
         subtitleController.detachListener(this);
@@ -143,6 +143,29 @@ public class EditorPresenter extends CommonSubtitlePresenter
     public void onSubtitleLineClicked(long id) {
         if(viewInterface == null) return;
         viewInterface.showTranslatorScreen(id);
+    }
+
+    @Override
+    public void onSubtitleEditedExternally(@NonNull ArrayList<Integer> editedLineNumbers) {
+        // if all items are being processed, then our partial processing is both unnecessary and
+        // likely to screw stuff up
+        if(createAllVsosTask != null) return;
+
+        showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
+
+        // TODO: preuzmi sve // TODO ipak neka budu idjevi
+        List<SubtitleLine> editedLines = new ArrayList<>();
+        for(Integer lineNumber : editedLineNumbers) {
+            SubtitleLine line = subtitleController.getLineForNumber(lineNumber);
+            if(line == null) continue; // defensive wtf // todo loguj
+            editedLines.add(line);
+        }
+
+        // TODO stavi na spisak taskova lepo cancelovanja radi
+        VsoFactoryTask convertEditedToVsosTask = new VsoFactoryTask(
+                subtitleLineVsoFactory, subtitleLineSettings,
+                EditorPresenter.this::onSelectedLinesConversionToVsosCompleted);
+        convertEditedToVsosTask.execute(new SolidList<>(editedLines));
     }
 
 
@@ -248,12 +271,12 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     private void asyncCreateSubtitleLineVsos(@NonNull List<SubtitleLine> lines) {
-        if(vsoFactoryTask != null) vsoFactoryTask.cancel(true);
+        if(createAllVsosTask != null) createAllVsosTask.cancel(true);
 
-        vsoFactoryTask = new VsoFactoryTask(
+        createAllVsosTask = new VsoFactoryTask(
                 subtitleLineVsoFactory, subtitleLineSettings,
                 EditorPresenter.this::onVsoFactoryTaskCompleted);
-        vsoFactoryTask.execute(new SolidList<>(lines));
+        createAllVsosTask.execute(new SolidList<>(lines));
     }
 
     private void onDiffUtilTaskCompleted(@NonNull final DiffUtil.DiffResult result,
@@ -264,9 +287,24 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     private void onVsoFactoryTaskCompleted(SolidList<SubtitleLineVso> result) {
-        vsoFactoryTask = null;
-        allSubtitleLineVsos = result;
+        createAllVsosTask = null;
+        allSubtitleLineVsos = new ArrayList<>(result);
         showResultsForQuery(currentSearchQuery); // can now apply query to the set of all items
+    }
+
+    private void onSelectedLinesConversionToVsosCompleted(
+            @NonNull SolidList<SubtitleLineVso> editedVsos) {
+        for(SubtitleLineVso editedVso : editedVsos) {
+            for (int i = 0; i < allSubtitleLineVsos.size(); i++) {
+                if (allSubtitleLineVsos.get(i).getId() == editedVso.getId()) {
+                    allSubtitleLineVsos.set(i, editedVso);
+                    break;
+                }
+            }
+        }
+
+        if(viewInterface == null) return;
+        viewInterface.updateSubtitleLines(editedVsos);
     }
 
 

@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 
+import java.util.ArrayList;
+
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVso;
@@ -23,6 +25,7 @@ public interface EditorMVP {
         void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings);
 
         void showTranslatorScreen(long lineId);
+        void updateSubtitleLines(@NonNull SolidList<SubtitleLineVso> editedVsos);
     }
 
     interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
@@ -31,6 +34,7 @@ public interface EditorMVP {
         void onSearchSubmitted(@NonNull String text);
         void onFileSelectedForLoad(@NonNull Uri uri, @NonNull String filename);
         void onSubtitleLineClicked(long id);
+        void onSubtitleEditedExternally(@NonNull ArrayList<Integer> editedLineNumbers);
     }
 
 }
