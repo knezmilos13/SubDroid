@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.MaterialIcons;
@@ -207,7 +208,8 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     // ------------------------------------------------------------------------------ VIEW INTERFACE
 
     @Override
-    public void closeScreen() {
+    public void closeScreenNoSubtitle() {
+        Toast.makeText(this, R.string.translator_no_subtitle_data, Toast.LENGTH_LONG);
         onBackPressed();
     }
 

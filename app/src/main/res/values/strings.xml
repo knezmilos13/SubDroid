@@ -35,6 +35,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TRANSLATOR ACTIVITY -->
 
     <string name="translator_commit_and_next">Commit &amp; Next</string>
+    <string name="translator_no_subtitle_data">Error - no subtitle data available!</string>
 
 
 

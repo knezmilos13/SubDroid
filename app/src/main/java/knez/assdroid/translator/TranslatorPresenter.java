@@ -60,8 +60,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         SubtitleFile subtitleFile = subtitleController.getCurrentSubtitleFile();
         if(subtitleFile == null) {
             logger.e("No subtitle file loaded");
-            // TODO: javi "tebra de ti je titl"
-            viewInterface.closeScreen();
+            viewInterface.closeScreenNoSubtitle();
             return;
         }
 
@@ -70,7 +69,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         SubtitleLine tempCurrentLine = subtitleController.getLineForId(internalState.getCurrentLineId());
         if(tempCurrentLine == null) {
             logger.e("Translator activity started, but no lines available!");
-            viewInterface.closeScreen();
+            viewInterface.closeScreenNoSubtitle();
             return;
         }
 

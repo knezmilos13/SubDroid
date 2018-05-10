@@ -13,7 +13,7 @@ import knez.assdroid.common.mvp.CommonSubtitleMVP;
 public interface TranslatorMVP {
 
     interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
-        void closeScreen();
+        void closeScreenNoSubtitle();
         void showSubtitleTexts(@NonNull String currentLineText, @Nullable String previousLineText,
                                @Nullable String nextLineText);
         void resetInputField(@NonNull String hint);
