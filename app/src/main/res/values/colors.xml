@@ -16,15 +16,6 @@
 
     <color name="translator_commit_indicator">@color/accent</color>
 
-
-
-
-
-
-
-    <color name="standard_bg_color">#ff000000</color>
-    <color name="gray">#ffff0000</color>
-    <color name="global_providna">#00000000</color>
-    <color name="kontrole_linija">#ffffffff</color>
+    <color name="background">#ff000000</color>
 
 </resources>

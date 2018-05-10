@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 public class PodesavanjaEditorUtil {
 	
 	public static final String EDITOR_MINIMIZED_TAG_CHAR = "editor_znak_minimizirani_tagovi";
-	public static final String EDITOR_KONTROLE_MIN_TRANSP = "editor_kontrole_minimized_transp";
 	public static final String EDITOR_FONT_TEXT = "editor_font_text";
 	public static final String EDITOR_FONT_OSTALO = "editor_font_ostalo";	
 	
@@ -18,13 +17,6 @@ public class PodesavanjaEditorUtil {
 		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_MINIMIZED_TAG_CHAR, 
 			apkont.getResources().getString(R.string.podesavanja_editor_default_zamena_taga));
-	}
-	
-	/** Vraca vrednost opacity-ja za minimiziran interfejs */
-	public static int getMinimizedTransparentnost() {
-		Context apkont = App.getAppComponent().getContext();
-		return PreferenceManager.getDefaultSharedPreferences(apkont).getInt(EDITOR_KONTROLE_MIN_TRANSP, 
-			apkont.getResources().getInteger(R.integer.editor_kontrole_min_transp_default));
 	}
 	
 	/** Vraca velicinu fonta za tekst (u pikselima) */

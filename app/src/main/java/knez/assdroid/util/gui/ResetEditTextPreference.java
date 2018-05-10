@@ -77,7 +77,7 @@ public class ResetEditTextPreference extends DialogPreference implements TextWat
 	private EditText spremiPoljeUnos() {
 		vrednost = getPersistedString(""); //default moze "" posto si ionako u onSetInitialValue vec namestio default
 		EditText rezultat = new EditText(getContext());
-		int dimenzija = Math.round(getContext().getResources().getDimension(R.dimen.padding_small));
+		int dimenzija = 4; // 4dp, or w/e, temporary patch
 		LayoutParams param = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		param.leftMargin = dimenzija;
 		param.rightMargin = dimenzija;

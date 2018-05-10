@@ -26,16 +26,4 @@
     <dimen name="translator_commit_indicator_dimension">20dp</dimen>
     <dimen name="translator_main_button_dimension">60dp</dimen>
 
-
-
-
-    <!-- TODO ove sutnuti ispod -->
-
-    <dimen name="padding_tiny">4dp</dimen>
-    <dimen name="padding_smaller">4dp</dimen>
-    <dimen name="padding_small">8dp</dimen>
-    <dimen name="padding_large">16dp</dimen>
-    
-    <dimen name="standard_element_visina">48dp</dimen>
-
 </resources>

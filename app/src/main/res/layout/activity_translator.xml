@@ -69,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/translator_next_line"
-            android:layout_marginTop="@dimen/padding_small"
+            android:layout_marginTop="@dimen/standard_content_margin"
             android:gravity="top|start"
             android:inputType="textMultiLine"
             android:imeOptions="actionNext"/>
@@ -109,7 +109,7 @@
                 android:id="@+id/translator_commit_next_button"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/translator_main_button_dimension"
-                android:text="@string/prevodilac_commit_next" />
+                android:text="@string/translator_commit_and_next" />
         </LinearLayout>
 
     </RelativeLayout>

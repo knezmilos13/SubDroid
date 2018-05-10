@@ -3,18 +3,18 @@
 
     <PreferenceCategory android:title="@string/podesavanja_prevodilac_kategorija_input" >
         <CheckBoxPreference
-            android:defaultValue="@bool/podesavanja_translator_use_hint_default"
+            android:defaultValue="bool/podesavanja_translator_use_hint_default"
             android:key="translator_use_hint"
             android:summary="@string/podesavanja_prevodilac_use_hint_summary"
             android:title="@string/podesavanja_prevodilac_use_hint_title" />
         <CheckBoxPreference
-            android:defaultValue="@bool/podesavanja_translator_empty_commit_default"
+            android:defaultValue="bool/podesavanja_translator_empty_commit_default"
             android:key="translator_commiting_empty_line"
             android:summaryOff="@string/podesavanja_prevodilac_empty_commit_summary_off"
             android:summaryOn="@string/podesavanja_prevodilac_empty_commit_summary_on"
             android:title="@string/podesavanja_prevodilac_empty_commit_title" />
         <CheckBoxPreference
-            android:defaultValue="@bool/podesavanja_translator_copy_line_default"
+            android:defaultValue="bool/podesavanja_translator_copy_line_default"
             android:key="translator_always_copy_original"
             android:summary="@string/podesavanja_prevodilac_copy_original_summary"
             android:title="@string/podesavanja_prevodilac_copy_original_title" />

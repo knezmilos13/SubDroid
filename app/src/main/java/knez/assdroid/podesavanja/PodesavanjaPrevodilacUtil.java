@@ -1,6 +1,5 @@
 package knez.assdroid.podesavanja;
 
-import knez.assdroid.R;
 import knez.assdroid.App;
 import android.content.Context;
 import android.preference.PreferenceManager;
@@ -16,24 +15,21 @@ public class PodesavanjaPrevodilacUtil {
 	public static boolean isPrevodilacHintOn() {
 		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont)
-				.getBoolean(TRANSLATOR_USE_HINT, 
-						apkont.getResources().getBoolean(R.bool.podesavanja_translator_use_hint_default));
+				.getBoolean(TRANSLATOR_USE_HINT, true);
 	}
 
 	/** Da li se svaka linija automatski ispisuje u tekstualno polje */
 	public static boolean isAlwaysCopyOn() {
 		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont)
-				.getBoolean(TRANSLATOR_COPY_LINE, 
-						apkont.getResources().getBoolean(R.bool.podesavanja_translator_copy_line_default));
+				.getBoolean(TRANSLATOR_COPY_LINE, false);
 	}
 
 	/** Da li commit zadrazava originalnu liniju. */
 	public static boolean isCommitKeepOriginalOn() {
 		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont)
-				.getBoolean(TRANSLATOR_EMPTY_COMMIT, 
-						apkont.getResources().getBoolean(R.bool.podesavanja_translator_empty_commit_default));
+				.getBoolean(TRANSLATOR_EMPTY_COMMIT, false);
 	}
 
 }
