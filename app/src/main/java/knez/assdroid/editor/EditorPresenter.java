@@ -23,7 +23,7 @@ import knez.assdroid.subtitle.data.SubtitleLine;
 import solid.collections.SolidList;
 
 public class EditorPresenter extends CommonSubtitlePresenter
-        implements EditorMVP.PresenterInterface, SubtitleController.Callback {
+        implements EditorMVP.PresenterInterface {
 
     private static final String STORAGE_KEY_SUBTITLE_LINE_SETTINGS = "subtitle_line_settings";
 
@@ -180,11 +180,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public void onFileWritingFailed(@NonNull String destFilename) {
-        // TODO prikazi poruku
-    }
-
-    @Override
     public void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
                                      @NonNull List<ParsingError> parsingErrors) {
         if(viewInterface == null) return;
@@ -203,12 +198,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @Override
     public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {
         showSubtitleFile(subtitleFile);
-    }
-
-    @Override
-    public void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) {
-        if(viewInterface == null) return;
-        showSubtitleTitle(subtitleFile);
     }
 
     @Override @Nullable

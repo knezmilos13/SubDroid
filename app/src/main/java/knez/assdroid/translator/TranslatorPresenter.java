@@ -55,8 +55,6 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         this.editedLineNumbers.clear();
         this.editedLineNumbers.addAll(internalState.getEditedLineNumbers());
 
-//        subtitleController.attachListener(this); // TODO odvojen listener - ili implementiraj sve u nadklasi? kao prazne implementacije?
-
         SubtitleFile subtitleFile = subtitleController.getCurrentSubtitleFile();
         if(subtitleFile == null) {
             logger.e("No subtitle file loaded");
@@ -72,6 +70,8 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
             viewInterface.closeScreenNoSubtitle();
             return;
         }
+
+        subtitleController.attachListener(this);
 
         currentLine = tempCurrentLine;
         previousLine = subtitleController.getLineForNumber(currentLine.getLineNumber() - 1);
@@ -90,7 +90,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @Override
     public void onDetach() {
         viewInterface = null;
-//        subtitleController.detachListener(this);
+        subtitleController.detachListener(this);
     }
 
 

@@ -4,10 +4,14 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.List;
+
 import knez.assdroid.subtitle.SubtitleController;
+import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 
-public abstract class CommonSubtitlePresenter implements CommonSubtitleMVP.PresenterInterface {
+public abstract class CommonSubtitlePresenter
+        implements CommonSubtitleMVP.PresenterInterface, SubtitleController.Callback {
 
     @NonNull private final SubtitleController subtitleController;
 
@@ -44,12 +48,40 @@ public abstract class CommonSubtitlePresenter implements CommonSubtitleMVP.Prese
         String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
 
         if(!subtitleController.canWriteSubtitle(subtitleExtension)) {
-            getViewInterface().showErrorWritingSubtitleInvalidFormat(filename);
+            if(getViewInterface() != null)
+                getViewInterface().showErrorWritingSubtitleInvalidFormat(filename);
             return;
         }
 
         subtitleController.writeSubtitle(uri);
     }
+
+
+    // ------------------------------------------------------------------------------- REPO CALLBACK
+
+    @Override
+    public void onFileWritingFailed(@NonNull String destFilename) {
+        // TODO show message
+    }
+
+    @Override
+    public void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) {
+        if(getViewInterface() == null) return;
+        showSubtitleTitle(subtitleFile);
+    }
+
+    @Override
+    public void onInvalidSubtitleFormat(@NonNull String subtitleFilename) {}
+
+    @Override
+    public void onFileReadingFailed(@NonNull String subtitleFilename) {}
+
+    @Override
+    public void onSubtitleFileParsed(
+            @NonNull SubtitleFile subtitleFile, @NonNull List<ParsingError> parsingErrors) {}
+
+    @Override
+    public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {}
 
 
     // ------------------------------------------------------------------------------------ INTERNAL
