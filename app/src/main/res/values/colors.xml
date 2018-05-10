@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <color name="pozadina_interfejsa">#ff000000</color>
-    <color name="gray">#ffff0000</color>
-    
-    <color name="global_providna">#00000000</color>
-    
-    <color name="kontrole_linija">#ffffffff</color>
-    
+
+    <color name="primary">#3F51B5</color>
+    <color name="primary_dark">#303F9F</color>
+    <color name="accent">#FF4081</color>
+
+    <color name="gray_1_dark">#484848</color>
+    <color name="gray_2_darkish">#6b6b6b</color>
+    <color name="gray_3_medium">#8c8c8c</color>
+    <color name="gray_4_medium_light">#aaaaaa</color>
+    <color name="gray_5_lighter">#c8c8c8</color>
+    <color name="gray_6_light">#dcdcdc</color>
+    <color name="gray_7_quite_light">#ebebeb</color>
+    <color name="gray_8_lightest">#f7f7f7</color>
+
+    <color name="translator_commit_indicator">@color/accent</color>
+
+    <color name="background">#ff000000</color>
+
 </resources>

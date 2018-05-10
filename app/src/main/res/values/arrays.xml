@@ -17,11 +17,5 @@
         <item>25</item>
         <item>30</item>
     </string-array>
-    
-    <string-array name="podesavanje_global_fullscreen_tip_elementi">
-        <item>@string/podesavanja_global_fullscreen_tip_status_bar</item>
-        <item>@string/podesavanja_global_fullscreen_tip_title_bar</item>
-        <item>@string/podesavanja_global_fullscreen_tip_both</item>
-    </string-array>
 
 </resources>

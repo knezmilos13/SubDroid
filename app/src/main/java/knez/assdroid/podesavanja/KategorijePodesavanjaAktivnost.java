@@ -31,12 +31,9 @@ public class KategorijePodesavanjaAktivnost extends ListActivity {
 		Intent namera = new Intent();
 		switch (position) {
 		case 0:
-			namera.setClass(this, PodesavanjaGlobalAktivnost.class);
-			break;
-		case 1:
 			namera.setClass(this, PodesavanjaEditorAktivnost.class);
 			break;
-		case 2:
+		case 1:
 			namera.setClass(this, PodesavanjaPrevodilacAktivnost.class);
 			break;
 		default:

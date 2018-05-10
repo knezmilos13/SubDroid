@@ -1,18 +1,50 @@
 <resources>
 
     <string name="app_name">SubDroid</string>
-    <string name="app_version_name">Ver. 0.4.6 - Zoro</string>
+    <string name="app_version_name">Ver. 1.0.0 - Zoro</string>
 
-    <string name="standard_exit">Exit</string>
-    <string name="standard_podesavanja">Settings</string>
-    <string name="standard_ucitaj_fajl">Load subtitle</string>
-    <string name="standard_kreiraj_fajl">Create new subtitle</string>
-    <string name="standard_untitled">Untitled</string>
-    <string name="standard_save">Save</string>
-    <string name="standard_save_as">Save As…</string>
-    <string name="standard_help">Help</string>
-    
-    
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  COMMON STRINGS -->
+
+    <string name="common_strings_untitled">Untitled</string>
+    <string name="common_strings_untitled_edited">Untitled*</string>
+    <string name="common_strings_title_edited">%1$s*</string>
+
+    <string name="common_save_subtitle">Save subtitle</string>
+    <string name="common_settings">Settings</string>
+    <string name="common_help">Help</string>
+
+    <string name="dev_lorem_123_chars">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</string>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
+
+    <string name="editor_subtitle_list_no_results_for_query">No matching lines for query</string>
+    <string name="editor_subtitle_list_no_lines_in_file">No lines in subtitle file</string>
+    <string name="editor_subtitle_search_hint">Search in subtitle file</string>
+
+    <string name="editor_create_new_subtitle">Create new subtitle</string>
+    <string name="editor_load_subtitle">Load subtitle</string>
+
+    <string name="subtitle_line_number">#%1$d</string>
+    <string name="subtitle_line_timings">%1$s — %2$s</string>
+    <string name="subtitle_line_style">Style: %1$s</string>
+    <string name="subtitle_line_actor">Actor: %1$s</string>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TRANSLATOR ACTIVITY -->
+
+    <string name="translator_commit_and_next">Commit &amp; Next</string>
+    <string name="translator_no_subtitle_data">Error - no subtitle data available!</string>
+
+
+
+
+
+
+
+    <!-- TODO remove/rename this stuff -->
+
     <!-- Podesavanja -->
     <string name="podesavanja_global">Global</string>
     <string name="podesavanja_global_trenutno_podesavanje">Currently:</string>
@@ -24,12 +56,7 @@
     
     	<!-- Podesavanja Global -->
     <string name="podesavanja_global_kategorija_interfejs">Interface</string>
-    <string name="podesavanja_global_fullscreen_tip_naslov">Hide in fullscreen</string>
-    <string name="podesavanja_global_fullscreen_tip_status_bar">Status bar</string>
-    <string name="podesavanja_global_fullscreen_tip_title_bar">Title bar</string>
-    <string name="podesavanja_global_fullscreen_tip_both">Status &amp; title bar</string>
-    <string name="podesavanja_global_fullscreen_tip_default">@string/podesavanja_global_fullscreen_tip_both</string>
-    
+
     	<!-- Podesavanja Prevodilac -->
     <string name="podesavanja_prevodilac">Translator</string>
     <string name="podesavanja_prevodilac_naslov">Translator Settings</string>
@@ -60,67 +87,15 @@
     <string name="podesavanja_editor_kategorija_kontrole">Controls</string>
     <string name="podesavanja_editor_min_transp_title">Transparency in minimized state</string>
     <string name="podesavanja_editor_min_transp_summary">Transparency percentage of minimized interface</string>
-    
-    
+
     <!-- Help -->
     <string name="help_kategorije_naslov">Help</string>
     <string name="help_about">About</string>
     <string name="help_about_naslov">About</string>
-    <string name="help_about_link"><a href="http://bitbucket.org/knezmilos/subdroid">http://bitbucket.org/knezmilos/subdroid</a></string>
+    <string name="help_about_link"><a href="https://github.com/knezmilos13/SubDroid">https://github.com/knezmilos13/SubDroid</a></string>
     <string name="help_editor">Editor</string>
     <string name="help_editor_naslov">Editor Help</string>
     <string name="help_translator">Translator</string>
     <string name="help_translator_naslov">Translator Help</string>
-    
-    
-    <!-- Deo za editor -->
-    <string name="editor_load_fail">Failed to load file!</string>
-    <string name="editor_parsiranje_fail">Parsing eror! Malformed file!</string>
-    <string name="editor_prevod_menjan_znak">*</string>
-    
-    	<!-- Editor - panel View -->
-    <string name="editor_view_dugme_find">Find</string>
-    <string name="editor_view_dugme_filter">Filter</string>
-    <string name="editor_view_dugme_clear">Clear</string>
-    <string name="editor_view_hint_enter">Enter text to find/filter</string>
-    <string name="editor_view_dijalog_filter_naslov">Filter settings</string>
-    <string name="editor_view_dijalog_filter_match_case">Match case</string>
-    <string name="editor_view_dijalog_filter_highlight">Highlight results</string>
-    <string name="editor_view_dijalog_filter_dugme_ok">@android:string/ok</string>
-    <string name="editor_view_dijalog_filter_dugme_cancel">@android:string/cancel</string>
-    
-    
-    <!-- Prevod -->
-    <string name="prevod_style_">Style:</string>
-    <string name="prevod_actor_">Actor:</string>
-    <string name="prevod_znak_izmedju_od_do"> — </string>
-    <string name="prevod_znak_redni_broj">#</string>
-    
-    
-    <!-- Deo za fajl menadzer -->
-    <string name="fajl_dijalog_location">Location</string>
-    <string name="fajl_dijalog_cant_read_folder">folder can\'t be read!</string>
-    <string name="fajl_dijalog_nnew">New</string>
-    <string name="fajl_dijalog_select">Select</string>
-    <string name="fajl_dijalog_file_name">File name:</string>
-    <string name="fajl_dijalog_cancel">Cancel</string>
-    <string name="fajl_dijalog_create">Save</string>
-    <string name="fajl_dijalog_no_data">No Data</string>   
-    
-    
-    <!-- Deo za Translation Assistant -->
-    <string name="prevodilac_meni_help">Translator Help</string>
-    <string name="prevodilac_meni_podesavanja">Translator Settings</string>
-    
-    <string name="prevodilac_commit">Commit</string>
-    <string name="prevodilac_commit_next">Commit &amp; Next</string>
-    <string name="prevodilac_samo_next">Next</string>
-    <string name="prevodilac_copy">Copy original</string>
-    
-    
-    <!-- Parsiranje -->
-    <string name="parsiranje_fail_nema_prevod_format_linije">- Subtitle format not defined, using default</string>
-    <string name="parsiranje_fail_problem_red_prevoda">- Problem while parsing lines: %s</string>
-    <string name="parsiranje_fail_problem_nepoznat_red_prevoda">- Unindentified subtitle lines skipped: %d</string>
 
 </resources>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    android:id="@+id/subtitle_line_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/subtitle_line_line_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:textStyle="bold"
+        tools:text="#340"
+        tools:textSize="@dimen/subtitle_line_demo_other_font_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/subtitle_line_timings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/subtitle_line_timings"
+        tools:textSize="@dimen/subtitle_line_demo_other_font_size"
+        tools:text="0:00:15.64 — 0:00:22.30"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/subtitle_line_line_number"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <View
+        android:id="@+id/subtitle_line_hack_view_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/subtitle_line_line_number"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <android.support.constraint.Barrier
+        android:id="@+id/subtitle_line_barrier_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="subtitle_line_hack_view_1,subtitle_line_timings"/>
+
+    <TextView
+        android:id="@+id/subtitle_line_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/subtitle_line_style"
+        app:layout_constraintStart_toEndOf="@+id/subtitle_line_line_number"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle_line_barrier_1"
+        tools:text="Style: greenish"
+        tools:textSize="@dimen/subtitle_line_demo_other_font_size"/>
+
+    <TextView
+        android:id="@+id/subtitle_line_actor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/subtitle_line_actor"
+        app:layout_constraintStart_toEndOf="@+id/subtitle_line_style"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle_line_timings"
+        tools:textSize="@dimen/subtitle_line_demo_other_font_size"/>
+
+    <android.support.constraint.Barrier
+        android:id="@+id/subtitle_line_barrier_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="subtitle_line_barrier_1, subtitle_line_style, subtitle_line_actor"/>
+
+    <TextView
+        android:id="@+id/subtitle_line_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/subtitle_line_line_number"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle_line_barrier_2"
+        tools:text="@string/dev_lorem_123_chars"
+        tools:textSize="@dimen/subtitle_line_demo_text_font_size"/>
+
+</android.support.constraint.ConstraintLayout>

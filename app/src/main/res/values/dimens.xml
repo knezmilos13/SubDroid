@@ -1,12 +1,29 @@
 <resources>
 
-    <dimen name="padding_tiny">4dp</dimen>
-    <dimen name="padding_smaller">4dp</dimen>
-    <dimen name="padding_small">8dp</dimen>
-    <dimen name="padding_large">16dp</dimen>
-    
-    <dimen name="standard_element_visina">48dp</dimen>
-    <dimen name="standard_font_text_size">15sp</dimen>
-    <dimen name="standard_font_ostalo_size">12sp</dimen>
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - COMMON DIMENSIONS -->
+
+    <dimen name="scroll_padding_under_search_top">80dp</dimen>
+
+    <dimen name="standard_margin">16dp</dimen>
+    <dimen name="standard_padding">16dp</dimen>
+
+    <dimen name="standard_content_margin">8dp</dimen>
+    <dimen name="standard_content_padding">8dp</dimen>
+
+    <dimen name="elevation_content">2dp</dimen>
+
+    <dimen name="recycler_center_text_size">16dp</dimen>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
+
+    <dimen name="subtitle_line_demo_text_font_size">15sp</dimen>
+    <dimen name="subtitle_line_demo_other_font_size">12sp</dimen>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TRANSLATOR ACTIVITY -->
+
+    <dimen name="translator_commit_indicator_dimension">20dp</dimen>
+    <dimen name="translator_main_button_dimension">60dp</dimen>
 
 </resources>

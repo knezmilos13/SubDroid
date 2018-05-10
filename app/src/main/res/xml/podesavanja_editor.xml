@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory android:title="@string/podesavanja_editor_kategorija_prevod" >
-        <knez.assdroid.gui.ResetEditTextPreference
+        <knez.assdroid.util.gui.ResetEditTextPreference
             xmlns:knez="http://knez.lol.com/"
             android:defaultValue="@string/podesavanja_editor_default_zamena_taga"
             android:key="editor_znak_minimizirani_tagovi"
@@ -22,18 +22,6 @@
             android:title="@string/podesavanja_editor_ostalo_size"
             android:entries="@array/podesavanje_velicine_fonta"
             android:entryValues="@array/podesavanje_velicine_fonta" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="@string/podesavanja_editor_kategorija_kontrole"
-        xmlns:robobunny="http://robobunny.com" >
-        <knez.assdroid.gui.SeekBarPreference
-            android:defaultValue="@integer/editor_kontrole_min_transp_default"
-            android:key="editor_kontrole_minimized_transp"
-            android:max="@integer/editor_kontrole_max_transp"
-            android:summary="@string/podesavanja_editor_min_transp_summary"
-            android:title="@string/podesavanja_editor_min_transp_title"
-            robobunny:min="@integer/editor_kontrole_min_transp"
-            robobunny:unitsLeft=""
-            robobunny:unitsRight="%" />
     </PreferenceCategory>
 
 </PreferenceScreen>

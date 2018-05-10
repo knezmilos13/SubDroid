@@ -1,7 +1,0 @@
-<resources>
-
-    <style name="Theme.Standardna" parent="@android:style/Theme.Holo">
-        <item name="android:windowBackground">@color/pozadina_interfejsa</item>
-    </style>
-    
-</resources>

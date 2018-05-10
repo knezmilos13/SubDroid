@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/activity_editor_root_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:kontekst=".editor.EditorActivity">
+
+    <knez.assdroid.util.gui.BgpEditText
+        android:id="@+id/editor_search_view"
+        style="@style/BaseSearchViewStyle"
+        app:hint="@string/editor_subtitle_search_hint"
+        android:visibility="gone"
+        app:noFullScreen="true"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/editor_subtitle_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/editor_search_view"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/item_subtitle_line"/>
+
+    <TextView
+        android:id="@+id/editor_center_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/standard_margin"
+        android:layout_marginRight="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/scroll_padding_under_search_top"
+        android:gravity="center"
+        android:textSize="@dimen/recycler_center_text_size"
+        android:visibility="visible"/>
+
+</RelativeLayout>
