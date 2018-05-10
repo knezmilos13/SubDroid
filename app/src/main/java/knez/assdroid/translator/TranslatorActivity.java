@@ -27,20 +27,20 @@ import com.joanzapata.iconify.fonts.MaterialIcons;
 
 import java.util.ArrayList;
 
-public class TranslatorActivity extends CommonSubtitleActivity implements TranslatorMVP.ViewInterface {
+import static knez.assdroid.translator.TranslatorMVP.*;
+
+public class TranslatorActivity extends CommonSubtitleActivity implements ViewInterface {
 
     public static final String INPUT_LINE_ID =
-            TranslatorActivity.class.getCanonicalName() + "input_line_id";
+            TranslatorActivity.class.getCanonicalName() + ".input_line_id";
 
-    private static final String INSTANCE_STATE_CURRENT_LINE_ID =
-            TranslatorActivity.class.getCanonicalName() + ".current_line_id";
-    private static final String INSTANCE_STATE_HAD_CHANGES =
-            TranslatorActivity.class.getCanonicalName() + "had_changes";
+    private static final String INSTANCE_STATE_PRESENTER_STATE =
+            TranslatorActivity.class.getCanonicalName() + ".presenter_state";
 
     public static final String OUTPUT_LAST_VIEWED_LINE_NUMBER =
-            TranslatorActivity.class.getCanonicalName() + "output_last_viewed_line_number";
+            TranslatorActivity.class.getCanonicalName() + ".output_last_viewed_line_number";
     public static final String OUTPUT_EDITED_LINE_NUMBERS =
-            TranslatorActivity.class.getCanonicalName() + "output_edited_line_numbers";
+            TranslatorActivity.class.getCanonicalName() + ".output_edited_line_numbers";
 
     @BindView(R.id.translator_prev_line) protected TextView prevLineTextView;
     @BindView(R.id.translator_current_line) protected TextView currentLineTextView;
@@ -48,10 +48,10 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
     @BindView(R.id.translator_input) protected EditText inputView;
     @BindView(R.id.translator_commit_indicator) protected ImageView commitIndicatorView;
 
-    private TranslatorMVP.PresenterInterface presenter;
+    private PresenterInterface presenter;
 
 
-    // ------------------------------------------------------------------------------ Zivotni ciklus
+    // ----------------------------------------------------------------------------------- LIFECYCLE
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,26 +59,28 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
         setContentView(R.layout.activity_translator);
         ButterKnife.bind(this);
 
-        long lineId;
-        boolean hadChanges;
-        if(savedInstanceState != null) {
-            lineId = savedInstanceState.getLong(INSTANCE_STATE_CURRENT_LINE_ID, 0L);
-            hadChanges = savedInstanceState.getBoolean(INSTANCE_STATE_HAD_CHANGES, false);
-        }
-        else if(getIntent().getExtras() != null) {
-            lineId = getIntent().getLongExtra(INPUT_LINE_ID, 0L);
-            hadChanges = false;
-        }
-        else {
-            logger.w("%s did not receive any input data nor has a instance state!", getClass().getCanonicalName());
-            lineId = 0L;
-            hadChanges = false;
-        }
-
         setUpViews();
 
         presenter = App.getAppComponent().getTranslatorPresenter();
-        presenter.onAttach(this, lineId, hadChanges);
+
+        if(savedInstanceState != null) {
+            InternalState state = (InternalState)
+                    savedInstanceState.getSerializable(INSTANCE_STATE_PRESENTER_STATE);
+            if(state == null) {
+                logger.w("%s did not receive any presenter state!", getClass().getCanonicalName());
+                presenter.onAttach(this);
+            }
+            else
+                presenter.onAttach(this, state);
+        }
+        else {
+            long lineId = getIntent().getLongExtra(INPUT_LINE_ID, 0L);
+            if(lineId == 0) {
+                logger.w("%s did not receive any input data!", getClass().getCanonicalName());
+                presenter.onAttach(this);
+            } else
+                presenter.onAttach(this, lineId);
+        }
     }
 
     @Override
@@ -120,8 +122,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements Transl
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putLong(INSTANCE_STATE_CURRENT_LINE_ID, presenter.getCurrentLineNumber());
-        outState.putBoolean(INSTANCE_STATE_HAD_CHANGES, presenter.hasHadChangesToSubtitleMade());
+        outState.putSerializable(INSTANCE_STATE_PRESENTER_STATE, presenter.getInternalState());
         super.onSaveInstanceState(outState);
     }
 

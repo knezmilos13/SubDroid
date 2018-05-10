@@ -7,39 +7,29 @@ import android.support.annotation.Nullable;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
 
-public class CommonSubtitlePresenter implements CommonSubtitleMVP.PresenterInterface {
+public abstract class CommonSubtitlePresenter implements CommonSubtitleMVP.PresenterInterface {
 
     @NonNull private final SubtitleController subtitleController;
-
-    private CommonSubtitleMVP.ViewInterface viewInterface;
 
     public CommonSubtitlePresenter(@NonNull SubtitleController subtitleController) {
         this.subtitleController = subtitleController;
     }
 
-    @Override
-    public void onAttach(@NonNull CommonSubtitleMVP.ViewInterface viewInterface) {
-        this.viewInterface = viewInterface;
-    }
-
-    @Override
-    public void onDetach() {
-        viewInterface = null;
-    }
+    @Nullable public abstract CommonSubtitleMVP.ViewInterface getViewInterface();
 
 
     // ------------------------------------------------------------------------- PRESENTER INTERFACE
 
     @Override
     public void onShowSettingsClicked() {
-        if(viewInterface == null) return;
-        viewInterface.showSettingsScreen();
+        if(getViewInterface() == null) return;
+        getViewInterface().showSettingsScreen();
     }
 
     @Override
     public void onShowHelpClicked() {
-        if(viewInterface == null) return;
-        viewInterface.showHelpScreen();
+        if(getViewInterface() == null) return;
+        getViewInterface().showHelpScreen();
     }
 
     @Override @Nullable
@@ -54,7 +44,7 @@ public class CommonSubtitlePresenter implements CommonSubtitleMVP.PresenterInter
         String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
 
         if(!subtitleController.canWriteSubtitle(subtitleExtension)) {
-            viewInterface.showErrorWritingSubtitleInvalidFormat(filename);
+            getViewInterface().showErrorWritingSubtitleInvalidFormat(filename);
             return;
         }
 
@@ -65,14 +55,14 @@ public class CommonSubtitlePresenter implements CommonSubtitleMVP.PresenterInter
     // ------------------------------------------------------------------------------------ INTERNAL
 
     protected void showSubtitleTitle(@Nullable SubtitleFile subtitleFile) {
-        if(viewInterface == null) return;
+        if(getViewInterface() == null) return;
         if(subtitleFile == null) return;
 
         if(subtitleFile.getName() != null)
-            viewInterface.showTitleForName(
+            getViewInterface().showTitleForName(
                     subtitleFile.getName(), subtitleFile.isEdited());
         else
-            viewInterface.showTitleUntitled(subtitleFile.isEdited());
+            getViewInterface().showTitleUntitled(subtitleFile.isEdited());
     }
 
 }

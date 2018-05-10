@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knez.assdroid.common.StorageHelper;
+import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.editor.adapter.SubtitleLineDiffCallback;
 import knez.assdroid.editor.data.SubtitleLineSettings;
@@ -68,7 +69,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onAttach(@NonNull EditorMVP.ViewInterface viewInterface) {
-        super.onAttach(viewInterface);
         this.viewInterface = viewInterface;
 
         subtitleLineSettings = storageHelper.readJson(
@@ -96,8 +96,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onDetach() {
-        super.onDetach();
-
         if(diffUtilTask != null) {
             diffUtilTask.cancel(true);
             diffUtilTask = null;
@@ -211,6 +209,11 @@ public class EditorPresenter extends CommonSubtitlePresenter
     public void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) {
         if(viewInterface == null) return;
         showSubtitleTitle(subtitleFile);
+    }
+
+    @Override @Nullable
+    public CommonSubtitleMVP.ViewInterface getViewInterface() {
+        return viewInterface;
     }
 
 

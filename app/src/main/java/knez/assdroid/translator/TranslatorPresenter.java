@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
+import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
@@ -20,13 +21,12 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @NonNull private final Timber.Tree logger;
 
     private TranslatorMVP.ViewInterface viewInterface;
-    private boolean hadChanges;
-    private boolean currentLineEdited; // TODO trebace za instance state - ili da sacuvas prezenter onda ?
+    private boolean currentLineHadUncommittedChanges;
+    @NonNull private final HashSet<Integer> editedLineNumbers = new HashSet<>();
 
     private SubtitleLine currentLine;
     @Nullable private SubtitleLine previousLine;
     @Nullable private SubtitleLine nextLine;
-    @NonNull private final Set<Integer> editedLineNumbers = new HashSet<>(); // TODO save instance state
 
     public TranslatorPresenter(
             @NonNull SubtitleController subtitleController,
@@ -38,21 +38,22 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         this.logger = logger;
     }
 
-    // TODO: postojalo je podesavanje da se linija teksta automatski kopira; ovo je zgodno ako samo
-    // editujes neki svoj postojeci prevod (mada ima copy dugme)
-//    if(PodesavanjaPrevodilacUtil.isAlwaysCopyOn() && inputView.getText().toString().equals("")) {
-//            inputView.setText(tekuciRed.getText());
-//        }
-
 
     // ---------------------------------------------------------------------------- SETUP & TEARDOWN
 
     @Override
+    public void onAttach(@NonNull TranslatorMVP.ViewInterface viewInterface) {
+        onAttach(viewInterface, 1);
+    }
+
+    @Override
     public void onAttach(@NonNull TranslatorMVP.ViewInterface viewInterface,
-                         long lineId, boolean hadChanges) {
-        super.onAttach(viewInterface);
+                         @NonNull TranslatorMVP.InternalState internalState) {
         this.viewInterface = viewInterface;
-        this.hadChanges = hadChanges;
+        this.currentLineHadUncommittedChanges = internalState.isCurrentLineHadUncommittedChanges();
+
+        this.editedLineNumbers.clear();
+        this.editedLineNumbers.addAll(internalState.getEditedLineNumbers());
 
 //        subtitleController.attachListener(this); // TODO odvojen listener - ili implementiraj sve u nadklasi? kao prazne implementacije?
 
@@ -66,7 +67,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
         showSubtitleTitle(subtitleFile);
 
-        SubtitleLine tempCurrentLine = subtitleController.getLineForId(lineId);
+        SubtitleLine tempCurrentLine = subtitleController.getLineForId(internalState.getCurrentLineId());
         if(tempCurrentLine == null) {
             logger.e("Translator activity started, but no lines available!");
             viewInterface.closeScreen();
@@ -79,13 +80,16 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
-        currentLineEdited = true;
-        viewInterface.showCurrentLineEdited(true);
+        viewInterface.showCurrentLineEdited(currentLineHadUncommittedChanges);
+    }
+
+    @Override
+    public void onAttach(@NonNull TranslatorMVP.ViewInterface viewInterface, long lineId) {
+        onAttach(viewInterface, new TranslatorMVP.InternalState(false, lineId, new HashSet<>()));
     }
 
     @Override
     public void onDetach() {
-        super.onDetach();
         viewInterface = null;
 //        subtitleController.detachListener(this);
     }
@@ -105,7 +109,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
 
-        currentLineEdited = true;
+        currentLineHadUncommittedChanges = true;
         viewInterface.showCurrentLineEdited(true);
     }
 
@@ -121,7 +125,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
 
-        currentLineEdited = true;
+        currentLineHadUncommittedChanges = true;
         viewInterface.showCurrentLineEdited(true);
     }
 
@@ -145,9 +149,9 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
         showActiveSubtitleLines();
 
-        hadChanges = true;
+        currentLineHadUncommittedChanges = true;
 
-        currentLineEdited = false;
+        currentLineHadUncommittedChanges = false;
         viewInterface.showCurrentLineEdited(false);
     }
 
@@ -162,7 +166,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         if(viewInterface == null) return;
         viewInterface.setInputText(currentLine.getText());
 
-        currentLineEdited = false;
+        currentLineHadUncommittedChanges = false;
         viewInterface.showCurrentLineEdited(false);
     }
 
@@ -173,7 +177,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public boolean hasHadChangesToSubtitleMade() {
-        return hadChanges;
+        return currentLineHadUncommittedChanges;
     }
 
     @Override
@@ -184,11 +188,22 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @Override
     public void onTextChanged(@NonNull String text) {
         boolean linesSame = currentLine.getText().equals(text);
-        if(currentLineEdited && linesSame) currentLineEdited = false;
-        else if(!currentLineEdited && !linesSame) currentLineEdited = true;
+        if(currentLineHadUncommittedChanges && linesSame) currentLineHadUncommittedChanges = false;
+        else if(!currentLineHadUncommittedChanges && !linesSame) currentLineHadUncommittedChanges = true;
         else return; // no changes
 
-        if(viewInterface != null) viewInterface.showCurrentLineEdited(currentLineEdited);
+        if(viewInterface != null) viewInterface.showCurrentLineEdited(currentLineHadUncommittedChanges);
+    }
+
+    @Override @NonNull
+    public TranslatorMVP.InternalState getInternalState() {
+        return new TranslatorMVP.InternalState(
+                currentLineHadUncommittedChanges, currentLine.getId(), editedLineNumbers);
+    }
+
+    @Override @Nullable
+    public CommonSubtitleMVP.ViewInterface getViewInterface() {
+        return viewInterface;
     }
 
 
@@ -201,8 +216,6 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
                 currentLine.getText(),
                 previousLine == null? null : previousLine.getText(),
                 nextLine == null? null : nextLine.getText());
-
-        // TODO: ovde svasta nesto kada bude bilo, tipa tajminzi?
     }
 
 }

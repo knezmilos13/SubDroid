@@ -16,8 +16,6 @@ public interface CommonSubtitleMVP {
     }
 
     interface PresenterInterface {
-        void onAttach(@NonNull CommonSubtitleMVP.ViewInterface viewInterface);
-        void onDetach();
         void onShowHelpClicked();
         void onShowSettingsClicked();
         @Nullable String getCurrentSubtitleName();
