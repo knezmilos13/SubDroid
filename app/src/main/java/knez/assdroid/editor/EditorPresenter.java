@@ -40,6 +40,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     private EditorMVP.ViewInterface viewInterface;
     private SubtitleLineSettings subtitleLineSettings;
+    private boolean presenterInitialized = false;
 
     // TODO: mnogo ti je glomazno ovo sve sa filtriranjem. Vidi da li moze to da se offloaduje na adapter
     // bar diff utilovanje mora da moze kroz onaj neki novi recycler ili sta god
@@ -70,6 +71,15 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @Override
     public void onAttach(@NonNull EditorMVP.ViewInterface viewInterface) {
         this.viewInterface = viewInterface;
+
+        // if reattaching to the same presenter (e.g. after orientation change)
+        if(presenterInitialized) {
+            showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
+            viewInterface.showSubtitleLines(filteredSubtitleLineVsos);
+            return;
+        }
+
+        presenterInitialized = true;
 
         subtitleLineSettings = storageHelper.readJson(
                 STORAGE_KEY_SUBTITLE_LINE_SETTINGS, SubtitleLineSettings.class);
@@ -115,13 +125,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @Override
     public void onSearchSubmitted(@NonNull final String text) {
 //        String[] newQuery = CommonTasks.getQueryPartsFromInput(text);
-
 //        if(CommonTasks.areSortedStringArraysEqual(currentSearchQuery, newQuery)) return;
-
 //        currentSearchQuery = newQuery;
-
 //        if(viewInterface == null) return;
-
 //        TO DO - ovde bi sad zvao filtriranje, a inace je islo preko delayed taska, sto ti ne treba
     }
 

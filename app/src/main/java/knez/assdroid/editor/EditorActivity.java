@@ -32,8 +32,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static knez.assdroid.editor.EditorMVP.*;
+
 public class EditorActivity extends CommonSubtitleActivity
-        implements EditorMVP.ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
+        implements ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
 
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
     private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
@@ -42,7 +44,7 @@ public class EditorActivity extends CommonSubtitleActivity
     @BindView(R.id.editor_search_view) protected BgpEditText searchView;
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
 
-    private EditorMVP.PresenterInterface presenter;
+    private PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
     private LinearLayoutManager linearLayoutManager;
 
@@ -76,10 +78,20 @@ public class EditorActivity extends CommonSubtitleActivity
 
         setUpInterface();
 
-        presenter = App.getAppComponent().getEditorPresenter();
+        Object retainedInstance = getLastCustomNonConfigurationInstance();
+        if(retainedInstance != null && retainedInstance instanceof PresenterInterface) {
+            presenter = (PresenterInterface) retainedInstance;
+        } else {
+            presenter = App.getAppComponent().getEditorPresenter();
+        }
 
         presenter.onAttach(this);
 	}
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return presenter;
+    }
 
     @Override
     protected CommonSubtitleMVP.PresenterInterface getPresenter() {
@@ -229,7 +241,7 @@ public class EditorActivity extends CommonSubtitleActivity
 
     @Override
     public void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings) {
-        // TODO
+        // TODO should activate/deactivate options in menu
     }
 
     @Override
