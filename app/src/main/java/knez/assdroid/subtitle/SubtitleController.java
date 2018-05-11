@@ -280,13 +280,13 @@ public class SubtitleController extends AbstractRepo {
 
     @UiThread
     public interface Callback {
-        void onInvalidSubtitleFormat(@NonNull String subtitleFilename);
-        void onFileReadingFailed(@NonNull String subtitleFilename);
-		void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
-                                  @NonNull List<ParsingError> parsingErrors);
-        void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile);
-        void onFileWritingFailed(@NonNull String destFilename);
-        void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile);
+        default void onInvalidSubtitleFormat(@NonNull String subtitleFilename) { }
+        default void onFileReadingFailed(@NonNull String subtitleFilename) { }
+        default void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
+                                          @NonNull List<ParsingError> parsingErrors) { }
+        default void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) { }
+        default void onFileWritingFailed(@NonNull String destFilename) { }
+        default void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) { }
     }
 
 }

@@ -4,10 +4,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.List;
-
 import knez.assdroid.subtitle.SubtitleController;
-import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 
 public abstract class CommonSubtitlePresenter
@@ -69,19 +66,6 @@ public abstract class CommonSubtitlePresenter
         if(getViewInterface() == null) return;
         showSubtitleTitle(subtitleFile);
     }
-
-    @Override
-    public void onInvalidSubtitleFormat(@NonNull String subtitleFilename) {}
-
-    @Override
-    public void onFileReadingFailed(@NonNull String subtitleFilename) {}
-
-    @Override
-    public void onSubtitleFileParsed(
-            @NonNull SubtitleFile subtitleFile, @NonNull List<ParsingError> parsingErrors) {}
-
-    @Override
-    public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {}
 
 
     // ------------------------------------------------------------------------------------ INTERNAL
