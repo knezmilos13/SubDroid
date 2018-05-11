@@ -51,7 +51,6 @@ public class EditorActivity extends CommonSubtitleActivity
 
     // TODO: add progress bar while loading stuff; also disable clicks on items
 
-    // TODO: zvezdica kad je editovan fajl da bude ispred imena jer se ne vidi nista
     // TODO takodje imenovanje ti je fucked up sa onim (2)...
     // TODO probaj da dozvolis save? tj. overwrite
 
@@ -227,7 +226,7 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
     public void removeAllCurrentSubtitleData() {
 	    subtitleLinesAdapter.clear();
-	    searchView.setText(""); // TODO dal ovo puca listener
+	    searchView.setText("");
     }
 
     @Override
@@ -255,104 +254,6 @@ public class EditorActivity extends CommonSubtitleActivity
         else if(subtitleLinesAdapter.getItemCount() != 0 && centerTextView.getVisibility() == View.VISIBLE)
             FadeAnimationHelper.fadeView(false, centerTextView, false);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// ---------------------------------------------------------------------------------------- Eventovi - panel View
-
-//	@Override
-//	public void onPritisnutoFilter(String subtitleTextView, boolean ukljucen, boolean matchCase, boolean highlight) {
-//		if(!ukljucen) {
-//			osveziListu();
-//			prevodAdapter.clearTrazeniTekst();
-//		} else {
-//			if(subtitleTextView == null || subtitleTextView.equals(""))
-//				// tek ukljucen - a prazno polje - ne treba nista da menjas ni da trazis osvezavanje
-//				return;
-//			izfiltrirajListu(subtitleTextView, matchCase, highlight);
-//		}
-//	}
-
-//	@Override
-//	public void onUnetTekstZaPretragu(String subtitleTextView, boolean matchCase, boolean highlight) {
-//		if(panelView.isUkljucenFilter()) {
-//			izfiltrirajListu(subtitleTextView, matchCase, highlight);
-//		}
-//	}
-//	@Override
-//	public void onPritisnutoStil(boolean prikazi) {
-//		prevodAdapter.setPrikaziDrugiRed(prikazi);
-//		prevodAdapter.notifyDataSetChanged();
-//	}
-//	@Override
-//	public void onPritisnutoTagovi(boolean prikazi) {
-//		prevodAdapter.setPrikaziTagove(prikazi);
-//		prevodAdapter.notifyDataSetChanged();
-//	}
-//	@Override
-//	public void onPritisnutoTajming(boolean prikazi) {
-//		prevodAdapter.setPrikaziPrviRed(prikazi);
-//		prevodAdapter.notifyDataSetChanged();
-//	}
-//	@Override
-//	public void onPrikaziPodesavanjaFiltera() {
-//		showDialog(PanelView.ID_DIJALOG_FILTER);
-//	}
-//	@Override
-//	public void onPromenjenaPodesavanjaFiltera(boolean matchCase, boolean highlight) {
-//		izfiltrirajListu(panelView.poljeUnos.getText().toString(), matchCase, highlight);
-//	}
-
-
-
-
-//	@Override
-//	protected void onSaveInstanceState(Bundle outState) {
-//		Bundle stanjeView = panelView.dajStanje();
-//		outState.putBundle(SAVE_PANEL_VIEW_STANJE, stanjeView);
-//		super.onSaveInstanceState(outState);
-//	}
-//
-//	@Override
-//	protected void onPause() {
-//		perzistirajStanjeInterfejsa();
-//		super.onPause();
-//	}
-//
-//	private void perzistirajStanjeInterfejsa() {
-//		panelView.perzistirajStanje();
-//	}
-//
-//	@Override
-//	protected Dialog onCreateDialog(int id) {
-//		switch(id) {
-//		case PanelView.ID_DIJALOG_FILTER:
-//			return panelView.kreirajDijalogFilter();
-//		}
-//		return super.onCreateDialog(id);
-//	}
-//
-//	@Override
-//	protected void onPrepareDialog(int id, Dialog dialog) {
-//		switch(id) {
-//		case PanelView.ID_DIJALOG_FILTER:
-//			panelView.osveziDijalogFilter(dialog);
-//		}
-//		super.onPrepareDialog(id, dialog);
-//	}
-
-
-    // ------------------------------------------------------------------------------------ INTERNAL
 
     private void showFileOpenSelector() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);

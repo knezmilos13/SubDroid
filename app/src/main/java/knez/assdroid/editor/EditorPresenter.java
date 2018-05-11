@@ -185,8 +185,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         }
 
-        viewInterface.removeAllCurrentSubtitleData();
-        // TODO: ocisti linije koje mi sami drzimo ovde
+        viewInterface.removeAllCurrentSubtitleData(); // TODO clean out search query
 
         showSubtitleTitle(subtitleFile);
         asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
