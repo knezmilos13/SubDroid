@@ -23,15 +23,13 @@
         android:id="@+id/subtitle_line_timings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:text="@string/subtitle_line_timings"
-        tools:textSize="@dimen/subtitle_line_demo_other_font_size"
-        tools:text="0:00:15.64 — 0:00:22.30"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/subtitle_line_line_number"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="0:00:15.64 — 0:00:22.30"
+        tools:textSize="@dimen/subtitle_line_demo_other_font_size"/>
 
     <View
         android:id="@+id/subtitle_line_hack_view_1"
@@ -47,16 +45,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="subtitle_line_hack_view_1,subtitle_line_timings"/>
+        app:constraint_referenced_ids="subtitle_line_hack_view_1,subtitle_line_timings,subtitle_line_style,subtitle_line_actor"/>
 
     <TextView
         android:id="@+id/subtitle_line_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/subtitle_line_style"
-        app:layout_constraintStart_toEndOf="@+id/subtitle_line_line_number"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle_line_barrier_1"
+        app:layout_constraintStart_toEndOf="@+id/subtitle_line_timings"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Style: greenish"
         tools:textSize="@dimen/subtitle_line_demo_other_font_size"/>
 
@@ -65,18 +64,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/subtitle_line_actor"
         tools:textSize="@dimen/subtitle_line_demo_other_font_size"
         tools:text="Actor: some guy"
         app:layout_constraintStart_toEndOf="@+id/subtitle_line_style"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle_line_barrier_1"/>
-
-    <android.support.constraint.Barrier
-        android:id="@+id/subtitle_line_barrier_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="subtitle_line_barrier_1, subtitle_line_style, subtitle_line_actor"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/subtitle_line_text"
@@ -89,7 +82,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/subtitle_line_line_number"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle_line_barrier_2"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle_line_barrier_1"
         tools:text="@string/dev_lorem_123_chars"
         tools:textSize="@dimen/subtitle_line_demo_text_font_size"/>
 
