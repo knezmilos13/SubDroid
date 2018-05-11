@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.List;
 import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
-import knez.assdroid.editor.adapter.SubtitleLineDiffCallback;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 import knez.assdroid.editor.vso.SubtitleLineVso;
@@ -21,6 +19,7 @@ import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import solid.collections.SolidList;
+import timber.log.Timber;
 
 public class EditorPresenter extends CommonSubtitlePresenter
         implements EditorMVP.PresenterInterface {
@@ -42,18 +41,16 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private SubtitleLineSettings subtitleLineSettings;
     private boolean presenterInitialized = false;
 
-    // TODO: mnogo ti je glomazno ovo sve sa filtriranjem. Vidi da li moze to da se offloaduje na adapter
-    // bar diff utilovanje mora da moze kroz onaj neki novi recycler ili sta god
+    @NonNull private final Object vsoCreationSyncObject = new Object();
 
     // TODO: vidi settings, ima ona fora gde je svaki setting svoj objekat, jer ti je dependensi uvek
     // na samo nekim podesavanjima
 
-    @Nullable private DiffUtilTask diffUtilTask = null;
-    @Nullable private VsoFactoryTask createAllVsosTask = null;
+    @Nullable private CreateVsosTask createVsosTask = null;
 
-    @NonNull private String[] currentSearchQuery = new String[0];
+//    @NonNull private String[] currentSearchQuery = new String[0];
     @NonNull private List<SubtitleLineVso> allSubtitleLineVsos = new ArrayList<>();
-    @NonNull private SolidList<SubtitleLineVso> filteredSubtitleLineVsos = SolidList.empty();
+//    @NonNull private SolidList<SubtitleLineVso> filteredSubtitleLineVsos = SolidList.empty();
 
     public EditorPresenter(
             @NonNull SubtitleController subtitleController,
@@ -72,10 +69,13 @@ public class EditorPresenter extends CommonSubtitlePresenter
     public void onAttach(@NonNull EditorMVP.ViewInterface viewInterface) {
         this.viewInterface = viewInterface;
 
+        // TODO and what if file was changed in the mean time?
+        subtitleController.attachListener(this);
+
         // if reattaching to the same presenter (e.g. after orientation change)
         if(presenterInitialized) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
-            viewInterface.showSubtitleLines(filteredSubtitleLineVsos);
+            viewInterface.showSubtitleLines(new SolidList<>(allSubtitleLineVsos));
             return;
         }
 
@@ -91,30 +91,24 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         viewInterface.showCurrentSubtitleLineSettings(subtitleLineSettings);
 
-        subtitleController.attachListener(this);
-
         if(subtitleController.getCurrentSubtitleFile() != null) {
-            showSubtitleFile(subtitleController.getCurrentSubtitleFile());
-        } else if(subtitleController.hasStoredSubtitle()) {
+            showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
+            asyncCreateSubtitleLineVsos(subtitleController.getCurrentSubtitleFile()
+                    .getSubtitleContent().getSubtitleLines());
+        }
+        else if(subtitleController.hasStoredSubtitle()) {
             subtitleController.reloadCurrentSubtitleFile();
-        } else {
+        }
+        else {
             SubtitleFile newlyCreatedSubtitleFile = subtitleController.createNewSubtitleFile();
-            showSubtitleFile(newlyCreatedSubtitleFile);
+            showSubtitleTitle(newlyCreatedSubtitleFile);
+            asyncCreateSubtitleLineVsos(newlyCreatedSubtitleFile.getSubtitleContent().getSubtitleLines());
         }
 
     }
 
     @Override
     public void onDetach() {
-        if(diffUtilTask != null) {
-            diffUtilTask.cancel(true);
-            diffUtilTask = null;
-        }
-        if(createAllVsosTask != null) {
-            createAllVsosTask.cancel(true);
-            createAllVsosTask = null;
-        }
-
         subtitleController.detachListener(this);
         viewInterface = null;
     }
@@ -151,11 +145,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onSubtitleEditedExternally(@NonNull ArrayList<Integer> editedLineNumbers) {
-        // if all items are being processed, then our partial processing is both unnecessary and
-        // likely to screw stuff up
-        if(createAllVsosTask != null) return;
-
-        showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
+        showSubtitleTitle(subtitleController.getCurrentSubtitleFile()); // to update the "*"
 
         // TODO: preuzmi sve // TODO ipak neka budu idjevi
         List<SubtitleLine> editedLines = new ArrayList<>();
@@ -165,11 +155,11 @@ public class EditorPresenter extends CommonSubtitlePresenter
             editedLines.add(line);
         }
 
-        // TODO stavi na spisak taskova lepo cancelovanja radi
-        VsoFactoryTask convertEditedToVsosTask = new VsoFactoryTask(
+        //noinspection unchecked
+        new CreateVsosTask(
                 subtitleLineVsoFactory, subtitleLineSettings,
-                EditorPresenter.this::onSelectedLinesConversionToVsosCompleted);
-        convertEditedToVsosTask.execute(new SolidList<>(editedLines));
+                this::onSelectedLinesConversionToVsosCompleted, vsoCreationSyncObject)
+                .execute(new SolidList<>(editedLines));
     }
 
 
@@ -198,12 +188,14 @@ public class EditorPresenter extends CommonSubtitlePresenter
         viewInterface.removeAllCurrentSubtitleData();
         // TODO: ocisti linije koje mi sami drzimo ovde
 
-        showSubtitleFile(subtitleFile);
+        showSubtitleTitle(subtitleFile);
+        asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 
     @Override
     public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {
-        showSubtitleFile(subtitleFile);
+        showSubtitleTitle(subtitleFile);
+        asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 
     @Override @Nullable
@@ -222,72 +214,23 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP, SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP);
     }
 
-    private void showSubtitleFile(@NonNull SubtitleFile subtitleFile) {
-        showSubtitleTitle(subtitleFile);
-
-        asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
-    }
-
-    private void showResultsForQuery(@NonNull final String[] queryToShow) {
-        if(viewInterface == null) return;
-//        if(diffUtilTask != null) diffUtilTask.cancel(true);
-
-        // TODO: cekaj kako ovo ima logike? ako je query 0 treba da prikazes sve, a sto ne bi morao da diffjes?
-        if(queryToShow.length == 0) {
-            filteredSubtitleLineVsos = new SolidList<>(allSubtitleLineVsos);
-            viewInterface.showSubtitleLines(filteredSubtitleLineVsos);
-            return;
-        }
-
-        // Note: can't store new results here now, pass them to asyncTask and store them in this
-        // presenter only when work is done. Otherwise if a new query cancels the previous one, it
-        // will get to work with the wrong number of "old" results.
-        SolidList<SubtitleLineVso> newResultVsos =
-                new SolidList<>(filterVsos(allSubtitleLineVsos, queryToShow));
-
-        SubtitleLineDiffCallback diffCallback =
-                new SubtitleLineDiffCallback(filteredSubtitleLineVsos, newResultVsos);
-        diffUtilTask = new DiffUtilTask(
-                diffCallback, newResultVsos, EditorPresenter.this::onDiffUtilTaskCompleted);
-        diffUtilTask.execute();
-    }
-
-    private List<SubtitleLineVso> filterVsos(@NonNull final List<SubtitleLineVso> itemVsos,
-                                             @NonNull final String[] searchQuery) {
-        List<SubtitleLineVso> filteredVsos = new ArrayList<>();
-
-        outer:
-        for(SubtitleLineVso vso : itemVsos) {
-            for(String queryPart : searchQuery) {
-                if(!vso.getText().toLowerCase().contains(queryPart)) continue outer;
-            }
-
-            filteredVsos.add(vso);
-        }
-
-        return filteredVsos;
-    }
-
     private void asyncCreateSubtitleLineVsos(@NonNull List<SubtitleLine> lines) {
-        if(createAllVsosTask != null) createAllVsosTask.cancel(true);
+        if(createVsosTask != null) createVsosTask.cancel(true);
 
-        createAllVsosTask = new VsoFactoryTask(
+        createVsosTask = new CreateVsosTask(
                 subtitleLineVsoFactory, subtitleLineSettings,
-                EditorPresenter.this::onVsoFactoryTaskCompleted);
-        createAllVsosTask.execute(new SolidList<>(lines));
+                this::onCreateAllVsosTaskCompleted, vsoCreationSyncObject);
+        //noinspection unchecked
+        createVsosTask.execute(new SolidList<>(lines));
     }
 
-    private void onDiffUtilTaskCompleted(@NonNull final DiffUtil.DiffResult result,
-                                         @NonNull final SolidList<SubtitleLineVso> newFilteredResults) {
-        diffUtilTask = null;
-        filteredSubtitleLineVsos = newFilteredResults;
-        if(viewInterface != null) viewInterface.showSubtitleLines(filteredSubtitleLineVsos, result);
-    }
-
-    private void onVsoFactoryTaskCompleted(SolidList<SubtitleLineVso> result) {
-        createAllVsosTask = null;
+    private void onCreateAllVsosTaskCompleted(SolidList<SubtitleLineVso> result) { // TODO solid?
+        createVsosTask = null;
         allSubtitleLineVsos = new ArrayList<>(result);
-        showResultsForQuery(currentSearchQuery); // can now apply query to the set of all items
+
+        if(viewInterface == null) return;
+
+        viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
     }
 
     private void onSelectedLinesConversionToVsosCompleted(
@@ -308,59 +251,31 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     // ------------------------------------------------------------------------------------- CLASSES
 
-    private static class DiffUtilTask extends AsyncTask<Void, Void, DiffUtil.DiffResult> {
-
-        @NonNull private final Callback callback;
-        @NonNull private final SubtitleLineDiffCallback diffCallback;
-        @NonNull private final SolidList<SubtitleLineVso> newFilteredResults;
-
-        DiffUtilTask(@NonNull final SubtitleLineDiffCallback diffCallback,
-                     @NonNull final SolidList<SubtitleLineVso> newFilteredResults,
-                     @NonNull final Callback callback) {
-            this.diffCallback = diffCallback;
-            this.newFilteredResults = newFilteredResults;
-            this.callback = callback;
-        }
-
-        @Override
-        protected DiffUtil.DiffResult doInBackground(Void... params) {
-            return DiffUtil.calculateDiff(diffCallback);
-        }
-
-        @Override
-        protected void onPostExecute(DiffUtil.DiffResult result) {
-            callback.onDiffUtilTaskCompleted(result, newFilteredResults);
-        }
-
-        @Override protected void onPreExecute() {}
-        @Override protected void onProgressUpdate(Void... values) {}
-
-        interface Callback {
-            void onDiffUtilTaskCompleted(@NonNull DiffUtil.DiffResult result,
-                                         @NonNull SolidList<SubtitleLineVso> filteredResults);
-        }
-    }
-
-    private static class VsoFactoryTask
+    private static class CreateVsosTask
             extends AsyncTask<SolidList<SubtitleLine>, Void, SolidList<SubtitleLineVso>> {
 
         @NonNull private final Callback callback;
         @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
         @NonNull private final SubtitleLineSettings subtitleLineSettings;
+        @NonNull private final Object syncObject;
 
-        VsoFactoryTask(@NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
+        CreateVsosTask(@NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
                        @NonNull SubtitleLineSettings subtitleLineSettings,
-                       @NonNull Callback callback) {
+                       @NonNull Callback callback,
+                       @NonNull Object syncObject) {
             this.subtitleLineVsoFactory = subtitleLineVsoFactory;
             this.subtitleLineSettings = subtitleLineSettings;
             this.callback = callback;
+            this.syncObject = syncObject;
         }
 
         @SuppressWarnings("unchecked") // something about safe varargs
         @Override
         protected final SolidList<SubtitleLineVso> doInBackground(SolidList<SubtitleLine>... params) {
-            return new SolidList<>(
-                    subtitleLineVsoFactory.createSubtitleLineVsos(params[0], subtitleLineSettings));
+            synchronized (syncObject) {
+                return new SolidList<>(
+                        subtitleLineVsoFactory.createSubtitleLineVsos(params[0], subtitleLineSettings));
+            }
         }
 
         @Override

@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static knez.assdroid.editor.EditorMVP.*;
 
@@ -48,25 +49,13 @@ public class EditorActivity extends CommonSubtitleActivity
     private IdentifiableAdapter subtitleLinesAdapter;
     private LinearLayoutManager linearLayoutManager;
 
+    // TODO: add progress bar while loading stuff; also disable clicks on items
+
     // TODO: zvezdica kad je editovan fajl da bude ispred imena jer se ne vidi nista
-    // TODO takodje imenovanje ti je fucked up sa onim (2)... probaj da dozvolis save? tj. overwrite
+    // TODO takodje imenovanje ti je fucked up sa onim (2)...
+    // TODO probaj da dozvolis save? tj. overwrite
 
     // TODO: da probas start/stop umesto create/destroy?
-    // TODO:
-    // da tamo edituje i vrati
-    // pa tek onda razmisljaj kako ces ona podesavanja silna sta da se vidi i tako to
-    // to sve mozes i u neki drawer sa leve strane, najlakse tako
-    // 2. subtitle line settings objekat snimaj u bundle i ucitavaj
-    // 3. taj objekat daj prezenteru pre attacha
-    // 4. taj objekat ubacujes u subtitle line VSO-jeve, taman neces imati sto puta iste atribute u njima
-
-    // TODO: zbog komplikacija sa navigatorom, nemas vise startactivity for result. Treba ga implementirati za settings
-    // (ili implementirati proveru promena nakon svakog zatvaranja)
-
-    // TODO dodaj dugme za dodavanje nove linije prevoda (mada je malo besmisleno dok nemas edit tajminga)
-    // eventualno duplicate linije na long hold
-
-    // TODO: tablet and horizontal variant
 
     // --------------------------------------------------------------------------- LIFECYCLE & SETUP
 
@@ -208,15 +197,6 @@ public class EditorActivity extends CommonSubtitleActivity
         // TODO
     }
 
-    @Override
-    public void onBackPressed() { // TODO - mada mozda ne moras nista, to ce sve da bude u detached
-//		if(editorControlsView.isInterfejsMinimiziran())
-//			editorControlsView.setInterfejsMinimiziran(false);
-//		else if(editorControlsView.isPrikazanPanel())
-//			editorControlsView.skloniPrikazaniPanel();
-//		else super.onBackPressed();
-    }
-
 
     // ------------------------------------------------------------------------------ VIEW INTERFACE
 
@@ -226,13 +206,13 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos) {
+    public void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos) {
         subtitleLinesAdapter.setItems(subtitleLineVsos);
         updateCenterText();
     }
 
     @Override
-    public void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos,
+    public void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos,
                                   @NonNull DiffUtil.DiffResult diffResult) {
         subtitleLinesAdapter.setItemsDontNotify(subtitleLineVsos);
         diffResult.dispatchUpdatesTo(subtitleLinesAdapter);

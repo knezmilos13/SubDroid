@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.editor.data.SubtitleLineSettings;
@@ -16,8 +17,8 @@ public interface EditorMVP {
     interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
         void removeAllCurrentSubtitleData();
         void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename);
-        void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos);
-        void showSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos,
+        void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos);
+        void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos,
                                @NonNull DiffUtil.DiffResult result);
 
         /** Should activate/deactivate appropriate controls in the UI. The actual presentation of
