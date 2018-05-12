@@ -48,10 +48,10 @@ public class SubtitleController extends AbstractRepo {
     @NonNull private final Timber.Tree logger;
 
     @NonNull private final List<Callback> callbacks = Collections.synchronizedList(new ArrayList<>());
+    @Nullable private SubtitleFile currentSubtitleFile;
+    private boolean isLoadingFile;
 
     // TODO sinhronizovan pristup subtajtl fajlu... preko nekog objekta drugog posto ovja moze biti null
-
-    @Nullable private SubtitleFile currentSubtitleFile;
 
     public SubtitleController(@NonNull SubtitleHandlerRepository subtitleHandlerRepository,
                               @NonNull FileHandler fileHandler,
@@ -89,6 +89,10 @@ public class SubtitleController extends AbstractRepo {
         callbacks.remove(callback);
     }
 
+    public boolean isLoadingFile() {
+        return isLoadingFile;
+    }
+
     public boolean canLoadExtension(@NonNull String subtitleExtension) {
         return subtitleHandlerRepository.canOpenSubtitleExtension(subtitleExtension);
     }
@@ -98,6 +102,7 @@ public class SubtitleController extends AbstractRepo {
     }
 
     public void parseSubtitle(@NonNull Uri subtitlePath) {
+        isLoadingFile = true;
         executorService.execute(() -> _parseSubtitle(subtitlePath));
     }
 
@@ -170,6 +175,7 @@ public class SubtitleController extends AbstractRepo {
 
         SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
         if(subtitleParser == null) {
+            isLoadingFile = false;
             fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormat(subtitleFilename),
                     mainThreader);
             return;
@@ -179,6 +185,7 @@ public class SubtitleController extends AbstractRepo {
         try {
             fileContent = fileHandler.readFileContent(subtitlePath);
         } catch (IOException e) {
+            isLoadingFile = false;
             logger.e(e);
             fireCallbacks(callbacks, callback -> callback.onFileReadingFailed(subtitleFilename),
                     mainThreader);
@@ -201,7 +208,8 @@ public class SubtitleController extends AbstractRepo {
         storageHelper.putString(STORAGE_KEY_SUBTITLE_NAME, subtitleName);
         storageHelper.putString(STORAGE_KEY_SUBTITLE_URI, subtitlePath.toString());
 
-		fireCallbacks(callbacks,
+        isLoadingFile = false;
+        fireCallbacks(callbacks,
 				callback -> callback.onSubtitleFileParsed(currentSubtitleFile, parsingErrors),
 				mainThreader);
     }

@@ -19,7 +19,6 @@ import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import solid.collections.SolidList;
-import timber.log.Timber;
 
 public class EditorPresenter extends CommonSubtitlePresenter
         implements EditorMVP.PresenterInterface {
@@ -76,6 +75,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         if(presenterInitialized) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
             viewInterface.showSubtitleLines(new SolidList<>(allSubtitleLineVsos));
+            if(subtitleController.isLoadingFile()) viewInterface.showProgressLoadingFile();
             return;
         }
 
@@ -134,6 +134,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
             return;
         }
 
+        viewInterface.showProgressLoadingFile();
         subtitleController.parseSubtitle(uri);
     }
 
@@ -178,16 +179,19 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @Override
     public void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
                                      @NonNull List<ParsingError> parsingErrors) {
-        if(viewInterface == null) return;
-
         // TODO: utvrdi da li su neke fatalne greske i prikazi nekakav dijalog
         for(ParsingError parsingError : parsingErrors) {
 
         }
 
-        viewInterface.removeAllCurrentSubtitleData(); // TODO clean out search query
+        // TODO clean out search query
 
-        showSubtitleTitle(subtitleFile);
+        if(viewInterface != null) {
+            viewInterface.removeAllCurrentSubtitleData();
+            showSubtitleTitle(subtitleFile);
+            viewInterface.hideProgress();
+        }
+
         asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 

@@ -18,4 +18,6 @@
 
     <color name="background">#ff000000</color>
 
+    <color name="blackish_transparent">#b4000000</color>
+
 </resources>

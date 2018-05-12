@@ -16,6 +16,9 @@
 
     <string name="dev_lorem_123_chars">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</string>
 
+    <string name="common_loading_file">Loading file...</string>
+    <string name="common_saving_file">Saving file...</string>
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
 
