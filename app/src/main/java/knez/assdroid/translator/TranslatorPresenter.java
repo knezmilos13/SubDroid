@@ -11,12 +11,12 @@ import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.util.FileHandler;
 import timber.log.Timber;
 
 public class TranslatorPresenter extends CommonSubtitlePresenter
         implements TranslatorMVP.PresenterInterface {
 
-    @NonNull private final SubtitleController subtitleController;
     @NonNull private final SubtitleLine.Builder subtitleLineBuilder;
     @NonNull private final Timber.Tree logger;
 
@@ -31,9 +31,9 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     public TranslatorPresenter(
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLine.Builder subtitleLineBuilder,
-            @NonNull Timber.Tree logger) {
-        super(subtitleController);
-        this.subtitleController = subtitleController;
+            @NonNull Timber.Tree logger,
+            @NonNull FileHandler fileHandler) {
+        super(subtitleController, fileHandler);
         this.subtitleLineBuilder = subtitleLineBuilder;
         this.logger = logger;
     }

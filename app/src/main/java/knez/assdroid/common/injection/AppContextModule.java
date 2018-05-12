@@ -96,8 +96,9 @@ public class AppContextModule {
     @Provides
     EditorMVP.PresenterInterface getEditorPresenter(
             SubtitleController subtitleController, SubtitleLineVsoFactory subtitleLineVsoFactory,
-            StorageHelper storageHelper) {
-        return new EditorPresenter(subtitleController, subtitleLineVsoFactory, storageHelper);
+            StorageHelper storageHelper, FileHandler fileHandler) {
+        return new EditorPresenter(
+                subtitleController, subtitleLineVsoFactory, storageHelper, fileHandler);
     }
 
     @Provides @Singleton
@@ -108,8 +109,8 @@ public class AppContextModule {
     @Provides
     TranslatorMVP.PresenterInterface getTranslatorPresenter(
             SubtitleController subtitleController, SubtitleLine.Builder subLineBuilder,
-            Timber.Tree logger) {
-        return new TranslatorPresenter(subtitleController, subLineBuilder, logger);
+            Timber.Tree logger, FileHandler fileHandler) {
+        return new TranslatorPresenter(subtitleController, subLineBuilder, logger, fileHandler);
     }
 
 }

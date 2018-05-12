@@ -252,6 +252,7 @@ public class SubtitleController extends AbstractRepo {
             // TODO nije realisticno ali eto bas ako se desi neki fuckup
         }
 
+        // TODO: ovaj baca java.lang.SecurityException... napravi metodu tipa "proveri permisije" koje ce da frljne to
         String destFilename = fileHandler.getFileNameFromUri(destPath);
         String destExtension = destFilename.substring(destFilename.lastIndexOf(".") + 1);
 

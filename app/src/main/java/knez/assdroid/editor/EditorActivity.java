@@ -158,8 +158,7 @@ public class EditorActivity extends CommonSubtitleActivity
             Uri uri = intent.getData();
             if(uri == null) return;
 
-            String filename = AndroidUtil.getFileNameFromUri(this, uri);
-            presenter.onFileSelectedForLoad(uri, filename);
+            presenter.onFileSelectedForLoad(uri);
             return;
         } else if(requestCode == REQUEST_CODE_TRANSLATOR_ACTIVITY) {
             ArrayList<Integer> editedLineNumbers =

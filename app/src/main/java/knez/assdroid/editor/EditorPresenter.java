@@ -18,6 +18,7 @@ import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.util.FileHandler;
 import solid.collections.SolidList;
 
 public class EditorPresenter extends CommonSubtitlePresenter
@@ -32,7 +33,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private static final int SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP = 15;
     private static final int SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP = 12;
 
-    @NonNull private final SubtitleController subtitleController;
     @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
     @NonNull private final StorageHelper storageHelper;
 
@@ -54,9 +54,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
     public EditorPresenter(
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
-            @NonNull StorageHelper storageHelper) {
-        super(subtitleController);
-        this.subtitleController = subtitleController;
+            @NonNull StorageHelper storageHelper,
+            @NonNull FileHandler fileHandler) {
+        super(subtitleController, fileHandler);
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
         this.storageHelper = storageHelper;
     }
@@ -129,13 +129,17 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public void onFileSelectedForLoad(@NonNull Uri uri, @NonNull String filename) {
+    public void onFileSelectedForLoad(@NonNull Uri uri) {
+        String filename = fileHandler.getFileNameFromUri(uri);
         String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
 
         if(!subtitleController.canLoadExtension(subtitleExtension)) {
             viewInterface.showErrorLoadingSubtitleInvalidFormat(filename);
             return;
         }
+
+        // to allow saving into same file (if needed)
+        fileHandler.takePermissionForUri(uri);
 
         viewInterface.showProgressLoadingFile();
         subtitleController.parseSubtitle(uri);

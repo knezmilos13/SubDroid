@@ -22,7 +22,7 @@ public interface CommonSubtitleMVP {
         void onShowHelpClicked();
         void onShowSettingsClicked();
         @Nullable String getCurrentSubtitleName();
-        void onFileSelectedForSaveAs(@NonNull Uri uri, @NonNull String filename);
+        void onFileSelectedForSaveAs(@NonNull Uri uri);
         void onSaveClicked();
     }
 

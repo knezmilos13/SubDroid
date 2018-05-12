@@ -1,12 +1,15 @@
 package knez.assdroid.common.mvp;
 
 import android.content.Intent;
+import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+
+import java.util.List;
 
 import knez.assdroid.App;
 import knez.assdroid.R;
@@ -74,8 +77,7 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
             Uri uri = data.getData();
             if (uri == null) return;
 
-            String filename = AndroidUtil.getFileNameFromUri(this, uri);
-            getPresenter().onFileSelectedForSaveAs(uri, filename);
+            getPresenter().onFileSelectedForSaveAs(uri);
             return;
         }
     }

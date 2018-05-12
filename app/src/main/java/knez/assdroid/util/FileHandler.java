@@ -1,6 +1,8 @@
 package knez.assdroid.util;
 
 import android.content.ContentResolver;
+import android.content.Intent;
+import android.content.UriPermission;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
@@ -81,6 +83,27 @@ public class FileHandler {
             }
         }
         return result;
+    }
+
+    public boolean hasPermissionsToOpenUri(@NonNull Uri uri) {
+        List<UriPermission> permissionList = contentResolver.getPersistedUriPermissions();
+        for(UriPermission uriPermission : permissionList) {
+            if(uriPermission.getUri().equals(uri)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean takePermissionForUri(@NonNull Uri uri) {
+        try {
+            contentResolver.takePersistableUriPermission(uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
 }

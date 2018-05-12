@@ -34,7 +34,7 @@ public interface EditorMVP {
         void onAttach(@NonNull EditorMVP.ViewInterface viewInterface);
         void onDetach();
         void onSearchSubmitted(@NonNull String text);
-        void onFileSelectedForLoad(@NonNull Uri uri, @NonNull String filename);
+        void onFileSelectedForLoad(@NonNull Uri uri);
         void onSubtitleLineClicked(long id);
         void onSubtitleEditedExternally(@NonNull ArrayList<Integer> editedLineNumbers);
     }
