@@ -75,7 +75,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
         if(presenterInitialized) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
             viewInterface.showSubtitleLines(new SolidList<>(allSubtitleLineVsos));
+
             if(subtitleController.isLoadingFile()) viewInterface.showProgressLoadingFile();
+            else if(subtitleController.isWritingFile()) viewInterface.showProgressSavingFile();
+
             return;
         }
 
@@ -168,11 +171,15 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onInvalidSubtitleFormat(@NonNull String subtitleFilename) {
+        if(viewInterface == null) return;
+        viewInterface.hideProgress();
         // TODO prikazi poruku
     }
 
     @Override
     public void onFileReadingFailed(@NonNull String subtitleFilename) {
+        if(viewInterface == null) return;
+        viewInterface.hideProgress();
         // TODO prikazi poruku
     }
 

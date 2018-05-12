@@ -50,6 +50,7 @@ public abstract class CommonSubtitlePresenter
             return;
         }
 
+        getViewInterface().showProgressSavingFile();
         subtitleController.writeSubtitle(uri);
     }
 
@@ -59,12 +60,15 @@ public abstract class CommonSubtitlePresenter
     @Override
     public void onFileWritingFailed(@NonNull String destFilename) {
         // TODO show message
+        if(getViewInterface() == null) return;
+        getViewInterface().hideProgress();
     }
 
     @Override
     public void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) {
         if(getViewInterface() == null) return;
         showSubtitleTitle(subtitleFile);
+        getViewInterface().hideProgress();
     }
 
 

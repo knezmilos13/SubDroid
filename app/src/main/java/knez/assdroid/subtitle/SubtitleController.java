@@ -50,6 +50,7 @@ public class SubtitleController extends AbstractRepo {
     @NonNull private final List<Callback> callbacks = Collections.synchronizedList(new ArrayList<>());
     @Nullable private SubtitleFile currentSubtitleFile;
     private boolean isLoadingFile;
+    private boolean isWritingFile;
 
     // TODO sinhronizovan pristup subtajtl fajlu... preko nekog objekta drugog posto ovja moze biti null
 
@@ -89,9 +90,8 @@ public class SubtitleController extends AbstractRepo {
         callbacks.remove(callback);
     }
 
-    public boolean isLoadingFile() {
-        return isLoadingFile;
-    }
+    public boolean isLoadingFile() { return isLoadingFile; }
+    public boolean isWritingFile() { return isWritingFile; }
 
     public boolean canLoadExtension(@NonNull String subtitleExtension) {
         return subtitleHandlerRepository.canOpenSubtitleExtension(subtitleExtension);
@@ -111,6 +111,7 @@ public class SubtitleController extends AbstractRepo {
     }
 
     public void writeSubtitle(@NonNull Uri uri) {
+        isWritingFile = true;
         executorService.execute(() -> _writeSubtitle(uri));
     }
 
@@ -240,6 +241,7 @@ public class SubtitleController extends AbstractRepo {
     @WorkerThread
     private void _writeSubtitle(@NonNull Uri destPath) {
         if(currentSubtitleFile == null) {
+            isWritingFile = false;
             return;
             // TODO nije realisticno ali eto bas ako se desi neki fuckup
         }
@@ -251,6 +253,7 @@ public class SubtitleController extends AbstractRepo {
                 subtitleHandlerRepository.getFormatterForSubtitleFormat(subtitleExtension);
 
         if(subtitleFormatter == null) {
+            isWritingFile = false;
             fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormat(destFilename),
                     mainThreader); // TODO ovo invalidSubtitleFormat ti je isto i za read i write, aj nekako to razdvoj malo
             return;
@@ -264,6 +267,7 @@ public class SubtitleController extends AbstractRepo {
         try {
             fileHandler.writeFileContent(destPath, serializedSubtitle);
         } catch (IOException e) {
+            isWritingFile = false;
             logger.e(e);
             fireCallbacks(callbacks, callback -> callback.onFileWritingFailed(destFilename),
                     mainThreader);
@@ -279,6 +283,7 @@ public class SubtitleController extends AbstractRepo {
         storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
         storageHelper.putString(STORAGE_KEY_SUBTITLE_NAME, subtitleName);
 
+        isWritingFile = false;
         fireCallbacks(callbacks,
                 callback -> callback.onSubtitleFileSaved(currentSubtitleFile), mainThreader);
     }

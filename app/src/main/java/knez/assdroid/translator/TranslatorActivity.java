@@ -8,6 +8,7 @@ import knez.assdroid.App;
 import knez.assdroid.R;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
+import knez.assdroid.util.gui.FadeAnimationHelper;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,6 +49,8 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     @BindView(R.id.translator_next_line) protected TextView nextLineTextView;
     @BindView(R.id.translator_input) protected EditText inputView;
     @BindView(R.id.translator_commit_indicator) protected ImageView commitIndicatorView;
+    @BindView(R.id.subtitle_processing_progress) protected View progressBar;
+    @BindView(R.id.subtitle_processing_text) protected TextView progressLabel;
 
     private PresenterInterface presenter;
 
@@ -242,6 +245,17 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     @Override
     public void showCurrentLineEdited(boolean currentLineEdited) {
         commitIndicatorView.setVisibility(currentLineEdited? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void showProgressSavingFile() {
+        progressLabel.setText(R.string.common_saving_file);
+        FadeAnimationHelper.fadeView(true, progressBar, false);
+    }
+
+    @Override
+    public void hideProgress() {
+        FadeAnimationHelper.fadeView(false, progressBar, false);
     }
 
 }

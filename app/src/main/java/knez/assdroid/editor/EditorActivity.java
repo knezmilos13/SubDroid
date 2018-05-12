@@ -44,14 +44,13 @@ public class EditorActivity extends CommonSubtitleActivity
     @BindView(R.id.editor_subtitle_list) protected RecyclerView itemListRecycler;
     @BindView(R.id.editor_search_view) protected BgpEditText searchView;
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
-    @BindView(R.id.editor_progress) protected View progressBar;
-    @BindView(R.id.editor_progress_text) protected TextView progressLabel;
+    @BindView(R.id.subtitle_processing_progress) protected View progressBar;
+    @BindView(R.id.subtitle_processing_text) protected TextView progressLabel;
 
     private PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
     private LinearLayoutManager linearLayoutManager;
 
-    // TODO: progress for saving a file
     // TODO: disable clicks on items
 
     // TODO takodje imenovanje ti je fucked up sa onim (2)...
@@ -247,6 +246,12 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
     public void showProgressLoadingFile() {
         progressLabel.setText(R.string.common_loading_file);
+        FadeAnimationHelper.fadeView(true, progressBar, false);
+    }
+
+    @Override
+    public void showProgressSavingFile() {
+        progressLabel.setText(R.string.common_saving_file);
         FadeAnimationHelper.fadeView(true, progressBar, false);
     }
 

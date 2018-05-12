@@ -13,6 +13,8 @@ public interface CommonSubtitleMVP {
         void showSettingsScreen();
         void showHelpScreen();
         void showErrorWritingSubtitleInvalidFormat(@NonNull String filename);
+        void showProgressSavingFile();
+        void hideProgress();
     }
 
     interface PresenterInterface {

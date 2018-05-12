@@ -28,7 +28,6 @@ public interface EditorMVP {
         void showTranslatorScreen(long lineId);
         void updateSubtitleLines(@NonNull SolidList<SubtitleLineVso> editedVsos);
         void showProgressLoadingFile();
-        void hideProgress();
     }
 
     interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
