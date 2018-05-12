@@ -51,8 +51,6 @@ public class EditorActivity extends CommonSubtitleActivity
     private IdentifiableAdapter subtitleLinesAdapter;
     private LinearLayoutManager linearLayoutManager;
 
-    // TODO: disable clicks on items
-
     // TODO takodje imenovanje ti je fucked up sa onim (2)...
     // TODO probaj da dozvolis save? tj. overwrite
 

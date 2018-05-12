@@ -143,7 +143,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onSubtitleLineClicked(long id) {
-        if(viewInterface == null) return;
+        if(viewInterface == null || subtitleController.isLoadingFile()) return;
         viewInterface.showTranslatorScreen(id);
     }
 
@@ -160,7 +160,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         }
 
         //noinspection unchecked
-        new CreateVsosTask(
+        new CreateVsosTask( // TODO zabelezi i ovaj, pa ako dodje onaj full, neka otkaze ovaj
                 subtitleLineVsoFactory, subtitleLineSettings,
                 this::onSelectedLinesConversionToVsosCompleted, vsoCreationSyncObject)
                 .execute(new SolidList<>(editedLines));

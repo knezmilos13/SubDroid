@@ -130,7 +130,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onCommitRequested() {
-        if(viewInterface == null) return;
+        if(viewInterface == null || subtitleController.isWritingFile()) return;
 
         String translationText = viewInterface.getTranslationText();
 
@@ -156,6 +156,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onCommitAndNextRequested() {
+        if(subtitleController.isWritingFile()) return;
         onCommitRequested();
         onNextLineRequested();
     }
