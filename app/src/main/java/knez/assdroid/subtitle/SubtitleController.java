@@ -163,7 +163,10 @@ public class SubtitleController extends AbstractRepo {
         List<SubtitleLine> subtitleLines = currentSubtitleFile.getSubtitleContent().getSubtitleLines();
         subtitleLines.set(updatedLine.getLineNumber() - 1, updatedLine);
 
-        currentSubtitleFile.setEdited(true);
+        if(!currentSubtitleFile.isEdited()) {
+            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, true);
+            currentSubtitleFile.setEdited(true);
+        }
 
         // TODO ako se ne poklapaju i ID i line number stare i izmenjene linije, imas problem
         // TODO i oces da javis listenerima da se promenila linija?
