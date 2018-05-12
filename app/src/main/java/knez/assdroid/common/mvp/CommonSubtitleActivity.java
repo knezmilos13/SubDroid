@@ -41,7 +41,10 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
             case R.id.menu_item_settings:
                 getPresenter().onShowSettingsClicked();
                 break;
-            case R.id.menu_item_save_subtitle:
+            case R.id.menu_item_save:
+                getPresenter().onSaveClicked();
+                break;
+            case R.id.menu_item_save_as:
                 showFileSaveSelector();
                 break;
             case R.id.menu_item_help:
@@ -72,7 +75,7 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
             if (uri == null) return;
 
             String filename = AndroidUtil.getFileNameFromUri(this, uri);
-            getPresenter().onFileSelectedForSaving(uri, filename);
+            getPresenter().onFileSelectedForSaveAs(uri, filename);
             return;
         }
     }
@@ -124,17 +127,15 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
         // TODO
     }
 
-
-    // ------------------------------------------------------------------------------------ INTERNAL
-
-    private void showFileSaveSelector() {
+    @Override
+    public void showFileSaveSelector() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
 
         String currentName = getPresenter().getCurrentSubtitleName();
         if(currentName == null) currentName = getString(R.string.common_strings_untitled);
-        currentName += " (2).ass"; // TODO jednom kad snimis ovo valjda se azurira URI pa onda sledeci put kad snimis bude (2)(2)(2) itd... vidi save umesto save as
+        currentName += ".ass";
 
         intent.putExtra(Intent.EXTRA_TITLE, currentName);
 

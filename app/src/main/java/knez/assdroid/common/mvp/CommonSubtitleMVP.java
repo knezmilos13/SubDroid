@@ -15,13 +15,15 @@ public interface CommonSubtitleMVP {
         void showErrorWritingSubtitleInvalidFormat(@NonNull String filename);
         void showProgressSavingFile();
         void hideProgress();
+        void showFileSaveSelector();
     }
 
     interface PresenterInterface {
         void onShowHelpClicked();
         void onShowSettingsClicked();
         @Nullable String getCurrentSubtitleName();
-        void onFileSelectedForSaving(@NonNull Uri uri, @NonNull String filename);
+        void onFileSelectedForSaveAs(@NonNull Uri uri, @NonNull String filename);
+        void onSaveClicked();
     }
 
 }

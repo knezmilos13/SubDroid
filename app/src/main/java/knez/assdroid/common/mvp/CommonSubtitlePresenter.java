@@ -41,7 +41,7 @@ public abstract class CommonSubtitlePresenter
     }
 
     @Override
-    public void onFileSelectedForSaving(@NonNull Uri uri, @NonNull String filename) {
+    public void onFileSelectedForSaveAs(@NonNull Uri uri, @NonNull String filename) {
         String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
 
         if(!subtitleController.canWriteSubtitle(subtitleExtension)) {
@@ -52,6 +52,32 @@ public abstract class CommonSubtitlePresenter
 
         getViewInterface().showProgressSavingFile();
         subtitleController.writeSubtitle(uri);
+    }
+
+    @Override
+    public void onSaveClicked() {
+        SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
+        if(currentSubtitleFile == null) {
+            // TODO neki error - nema fajla
+            return;
+        }
+
+        // No name or extension? Must be a newly created file. Ask user to choose a location (save as)
+        if(currentSubtitleFile.getName() == null || currentSubtitleFile.getExtension() == null
+                || currentSubtitleFile.getUriPath() == null) {
+            if(getViewInterface() != null) getViewInterface().showFileSaveSelector();
+            return;
+        }
+
+        if(!subtitleController.canWriteSubtitle(currentSubtitleFile.getExtension())) {
+            if(getViewInterface() != null)
+                getViewInterface().showErrorWritingSubtitleInvalidFormat(
+                        currentSubtitleFile.getName() + "." + currentSubtitleFile.getExtension());
+            return;
+        }
+
+        if(getViewInterface() != null) getViewInterface().showProgressSavingFile();
+        subtitleController.writeSubtitle(currentSubtitleFile.getUriPath());
     }
 
 

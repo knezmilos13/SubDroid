@@ -10,7 +10,8 @@
     <string name="common_strings_untitled_edited">*Untitled</string>
     <string name="common_strings_title_edited">*%1$s</string>
 
-    <string name="common_save_subtitle">Save subtitle</string>
+    <string name="common_save">Save</string>
+    <string name="common_save_as">Save as...</string>
     <string name="common_settings">Settings</string>
     <string name="common_help">Help</string>
 

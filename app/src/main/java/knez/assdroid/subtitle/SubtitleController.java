@@ -30,10 +30,13 @@ import android.support.annotation.WorkerThread;
 
 public class SubtitleController extends AbstractRepo {
 
+    /** Set only initially in order to know if there is a file in storage or not */
     private static final String STORAGE_KEY_SUBTITLE_STORED =
             SubtitleController.class.getCanonicalName() + ".subtitle_stored";
     private static final String STORAGE_KEY_SUBTITLE_NAME =
             SubtitleController.class.getCanonicalName() + ".subtitle_name";
+    private static final String STORAGE_KEY_SUBTITLE_EXTENSION =
+            SubtitleController.class.getCanonicalName() + ".subtitle_extension";
     private static final String STORAGE_KEY_SUBTITLE_URI =
             SubtitleController.class.getCanonicalName() + ".subtitle_uri";
     private static final String STORAGE_KEY_SUBTITLE_EDITED =
@@ -117,7 +120,7 @@ public class SubtitleController extends AbstractRepo {
 
     @NonNull
     public SubtitleFile createNewSubtitleFile() {
-        SubtitleFile subtitleFile = new SubtitleFile(false, null, null,
+        SubtitleFile subtitleFile = new SubtitleFile(false, null, null, null,
                 new SubtitleContent(new ArrayList<>(), new HashMap<>()));
         currentSubtitleFile = subtitleFile;
         storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
@@ -200,14 +203,13 @@ public class SubtitleController extends AbstractRepo {
         // Filename should be kept without the extension since the app itself is format-neutral
         String subtitleName = subtitleFilename.substring(0, subtitleFilename.lastIndexOf("."));
 
-        currentSubtitleFile = new SubtitleFile(false, subtitlePath, subtitleName, result.first);
+        currentSubtitleFile = new SubtitleFile(
+                false, subtitlePath, subtitleName, subtitleExtension, result.first);
 
         subtitleContentDao.storeSubtitleContent(subtitleContent);
 
         storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
-        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
-        storageHelper.putString(STORAGE_KEY_SUBTITLE_NAME, subtitleName);
-        storageHelper.putString(STORAGE_KEY_SUBTITLE_URI, subtitlePath.toString());
+        storeSubtitleFileValues(currentSubtitleFile);
 
         isLoadingFile = false;
         fireCallbacks(callbacks,
@@ -225,13 +227,14 @@ public class SubtitleController extends AbstractRepo {
             subtitleContentDao.clearSubtitle(); // just in case
         }
 
-        String filename = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
+        String name = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
+        String extension = storageHelper.getString(STORAGE_KEY_SUBTITLE_EXTENSION, null);
         Uri uriPath = Uri.parse(storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null));
         boolean currentSubtitleEdited = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
 
         SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
         currentSubtitleFile = new SubtitleFile(
-                currentSubtitleEdited, uriPath, filename, subtitleContent);
+                currentSubtitleEdited, uriPath, name, extension, subtitleContent);
 
         fireCallbacks(callbacks,
                 callback -> callback.onSubtitleFileReloaded(currentSubtitleFile),
@@ -247,10 +250,10 @@ public class SubtitleController extends AbstractRepo {
         }
 
         String destFilename = fileHandler.getFileNameFromUri(destPath);
-        String subtitleExtension = destFilename.substring(destFilename.lastIndexOf(".") + 1);
+        String destExtension = destFilename.substring(destFilename.lastIndexOf(".") + 1);
 
         SubtitleFormatter subtitleFormatter =
-                subtitleHandlerRepository.getFormatterForSubtitleFormat(subtitleExtension);
+                subtitleHandlerRepository.getFormatterForSubtitleFormat(destExtension);
 
         if(subtitleFormatter == null) {
             isWritingFile = false;
@@ -274,18 +277,23 @@ public class SubtitleController extends AbstractRepo {
             return;
         }
 
-        currentSubtitleFile.setEdited(false);
-
-        // Filename should be kept without the extension since the app itself is format-neutral
         String subtitleName = destFilename.substring(0, destFilename.lastIndexOf("."));
-        currentSubtitleFile.setName(subtitleName);
+        currentSubtitleFile = new SubtitleFile(false, destPath, subtitleName, destExtension,
+                currentSubtitleFile.getSubtitleContent());
 
-        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
-        storageHelper.putString(STORAGE_KEY_SUBTITLE_NAME, subtitleName);
+        storeSubtitleFileValues(currentSubtitleFile);
 
         isWritingFile = false;
         fireCallbacks(callbacks,
                 callback -> callback.onSubtitleFileSaved(currentSubtitleFile), mainThreader);
+    }
+
+    private void storeSubtitleFileValues(@NonNull SubtitleFile subtitleFile) {
+        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, subtitleFile.isEdited());
+        storageHelper.putString(STORAGE_KEY_SUBTITLE_NAME, subtitleFile.getName());
+        storageHelper.putString(STORAGE_KEY_SUBTITLE_EXTENSION, subtitleFile.getExtension());
+        storageHelper.putString(STORAGE_KEY_SUBTITLE_URI,
+                subtitleFile.getUriPath() == null? null : subtitleFile.getUriPath().toString());
     }
 
 

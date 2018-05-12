@@ -9,17 +9,20 @@ import knez.assdroid.subtitle.handler.SubtitleContent;
 public class SubtitleFile {
 
     private boolean edited;
-    @Nullable private final Uri uriPath; // TODO treba li ti
+    @Nullable private final Uri uriPath;
     @Nullable private String name;
+    @Nullable private String extension;
     @NonNull private final SubtitleContent subtitleContent;
 
     public SubtitleFile(boolean edited,
-                        @Nullable Uri uriPath,
-                        @Nullable String name,
+                        @Nullable final Uri uriPath,
+                        @Nullable final String name,
+                        @Nullable final String extension,
                         @NonNull SubtitleContent subtitleContent) {
         this.edited = edited;
         this.uriPath = uriPath;
         this.name = name;
+        this.extension = extension;
         this.subtitleContent = subtitleContent;
     }
 
@@ -27,10 +30,8 @@ public class SubtitleFile {
     public void setEdited(boolean edited) { this.edited = edited; }
 
     @Nullable public String getName() { return name; }
-    public void setName(@Nullable String name) { this.name = name; }
-
+    @Nullable public String getExtension() { return extension; }
     @Nullable public Uri getUriPath() { return uriPath; }
-
     @NonNull public SubtitleContent getSubtitleContent() { return subtitleContent; }
 
 }
