@@ -158,7 +158,7 @@ public class SubtitleController extends AbstractRepo {
         if(lineToUpdate == null)
             throw new IllegalStateException("Subtitle line not found! Can not update!");
 
-        subtitleContentDao.updateSubtitleLine(lineToUpdate);
+        subtitleContentDao.updateSubtitleLine(updatedLine);
 
         List<SubtitleLine> subtitleLines = currentSubtitleFile.getSubtitleContent().getSubtitleLines();
         subtitleLines.set(updatedLine.getLineNumber() - 1, updatedLine);
