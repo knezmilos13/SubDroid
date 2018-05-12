@@ -108,8 +108,8 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
 
-        currentLineHadUncommittedChanges = true;
-        viewInterface.showCurrentLineEdited(true);
+        currentLineHadUncommittedChanges = false;
+        viewInterface.showCurrentLineEdited(false);
     }
 
     @Override
@@ -124,15 +124,16 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         showActiveSubtitleLines();
         viewInterface.resetInputField(currentLine.getText());
 
-        currentLineHadUncommittedChanges = true;
-        viewInterface.showCurrentLineEdited(true);
+        currentLineHadUncommittedChanges = false;
+        viewInterface.showCurrentLineEdited(false);
     }
 
     @Override
     public void onCommitRequested() {
         if(viewInterface == null || subtitleController.isWritingFile()) return;
 
-        String translationText = viewInterface.getTranslationText();
+        String translationText = viewInterface.getTranslationText().trim();
+        if(translationText.equals("")) translationText = currentLine.getText();
 
         subtitleLineBuilder.takeValuesFrom(currentLine);
         subtitleLineBuilder.setText(translationText);
@@ -147,8 +148,6 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
         showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
         showActiveSubtitleLines();
-
-        currentLineHadUncommittedChanges = true;
 
         currentLineHadUncommittedChanges = false;
         viewInterface.showCurrentLineEdited(false);
@@ -187,8 +186,11 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onTextChanged(@NonNull String text) {
-        boolean linesSame = currentLine.getText().equals(text);
-        if(currentLineHadUncommittedChanges && linesSame) currentLineHadUncommittedChanges = false;
+        String inputtedText = text.trim();
+        boolean linesSame = currentLine.getText().equals(inputtedText);
+
+        if(inputtedText.equals("")) currentLineHadUncommittedChanges = false;
+        else if(currentLineHadUncommittedChanges && linesSame) currentLineHadUncommittedChanges = false;
         else if(!currentLineHadUncommittedChanges && !linesSame) currentLineHadUncommittedChanges = true;
         else return; // no changes
 
