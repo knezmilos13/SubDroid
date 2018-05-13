@@ -6,8 +6,6 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 
-import knez.assdroid.editor.data.SubtitleLineSettings;
-
 public class StorageHelper {
 
     @NonNull private final SharedPreferences sharedPreferences;

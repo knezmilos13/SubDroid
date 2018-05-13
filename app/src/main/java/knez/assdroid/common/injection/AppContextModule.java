@@ -1,14 +1,7 @@
 package knez.assdroid.common.injection;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Looper;
-import android.preference.PreferenceManager;
-
-import com.google.gson.Gson;
-
-import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +15,6 @@ import dagger.Module;
 import dagger.Provides;
 import knez.assdroid.App;
 import knez.assdroid.common.StorageHelper;
-import knez.assdroid.common.gson.GsonFactory;
 import knez.assdroid.editor.EditorMVP;
 import knez.assdroid.editor.EditorPresenter;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
@@ -34,10 +26,8 @@ import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
 import timber.log.Timber;
 
-@Module
-public class AppContextModule {
-
-    // TODO grupisati bolje ove stvari? activity scope?
+@Module(includes = { GsonModule.class, StorageHelperModule.class, FileHandlerModule.class })
+class AppContextModule {
 
     @Provides @Singleton
     Context providesContext(App app) {
@@ -57,41 +47,8 @@ public class AppContextModule {
         return Timber.asTree();
     }
 
-    @Provides @Singleton
-    ContentResolver getContentResolver(Context context) {
-        return context.getContentResolver();
-    }
 
-    @Provides @Singleton
-    SharedPreferences getSharedPreferences(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
-    @Provides @Singleton
-    GsonFactory getGsonFactory() {
-        return new GsonFactory();
-    }
-
-    @Provides @Singleton
-    Gson getGson(GsonFactory gsonFactory) {
-        return gsonFactory.getNewStandardGson().create();
-    }
-
-    @Provides @Singleton
-    StorageHelper getStorageHelper(SharedPreferences sharedPreferences, Gson gson) {
-        return new StorageHelper(sharedPreferences, gson);
-    }
-
-    @Provides @Singleton
-    SubtitleLineVsoFactory getSubtitleLineVsoFactory(
-            @Named("subtitleTimeFormatter") DateTimeFormatter subtitleTimeFormatter) {
-        return new SubtitleLineVsoFactory(subtitleTimeFormatter);
-    }
-
-    @Provides @Named("subtitleTimeFormatter")
-    DateTimeFormatter getSubtitleTimeFormatter() {
-        return DateTimeFormatter.ofPattern("H:mm:ss.SS");
-    }
+    // ---------------------------------------------------------------------------------- PRESENTERS
 
     @Provides
     EditorMVP.PresenterInterface getEditorPresenter(
@@ -99,11 +56,6 @@ public class AppContextModule {
             StorageHelper storageHelper, FileHandler fileHandler) {
         return new EditorPresenter(
                 subtitleController, subtitleLineVsoFactory, storageHelper, fileHandler);
-    }
-
-    @Provides @Singleton
-    FileHandler getFileHandler(ContentResolver contentResolver) {
-        return new FileHandler(contentResolver);
     }
 
     @Provides

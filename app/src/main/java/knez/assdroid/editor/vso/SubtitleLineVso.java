@@ -4,6 +4,8 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Objects;
+
 import knez.assdroid.common.data.IdentifiableImpl;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 
@@ -47,5 +49,17 @@ public class SubtitleLineVso extends IdentifiableImpl {
     @Nullable public String getActorName() { return actorName; }
     @Nullable public String getStyle() { return style; }
     public int getLineNumber() { return lineNumber; }
+
+    public boolean isIdenticalTo(@NonNull SubtitleLineVso line) {
+        return getId() == line.getId()
+                && subtitleLineSettings == line.getSubtitleLineSettings()
+                && backgroundDrawable == line.getBackgroundDrawable()
+                && lineNumber == line.getLineNumber()
+                && start.equals(line.getStart())
+                && end.equals(line.getEnd())
+                && Objects.equals(style, line.getStyle())
+                && Objects.equals(actorName, line.getActorName())
+                && text.equals(line.getText());
+    }
 
 }

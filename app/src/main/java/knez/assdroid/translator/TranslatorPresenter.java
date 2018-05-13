@@ -186,10 +186,14 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onTextChanged(@NonNull String text) {
-        String inputtedText = text.trim();
-        boolean linesSame = currentLine.getText().equals(inputtedText);
+        if(text.contains("\n")) {
+            text = text.replace("\n", "\\N");
+            if(viewInterface != null) viewInterface.setInputText(text);
+        }
 
-        if(inputtedText.equals("")) currentLineHadUncommittedChanges = false;
+        boolean linesSame = currentLine.getText().equals(text);
+
+        if(text.equals("")) currentLineHadUncommittedChanges = false;
         else if(currentLineHadUncommittedChanges && linesSame) currentLineHadUncommittedChanges = false;
         else if(!currentLineHadUncommittedChanges && !linesSame) currentLineHadUncommittedChanges = true;
         else return; // no changes

@@ -33,16 +33,13 @@ public class SubtitleContentDao {
             boxSubLines.put(subtitleLine);
         }
 
-        // TODO: testirati da li ovo radi
-        // TODO: ucitati na pocetku sve
-        // TODO: omoguciti save/save as stagod
         RawLine rawLineEntity = new RawLine();
         Set<String> rawSectionsKeySet = subtitleContent.getRawSections().keySet();
         for(String key : rawSectionsKeySet) {
             List<String> rawLines = subtitleContent.getRawSections().get(key);
             for(String rawLine : rawLines) {
                 rawLineEntity.setLine(rawLine);
-                rawLineEntity.setTag(key);
+                rawLineEntity.setSection(key);
                 rawLineEntity.setId(0);
                 boxRawLines.put(rawLineEntity);
             }
@@ -65,7 +62,7 @@ public class SubtitleContentDao {
 
         Map<String, List<String>> rawLinesSectionsMap = new HashMap<>();
         for(RawLine rawLine : rawLines) {
-            String section = rawLine.getTag(); // TODO rename tag u section?
+            String section = rawLine.getSection();
             if(!rawLinesSectionsMap.containsKey(section))
                 rawLinesSectionsMap.put(section, new ArrayList<>());
             rawLinesSectionsMap.get(section).add(rawLine.getLine());

@@ -1,21 +1,22 @@
 package knez.assdroid.common.mvp;
 
 import android.content.Intent;
-import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.List;
-
+import butterknife.BindView;
 import knez.assdroid.App;
 import knez.assdroid.R;
 import knez.assdroid.help.KategorijeHelpaAktivnost;
 import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
-import knez.assdroid.util.AndroidUtil;
+import knez.assdroid.util.gui.FadeAnimationHelper;
 import timber.log.Timber;
 
 public abstract class CommonSubtitleActivity extends AppCompatActivity
@@ -23,6 +24,9 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
 
     private static final int REQUEST_CODE_SETTINGS_ACTIVITY = 501;
     private static final int REQUEST_CODE_SAVE_SUBTITLE = 1235;
+
+    @BindView(R.id.subtitle_processing_progress) protected View progressBar;
+    @BindView(R.id.subtitle_processing_text) protected TextView progressLabel;
 
     protected Timber.Tree logger;
 
@@ -61,14 +65,6 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//			case REQUEST_CODE_SETTINGS_ACTIVITY:
-//				boolean izmenjen = primeniPerzistentnaPodesavanjaNaAdapter();
-//				if(izmenjen) prevodAdapter.notifyDataSetChanged();
-//				primeniPerzistentnaPodesavanjaNaKontrole();
-//				primeniFullscreen(panelView.isFullscreenOn());
-//				break;
-// TODO
-
         if (resultCode != RESULT_OK) return;
 
         if (requestCode == REQUEST_CODE_SAVE_SUBTITLE) {
@@ -98,8 +94,7 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
     }
 
     @Override
-    public void showTitleForName(@NonNull String currentSubtitleFilename,
-                                 boolean currentSubtitleEdited) {
+    public void showTitleForName(@NonNull String name, boolean currentSubtitleEdited) {
         ActionBar actionBar = getSupportActionBar();
         if(actionBar == null) {
             logger.w("Action bar missing! Not supposed to happen!");
@@ -107,9 +102,9 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
         }
 
         if(currentSubtitleEdited)
-            actionBar.setTitle(getString(R.string.common_strings_title_edited, currentSubtitleFilename));
+            actionBar.setTitle(getString(R.string.common_strings_title_edited, name));
         else
-            actionBar.setTitle(currentSubtitleFilename);
+            actionBar.setTitle(name);
     }
 
     @Override
@@ -125,11 +120,6 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
     }
 
     @Override
-    public void showErrorWritingSubtitleInvalidFormat(@NonNull String filename) {
-        // TODO
-    }
-
-    @Override
     public void showFileSaveSelector() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -142,6 +132,29 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
         intent.putExtra(Intent.EXTRA_TITLE, currentName);
 
         startActivityForResult(intent, REQUEST_CODE_SAVE_SUBTITLE);
+    }
+
+    @Override
+    public void showProgressSavingFile() {
+        progressLabel.setText(R.string.common_saving_file);
+        FadeAnimationHelper.fadeView(true, progressBar, false);
+    }
+
+    @Override
+    public void showErrorWritingSubtitleInvalidFormat(@NonNull String filename) {
+        Toast.makeText(this, getString(R.string.common_error_writing_invalid_format, filename),
+                Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showErrorCantSaveMissingFile() {
+        Toast.makeText(this, R.string.common_error_writing_fail_missing_file, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showErrorWritingFailed(@NonNull String filename) {
+        Toast.makeText(this, getString(R.string.common_error_writing_failed, filename),
+                Toast.LENGTH_LONG).show();
     }
 
 }

@@ -20,7 +20,7 @@ import solid.collections.SolidList;
 import timber.log.Timber;
 
 @Module(includes = SubtitleAssModule.class)
-public class SubtitleModule {
+class SubtitleModule {
 
     @Provides @Singleton
     SubtitleController getSubtitleHandler(

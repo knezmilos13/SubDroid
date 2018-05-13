@@ -12,7 +12,8 @@ public class SubtitleLineDiffCallback extends DiffUtil.Callback {
     @NonNull private final List<SubtitleLineVso> oldList;
     @NonNull private final List<SubtitleLineVso> newList;
 
-    public SubtitleLineDiffCallback(@NonNull List<SubtitleLineVso> oldList, @NonNull List<SubtitleLineVso> newList) {
+    public SubtitleLineDiffCallback(@NonNull List<SubtitleLineVso> oldList,
+                                    @NonNull List<SubtitleLineVso> newList) {
         this.oldList = oldList;
         this.newList = newList;
     }
@@ -36,9 +37,9 @@ public class SubtitleLineDiffCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areContentsTheSame(final int oldItemPosition, final int newItemPosition) {
-//        return oldList.get(oldItemPosition).getText().equals(newList.get(newItemPosition).getText());
-        // TODO
-        return false;
+        SubtitleLineVso oldItem = oldList.get(oldItemPosition);
+        SubtitleLineVso newItem = newList.get(newItemPosition);
+        return oldItem.isIdenticalTo(newItem);
     }
 
 }

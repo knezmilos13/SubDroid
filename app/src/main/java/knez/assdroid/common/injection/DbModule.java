@@ -10,8 +10,8 @@ import io.objectbox.BoxStore;
 import knez.assdroid.MyObjectBox;
 import knez.assdroid.common.db.SubtitleContentDao;
 
-@Module(includes = SubtitleAssModule.class)
-public class DbModule {
+@Module
+class DbModule {
 
     @Provides @Singleton
     BoxStore getBoxStore(Context context) {

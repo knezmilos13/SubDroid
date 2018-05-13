@@ -33,7 +33,6 @@ public interface AppComponent {
     RefWatcher getRefWatcher();
     EditorMVP.PresenterInterface getEditorPresenter();
     TranslatorMVP.PresenterInterface getTranslatorPresenter();
-    SubtitleController getSubtitleHandler();
     Context getContext(); // TODO: ko koristi ovo da predje na druge klase
 
 }

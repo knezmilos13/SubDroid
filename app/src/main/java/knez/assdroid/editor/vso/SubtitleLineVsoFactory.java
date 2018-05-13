@@ -9,7 +9,6 @@ import java.util.List;
 
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.subtitle.data.SubtitleLine;
-import solid.collections.SolidList;
 
 public class SubtitleLineVsoFactory {
 
@@ -20,7 +19,7 @@ public class SubtitleLineVsoFactory {
     }
 
     public List<SubtitleLineVso> createSubtitleLineVsos(
-            @NonNull SolidList<SubtitleLine> subtitleLines,
+            @NonNull List<SubtitleLine> subtitleLines,
             @NonNull SubtitleLineSettings subtitleLineSettings) {
 
         List<SubtitleLineVso> vsos = new ArrayList<>();

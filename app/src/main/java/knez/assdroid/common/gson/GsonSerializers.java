@@ -10,7 +10,7 @@ import org.threeten.bp.LocalDate;
 
 import java.lang.reflect.Type;
 
-public class GsonSerializers {
+class GsonSerializers {
 
     public static class InstantSerializer implements JsonSerializer<Instant> {
         @Override

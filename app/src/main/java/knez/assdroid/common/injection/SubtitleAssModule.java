@@ -9,7 +9,7 @@ import knez.assdroid.subtitle.handler.ass.AssParser;
 import knez.assdroid.subtitle.handler.ass.TextSectionParser;
 
 @Module
-public class SubtitleAssModule {
+class SubtitleAssModule {
 
     @Provides @Singleton
     AssParser getAssParser(TextSectionParser textSectionParser) {

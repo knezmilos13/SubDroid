@@ -117,21 +117,15 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         }
     }
 
-    /** Sredjuje prikaz reda sa tekstom - da li se prikazuju tagovi, da li se hajlajtuje neki trazeni izraz
-     *  i da li se prikazuje redni broj u trecem redu (ili je vec prikazan u prvom/drugom) */
     private void handleSubtitleLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        // TODO ovo isto bi trebalo da bude vec sredjeno unapred; a kad tako napravis onda ti nece
-        // trebati pola podesavanja, pa mozes da ih setujes i rucno? Mada lakse je mozda kroz zajednicki objekat vako kako jeste
-        String tekstZaPrikaz = subtitleLineVso.getText();
+        // TODO a vso shouldn't have this kind of logic. String should already have either tag
+        // content or tag replacement. When that is done, it won't be needed in settings either.
+        String textToShow = subtitleLineVso.getText();
         if(!subtitleLineVso.getSubtitleLineSettings().isShowTagContents())
-            tekstZaPrikaz = ParserHelper.izbaciTagove(tekstZaPrikaz,
+            textToShow = ParserHelper.izbaciTagove(textToShow,
                     subtitleLineVso.getSubtitleLineSettings().getTagReplacement());
 
-        // TODO highlight
-//        if(trazeniTekst != null && !trazeniTekst.equals(""))
-//            holder.subtitleTextView.setText(hajlajtujTekst(tekstZaPrikaz));
-//        else
-            subtitleTextView.setText(tekstZaPrikaz);
+        subtitleTextView.setText(textToShow);
     }
 
     private void setFontSizes(@NonNull SubtitleLineSettings settings) {

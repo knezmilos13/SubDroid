@@ -12,7 +12,6 @@ import knez.assdroid.editor.adapter.SubtitleLineAdapterPack;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
 import knez.assdroid.editor.vso.SubtitleLineVso;
-import knez.assdroid.util.AndroidUtil;
 import knez.assdroid.util.gui.BgpEditText;
 import knez.assdroid.util.gui.DividerItemDecoration;
 import knez.assdroid.util.gui.FadeAnimationHelper;
@@ -29,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,17 +44,11 @@ public class EditorActivity extends CommonSubtitleActivity
     @BindView(R.id.editor_subtitle_list) protected RecyclerView itemListRecycler;
     @BindView(R.id.editor_search_view) protected BgpEditText searchView;
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
-    @BindView(R.id.subtitle_processing_progress) protected View progressBar;
-    @BindView(R.id.subtitle_processing_text) protected TextView progressLabel;
 
     private PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
     private LinearLayoutManager linearLayoutManager;
 
-    // TODO takodje imenovanje ti je fucked up sa onim (2)...
-    // TODO probaj da dozvolis save? tj. overwrite
-
-    // TODO: da probas start/stop umesto create/destroy?
 
     // --------------------------------------------------------------------------- LIFECYCLE & SETUP
 
@@ -181,27 +175,14 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void onXClicked() {
-        // TODO
-    }
-
+    public void onXClicked() {}
     @Override
-    public void onSearchSubmitted(@NonNull String text) {
-        // TODO
-    }
-
+    public void onSearchSubmitted(@NonNull String text) {}
     @Override
-    public void onLetterInputted(@NonNull String text) {
-        // TODO
-    }
+    public void onLetterInputted(@NonNull String text) {}
 
 
     // ------------------------------------------------------------------------------ VIEW INTERFACE
-
-    @Override
-    public void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename) {
-        // TODO tostiraj ili sta god
-    }
 
     @Override
     public void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos) {
@@ -247,14 +228,20 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void showProgressSavingFile() {
-        progressLabel.setText(R.string.common_saving_file);
-        FadeAnimationHelper.fadeView(true, progressBar, false);
+    public void hideProgress() {
+	    FadeAnimationHelper.fadeView(false, progressBar, false);
     }
 
     @Override
-    public void hideProgress() {
-	    FadeAnimationHelper.fadeView(false, progressBar, false);
+    public void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename) {
+        Toast.makeText(this, getString(R.string.editor_error_writing_invalid_format, filename),
+                Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showErrorLoadingFailed(@NonNull String filename) {
+        Toast.makeText(this, getString(R.string.common_error_writing_failed, filename),
+                Toast.LENGTH_LONG).show();
     }
 
 

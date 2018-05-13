@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import solid.collections.SolidList;
 
-public class GsonDeserializers {
+class GsonDeserializers {
 
     public static class InstantDeserializer implements JsonDeserializer<Instant> {
         public Instant deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)

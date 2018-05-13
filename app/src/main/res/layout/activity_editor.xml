@@ -37,7 +37,7 @@
         android:layout_marginTop="@dimen/scroll_padding_under_search_top"
         android:gravity="center"
         android:textSize="@dimen/recycler_center_text_size"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <include layout="@layout/include_subtitle_processing" />
 

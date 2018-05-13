@@ -74,7 +74,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         // if reattaching to the same presenter (e.g. after orientation change)
         if(presenterInitialized) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
-            viewInterface.showSubtitleLines(new SolidList<>(allSubtitleLineVsos));
+            viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
 
             if(subtitleController.isLoadingFile()) viewInterface.showProgressLoadingFile();
             else if(subtitleController.isWritingFile()) viewInterface.showProgressSavingFile();
@@ -96,8 +96,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         if(subtitleController.getCurrentSubtitleFile() != null) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
-            asyncCreateSubtitleLineVsos(subtitleController.getCurrentSubtitleFile()
-                    .getSubtitleContent().getSubtitleLines());
+            asyncCreateSubtitleLineVsos(new SolidList<>(subtitleController.getCurrentSubtitleFile()
+                    .getSubtitleContent().getSubtitleLines()));
         }
         else if(subtitleController.hasStoredSubtitle()) {
             subtitleController.reloadCurrentSubtitleFile();
@@ -105,7 +105,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
         else {
             SubtitleFile newlyCreatedSubtitleFile = subtitleController.createNewSubtitleFile();
             showSubtitleTitle(newlyCreatedSubtitleFile);
-            asyncCreateSubtitleLineVsos(newlyCreatedSubtitleFile.getSubtitleContent().getSubtitleLines());
+            asyncCreateSubtitleLineVsos(
+                    new SolidList<>(newlyCreatedSubtitleFile.getSubtitleContent().getSubtitleLines()));
         }
 
     }
@@ -125,7 +126,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
 //        if(CommonTasks.areSortedStringArraysEqual(currentSearchQuery, newQuery)) return;
 //        currentSearchQuery = newQuery;
 //        if(viewInterface == null) return;
-//        TO DO - ovde bi sad zvao filtriranje, a inace je islo preko delayed taska, sto ti ne treba
     }
 
     @Override
@@ -174,17 +174,17 @@ public class EditorPresenter extends CommonSubtitlePresenter
     // ------------------------------------------------------------------------------- REPO CALLBACK
 
     @Override
-    public void onInvalidSubtitleFormat(@NonNull String subtitleFilename) {
+    public void onInvalidSubtitleFormatForLoading(@NonNull String subtitleFilename) {
         if(viewInterface == null) return;
+        viewInterface.showErrorLoadingSubtitleInvalidFormat(subtitleFilename);
         viewInterface.hideProgress();
-        // TODO prikazi poruku
     }
 
     @Override
     public void onFileReadingFailed(@NonNull String subtitleFilename) {
         if(viewInterface == null) return;
         viewInterface.hideProgress();
-        // TODO prikazi poruku
+        viewInterface.showErrorLoadingFailed(subtitleFilename);
     }
 
     @Override
@@ -203,13 +203,15 @@ public class EditorPresenter extends CommonSubtitlePresenter
             viewInterface.hideProgress();
         }
 
-        asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
+        asyncCreateSubtitleLineVsos(
+                new SolidList<>(subtitleFile.getSubtitleContent().getSubtitleLines()));
     }
 
     @Override
     public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {
         showSubtitleTitle(subtitleFile);
-        asyncCreateSubtitleLineVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
+        asyncCreateSubtitleLineVsos(
+                new SolidList<>(subtitleFile.getSubtitleContent().getSubtitleLines()));
     }
 
     @Override @Nullable
@@ -228,17 +230,17 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP, SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP);
     }
 
-    private void asyncCreateSubtitleLineVsos(@NonNull List<SubtitleLine> lines) {
+    private void asyncCreateSubtitleLineVsos(@NonNull SolidList<SubtitleLine> lines) {
         if(createVsosTask != null) createVsosTask.cancel(true);
 
         createVsosTask = new CreateVsosTask(
                 subtitleLineVsoFactory, subtitleLineSettings,
                 this::onCreateAllVsosTaskCompleted, vsoCreationSyncObject);
         //noinspection unchecked
-        createVsosTask.execute(new SolidList<>(lines));
+        createVsosTask.execute(lines);
     }
 
-    private void onCreateAllVsosTaskCompleted(SolidList<SubtitleLineVso> result) { // TODO solid?
+    private void onCreateAllVsosTaskCompleted(List<SubtitleLineVso> result) {
         createVsosTask = null;
         allSubtitleLineVsos = new ArrayList<>(result);
 
@@ -247,8 +249,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
     }
 
-    private void onSelectedLinesConversionToVsosCompleted(
-            @NonNull SolidList<SubtitleLineVso> editedVsos) {
+    private void onSelectedLinesConversionToVsosCompleted(@NonNull List<SubtitleLineVso> editedVsos) {
         for(SubtitleLineVso editedVso : editedVsos) {
             for (int i = 0; i < allSubtitleLineVsos.size(); i++) {
                 if (allSubtitleLineVsos.get(i).getId() == editedVso.getId()) {
@@ -266,7 +267,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     // ------------------------------------------------------------------------------------- CLASSES
 
     private static class CreateVsosTask
-            extends AsyncTask<SolidList<SubtitleLine>, Void, SolidList<SubtitleLineVso>> {
+            extends AsyncTask<SolidList<SubtitleLine>, Void, List<SubtitleLineVso>> {
 
         @NonNull private final Callback callback;
         @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
@@ -285,15 +286,14 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         @SuppressWarnings("unchecked") // something about safe varargs
         @Override
-        protected final SolidList<SubtitleLineVso> doInBackground(SolidList<SubtitleLine>... params) {
+        protected final List<SubtitleLineVso> doInBackground(SolidList<SubtitleLine>... params) {
             synchronized (syncObject) {
-                return new SolidList<>(
-                        subtitleLineVsoFactory.createSubtitleLineVsos(params[0], subtitleLineSettings));
+                return subtitleLineVsoFactory.createSubtitleLineVsos(params[0], subtitleLineSettings);
             }
         }
 
         @Override
-        protected void onPostExecute(SolidList<SubtitleLineVso> result) {
+        protected void onPostExecute(List<SubtitleLineVso> result) {
             callback.onVsoFactoryTaskCompleted(result);
         }
 
@@ -301,7 +301,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         @Override protected void onProgressUpdate(Void... values) {}
 
         interface Callback {
-            void onVsoFactoryTaskCompleted(@NonNull SolidList<SubtitleLineVso> result);
+            void onVsoFactoryTaskCompleted(@NonNull List<SubtitleLineVso> result);
         }
     }
 

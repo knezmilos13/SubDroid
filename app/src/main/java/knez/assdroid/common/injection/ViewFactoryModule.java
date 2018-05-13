@@ -1,16 +1,26 @@
 package knez.assdroid.common.injection;
 
+import org.threeten.bp.format.DateTimeFormatter;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 
 @Module
-public class ViewFactoryModule {
+class ViewFactoryModule {
 
-//    @Provides @Singleton
-//    ItemVsoFactory getItemVsoFactory() {
-//        return new ItemVsoFactory();
-//    }
+    @Provides @Singleton
+    SubtitleLineVsoFactory getSubtitleLineVsoFactory(
+            @Named("subtitleTimeFormatter") DateTimeFormatter subtitleTimeFormatter) {
+        return new SubtitleLineVsoFactory(subtitleTimeFormatter);
+    }
+
+    @Provides @Named("subtitleTimeFormatter")
+    DateTimeFormatter getSubtitleTimeFormatter() {
+        return DateTimeFormatter.ofPattern("H:mm:ss.SS");
+    }
 
 }

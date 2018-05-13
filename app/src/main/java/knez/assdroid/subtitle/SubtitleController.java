@@ -183,7 +183,7 @@ public class SubtitleController extends AbstractRepo {
         SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
         if(subtitleParser == null) {
             isLoadingFile = false;
-            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormat(subtitleFilename),
+            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForLoading(subtitleFilename),
                     mainThreader);
             return;
         }
@@ -232,7 +232,8 @@ public class SubtitleController extends AbstractRepo {
 
         String name = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
         String extension = storageHelper.getString(STORAGE_KEY_SUBTITLE_EXTENSION, null);
-        Uri uriPath = Uri.parse(storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null));
+        String uriString = storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null);
+        Uri uriPath = uriString == null? null : Uri.parse(uriString);
         boolean currentSubtitleEdited = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
 
         SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
@@ -261,7 +262,7 @@ public class SubtitleController extends AbstractRepo {
 
         if(subtitleFormatter == null) {
             isWritingFile = false;
-            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormat(destFilename),
+            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForWriting(destFilename),
                     mainThreader); // TODO ovo invalidSubtitleFormat ti je isto i za read i write, aj nekako to razdvoj malo
             return;
         }
@@ -305,7 +306,8 @@ public class SubtitleController extends AbstractRepo {
 
     @UiThread
     public interface Callback {
-        default void onInvalidSubtitleFormat(@NonNull String subtitleFilename) { }
+        default void onInvalidSubtitleFormatForWriting(@NonNull String subtitleFilename) { }
+        default void onInvalidSubtitleFormatForLoading(@NonNull String subtitleFilename) { }
         default void onFileReadingFailed(@NonNull String subtitleFilename) { }
         default void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
                                           @NonNull List<ParsingError> parsingErrors) { }

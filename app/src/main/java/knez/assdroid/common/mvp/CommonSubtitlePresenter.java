@@ -66,7 +66,7 @@ public abstract class CommonSubtitlePresenter
     public void onSaveClicked() {
         SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
         if(currentSubtitleFile == null) {
-            // TODO neki error - nema fajla
+            getViewInterface().showErrorCantSaveMissingFile();
             return;
         }
 
@@ -101,8 +101,8 @@ public abstract class CommonSubtitlePresenter
 
     @Override
     public void onFileWritingFailed(@NonNull String destFilename) {
-        // TODO show message
         if(getViewInterface() == null) return;
+        getViewInterface().showErrorWritingFailed(destFilename);
         getViewInterface().hideProgress();
     }
 
@@ -110,6 +110,13 @@ public abstract class CommonSubtitlePresenter
     public void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) {
         if(getViewInterface() == null) return;
         showSubtitleTitle(subtitleFile);
+        getViewInterface().hideProgress();
+    }
+
+    @Override
+    public void onInvalidSubtitleFormatForWriting(@NonNull String subtitleFilename) {
+        if(getViewInterface() == null) return;
+        getViewInterface().showErrorWritingSubtitleInvalidFormat(subtitleFilename);
         getViewInterface().hideProgress();
     }
 

@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
-import org.threeten.bp.format.DateTimeFormatter;
-
 import knez.assdroid.common.adapter.AdapterPack;
 import knez.assdroid.common.data.Identifiable;
 import knez.assdroid.editor.gui.SubtitleLineLayoutItem;

@@ -10,32 +10,39 @@ import java.util.List;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVso;
-import solid.collections.SolidList;
 
 public interface EditorMVP {
 
     interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
         void removeAllCurrentSubtitleData();
+
         void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename);
+        void showErrorLoadingFailed(@NonNull String subtitleFilename);
+
         void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos);
         void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos,
                                @NonNull DiffUtil.DiffResult result);
+        void updateSubtitleLines(@NonNull List<SubtitleLineVso> editedVsos);
 
         /** Should activate/deactivate appropriate controls in the UI. The actual presentation of
          *  subtitle lines according to settings is not done here. */
         void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings);
 
         void showTranslatorScreen(long lineId);
-        void updateSubtitleLines(@NonNull SolidList<SubtitleLineVso> editedVsos);
+
         void showProgressLoadingFile();
     }
 
     interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
         void onAttach(@NonNull EditorMVP.ViewInterface viewInterface);
         void onDetach();
+
         void onSearchSubmitted(@NonNull String text);
+
         void onFileSelectedForLoad(@NonNull Uri uri);
+
         void onSubtitleLineClicked(long id);
+
         void onSubtitleEditedExternally(@NonNull ArrayList<Integer> editedLineNumbers);
     }
 

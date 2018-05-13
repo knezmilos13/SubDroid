@@ -20,6 +20,10 @@
     <string name="common_loading_file">Loading file...</string>
     <string name="common_saving_file">Saving file...</string>
 
+    <string name="common_error_writing_invalid_format">Error - invalid subtitle format for %1$s!</string>
+    <string name="common_error_writing_fail_missing_file">Error - missing file!</string>
+    <string name="common_error_writing_failed">Error - could not write to file %1$s!</string>
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EDITOR ACTIVITY -->
 
@@ -29,6 +33,12 @@
 
     <string name="editor_create_new_subtitle">Create new subtitle</string>
     <string name="editor_load_subtitle">Load subtitle</string>
+
+    <string name="editor_error_writing_invalid_format">Error - invalid subtitle format for %1$s!</string>
+    <string name="editor_error_loading_failed">Error - could not read file %1$s!</string>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - SUBTITLE LINE -->
 
     <string name="subtitle_line_number">#%1$d</string>
     <string name="subtitle_line_timings">%1$s — %2$s</string>

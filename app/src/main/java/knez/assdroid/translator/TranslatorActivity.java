@@ -49,8 +49,6 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     @BindView(R.id.translator_next_line) protected TextView nextLineTextView;
     @BindView(R.id.translator_input) protected EditText inputView;
     @BindView(R.id.translator_commit_indicator) protected ImageView commitIndicatorView;
-    @BindView(R.id.subtitle_processing_progress) protected View progressBar;
-    @BindView(R.id.subtitle_processing_text) protected TextView progressLabel;
 
     private PresenterInterface presenter;
 
@@ -197,13 +195,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
         @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
         @Override
         public void afterTextChanged(Editable editable) {
-            String text = editable.toString();
-            if(text.contains("\n")) {
-                text = text.replace("\n", "\\N");
-                inputView.setText(text);
-                inputView.setSelection(inputView.getText().length());
-            }
-            presenter.onTextChanged(text);
+            presenter.onTextChanged(editable.toString());
         }
     };
 
@@ -212,7 +204,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
 
     @Override
     public void closeScreenNoSubtitle() {
-        Toast.makeText(this, R.string.translator_no_subtitle_data, Toast.LENGTH_LONG);
+        Toast.makeText(this, R.string.translator_no_subtitle_data, Toast.LENGTH_LONG).show();
         onBackPressed();
     }
 
@@ -245,12 +237,6 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     @Override
     public void showCurrentLineEdited(boolean currentLineEdited) {
         commitIndicatorView.setVisibility(currentLineEdited? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void showProgressSavingFile() {
-        progressLabel.setText(R.string.common_saving_file);
-        FadeAnimationHelper.fadeView(true, progressBar, false);
     }
 
     @Override
