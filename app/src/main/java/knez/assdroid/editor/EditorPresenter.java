@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import knez.assdroid.Constants;
 import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
@@ -25,13 +26,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
         implements EditorMVP.PresenterInterface {
 
     private static final String STORAGE_KEY_SUBTITLE_LINE_SETTINGS = "subtitle_line_settings";
-
-    private static final boolean SUB_LINE_DEFAULT_SHOW_TIMINGS = true;
-    private static final boolean SUB_LINE_DEFAULT_SHOW_STYLE_ACTOR = true;
-    private static final boolean SUB_LINE_DEFAULT_SHOW_TAG_CONTENT = false;
-    private static final String SUB_LINE_DEFAULT_TAG_REPLACEMENT = "田";
-    private static final int SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP = 15;
-    private static final int SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP = 12;
 
     @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
     @NonNull private final StorageHelper storageHelper;
@@ -225,9 +219,12 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull
     private SubtitleLineSettings createDefaultSubtitleLineSettings() {
         return new SubtitleLineSettings(
-                SUB_LINE_DEFAULT_SHOW_TIMINGS, SUB_LINE_DEFAULT_SHOW_STYLE_ACTOR,
-                SUB_LINE_DEFAULT_SHOW_TAG_CONTENT, SUB_LINE_DEFAULT_TAG_REPLACEMENT,
-                SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP, SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP);
+                Constants.SUB_LINE_DEFAULT_SHOW_TIMINGS,
+                Constants.SUB_LINE_DEFAULT_SHOW_STYLE_ACTOR,
+                Constants.SUB_LINE_DEFAULT_SHOW_TAG_CONTENT,
+                Constants.DEFAULT_TAG_REPLACEMENT,
+                Constants.SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP,
+                Constants.SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP);
     }
 
     private void asyncCreateSubtitleLineVsos(@NonNull SolidList<SubtitleLine> lines) {

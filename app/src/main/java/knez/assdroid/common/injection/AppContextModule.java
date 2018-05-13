@@ -24,6 +24,7 @@ import knez.assdroid.translator.TranslatorMVP;
 import knez.assdroid.translator.TranslatorPresenter;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
+import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 @Module(includes = { GsonModule.class, StorageHelperModule.class, FileHandlerModule.class })
@@ -61,8 +62,10 @@ class AppContextModule {
     @Provides
     TranslatorMVP.PresenterInterface getTranslatorPresenter(
             SubtitleController subtitleController, SubtitleLine.Builder subLineBuilder,
-            Timber.Tree logger, FileHandler fileHandler) {
-        return new TranslatorPresenter(subtitleController, subLineBuilder, logger, fileHandler);
+            Timber.Tree logger, FileHandler fileHandler,
+            @Named("tagReplacement") StringPreference tagReplacementPreference) {
+        return new TranslatorPresenter(subtitleController, subLineBuilder, logger, fileHandler,
+                tagReplacementPreference);
     }
 
 }

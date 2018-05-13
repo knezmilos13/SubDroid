@@ -14,10 +14,19 @@
     <color name="gray_7_quite_light">#ebebeb</color>
     <color name="gray_8_lightest">#f7f7f7</color>
 
+    <color name="border">@color/gray_4_medium_light</color>
+
+    <color name="background">#ffffff</color>
+
+    <color name="whitish_transparent">#b4ffffff</color>
+
+    <color name="hint">#80ffffff</color>
+    <color name="bg_input">#823f51b5</color>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  TRANSLATOR -->
+
     <color name="translator_commit_indicator">@color/accent</color>
 
-    <color name="background">#ff000000</color>
-
-    <color name="blackish_transparent">#b4000000</color>
 
 </resources>

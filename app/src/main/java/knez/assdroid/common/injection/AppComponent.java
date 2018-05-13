@@ -17,7 +17,8 @@ import timber.log.Timber;
 
 @Singleton
 @Component(modules = {
-        AppContextModule.class, SubtitleModule.class, ViewFactoryModule.class, DbModule.class
+        AppContextModule.class, SubtitleModule.class, ViewFactoryModule.class, DbModule.class,
+        PreferencesModule.class
 })
 public interface AppComponent {
 

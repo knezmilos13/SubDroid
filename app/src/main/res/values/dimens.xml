@@ -2,8 +2,6 @@
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - COMMON DIMENSIONS -->
 
-    <dimen name="scroll_padding_under_search_top">80dp</dimen>
-
     <dimen name="standard_margin">16dp</dimen>
     <dimen name="standard_padding">16dp</dimen>
 

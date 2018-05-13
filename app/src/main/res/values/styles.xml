@@ -3,7 +3,7 @@
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  THEMES -->
 
-    <style name="SubDroid.Theme" parent="Theme.AppCompat">
+    <style name="SubDroid.Theme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
@@ -28,21 +28,29 @@
     <style name="translator_secondary_subtitle_line">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginLeft">@dimen/standard_content_margin</item>
+        <item name="android:paddingLeft">@dimen/standard_content_padding</item>
+        <item name="android:layout_marginRight">@dimen/standard_content_margin</item>
+        <item name="android:paddingRight">@dimen/standard_content_padding</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:background">@color/gray_8_lightest</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="translator_primary_subtitle_line">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:paddingLeft">@dimen/standard_content_padding</item>
+        <item name="android:paddingRight">@dimen/standard_content_padding</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:background">@drawable/bg_border</item>
     </style>
 
     <style name="translator_main_image_button">
         <item name="android:layout_width">@dimen/translator_main_button_dimension</item>
         <item name="android:layout_height">@dimen/translator_main_button_dimension</item>
         <item name="android:textSize" tools:ignore="SpUsage">30dp</item>
-        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="BaseSearchViewStyle" >
@@ -50,6 +58,12 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="hasXIcon">true</item>
         <item name="android:background">@android:color/white</item>
+    </style>
+
+    <style name="standard_input_field">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/hint</item>
+        <item name="android:background">@drawable/bg_standard_input</item>
     </style>
     
 </resources>

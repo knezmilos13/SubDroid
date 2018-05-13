@@ -8,10 +8,12 @@ import java.util.Set;
 
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
+import knez.assdroid.subtitle.ParserHelper;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.util.FileHandler;
+import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 public class TranslatorPresenter extends CommonSubtitlePresenter
@@ -19,6 +21,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @NonNull private final SubtitleLine.Builder subtitleLineBuilder;
     @NonNull private final Timber.Tree logger;
+    @NonNull private final StringPreference tagReplacementPreference;
 
     private TranslatorMVP.ViewInterface viewInterface;
     private boolean currentLineHadUncommittedChanges;
@@ -32,10 +35,12 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLine.Builder subtitleLineBuilder,
             @NonNull Timber.Tree logger,
-            @NonNull FileHandler fileHandler) {
+            @NonNull FileHandler fileHandler,
+            @NonNull StringPreference tagReplacementPreference) {
         super(subtitleController, fileHandler);
         this.subtitleLineBuilder = subtitleLineBuilder;
         this.logger = logger;
+        this.tagReplacementPreference = tagReplacementPreference;
     }
 
 
@@ -218,10 +223,13 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     private void showActiveSubtitleLines() {
         if(viewInterface == null) return;
 
-        viewInterface.showSubtitleTexts(
-                currentLine.getText(),
-                previousLine == null? null : previousLine.getText(),
-                nextLine == null? null : nextLine.getText());
+        String currentLineText = currentLine.getText();
+        String prevLineText = previousLine == null?
+                null : ParserHelper.izbaciTagove(previousLine.getText(), tagReplacementPreference.get());
+        String nextLineText = nextLine == null?
+                null : ParserHelper.izbaciTagove(nextLine.getText(), tagReplacementPreference.get());
+
+        viewInterface.showSubtitleTexts(currentLineText, prevLineText, nextLineText);
     }
 
 }

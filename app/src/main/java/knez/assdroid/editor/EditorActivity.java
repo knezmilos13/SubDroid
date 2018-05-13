@@ -15,7 +15,6 @@ import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.util.gui.BgpEditText;
 import knez.assdroid.util.gui.DividerItemDecoration;
 import knez.assdroid.util.gui.FadeAnimationHelper;
-import solid.collections.SolidList;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -217,7 +216,7 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void updateSubtitleLines(@NonNull SolidList<SubtitleLineVso> subtitleLineVsos) {
+    public void updateSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos) {
         for(SubtitleLineVso vso : subtitleLineVsos) subtitleLinesAdapter.updateItem(vso);
     }
 
