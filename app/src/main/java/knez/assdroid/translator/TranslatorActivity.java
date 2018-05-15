@@ -141,8 +141,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     public void onBackPressed() {
         Intent output = new Intent();
         output.putExtra(OUTPUT_LAST_VIEWED_LINE_NUMBER, presenter.getCurrentLineNumber());
-        output.putIntegerArrayListExtra(OUTPUT_EDITED_LINE_NUMBERS,
-                new ArrayList<>(presenter.getEditedLineNumbers()));
+        output.putExtra(OUTPUT_EDITED_LINE_NUMBERS, new ArrayList<>(presenter.getEditedLineIds()));
         setResult(RESULT_OK, output);
         finish();
     }

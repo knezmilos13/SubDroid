@@ -139,13 +139,13 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public void onSubtitleEditedExternally(@NonNull ArrayList<Integer> editedLineNumbers) {
+    public void onSubtitleEditedExternally(@NonNull ArrayList<Long> editedLineIds) {
         showSubtitleTitle(subtitleController.getCurrentSubtitleFile()); // to update the "*"
 
-        // TODO: preuzmi sve // TODO ipak neka budu idjevi
+        // TODO: preuzmi sve
         List<SubtitleLine> editedLines = new ArrayList<>();
-        for(Integer lineNumber : editedLineNumbers) {
-            SubtitleLine line = subtitleController.getLineForNumber(lineNumber);
+        for(Long id : editedLineIds) {
+            SubtitleLine line = subtitleController.getLineForId(id);
             if(line == null) continue; // defensive wtf // todo loguj
             editedLines.add(line);
         }

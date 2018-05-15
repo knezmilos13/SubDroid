@@ -153,9 +153,10 @@ public class EditorActivity extends CommonSubtitleActivity
             presenter.onFileSelectedForLoad(uri);
             return;
         } else if(requestCode == REQUEST_CODE_TRANSLATOR_ACTIVITY) {
-            ArrayList<Integer> editedLineNumbers =
-                    intent.getIntegerArrayListExtra(TranslatorActivity.OUTPUT_EDITED_LINE_NUMBERS);
-            if(editedLineNumbers.size() > 0) presenter.onSubtitleEditedExternally(editedLineNumbers);
+            //noinspection unchecked
+            ArrayList<Long> editedLineIds = (ArrayList<Long>)
+                    intent.getSerializableExtra(TranslatorActivity.OUTPUT_EDITED_LINE_NUMBERS);
+            if(editedLineIds.size() > 0) presenter.onSubtitleEditedExternally(editedLineIds);
 
             int lastViewedLineNumber =
                     intent.getIntExtra(TranslatorActivity.OUTPUT_LAST_VIEWED_LINE_NUMBER, 0);

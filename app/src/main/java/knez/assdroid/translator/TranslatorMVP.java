@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,8 +32,7 @@ public interface TranslatorMVP {
         void onCommitAndNextRequested();
         void onCopyCurrentLineToInputRequested();
         int getCurrentLineNumber();
-        boolean hasHadChangesToSubtitleMade();
-        Set<Integer> getEditedLineNumbers();
+        Set<Long> getEditedLineIds();
         void onTextChanged(@NonNull String text);
         @NonNull InternalState getInternalState();
     }
@@ -42,15 +40,15 @@ public interface TranslatorMVP {
     class InternalState implements Serializable {
         private final boolean currentLineHadUncommittedChanges;
         private final long currentLineId;
-        private final HashSet<Integer> editedLineNumbers;
+        private final HashSet<Long> editedLineIds;
 
         public InternalState(boolean currentLineHadUncommittedChanges,
-                             long currentLineId, HashSet<Integer> editedLineNumbers) {
+                             long currentLineId, HashSet<Long> editedLineIds) {
             this.currentLineHadUncommittedChanges = currentLineHadUncommittedChanges;
             this.currentLineId = currentLineId;
-            this.editedLineNumbers = editedLineNumbers;
+            this.editedLineIds = editedLineIds;
         }
-        public HashSet<Integer> getEditedLineNumbers() { return editedLineNumbers; }
+        public HashSet<Long> getEditedLineIds() { return editedLineIds; }
         public long getCurrentLineId() { return currentLineId; }
         public boolean isCurrentLineHadUncommittedChanges() { return currentLineHadUncommittedChanges; }
     }

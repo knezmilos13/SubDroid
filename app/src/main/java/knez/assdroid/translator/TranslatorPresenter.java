@@ -25,7 +25,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     private TranslatorMVP.ViewInterface viewInterface;
     private boolean currentLineHadUncommittedChanges;
-    @NonNull private final HashSet<Integer> editedLineNumbers = new HashSet<>();
+    @NonNull private final HashSet<Long> editedLineIds = new HashSet<>();
 
     private SubtitleLine currentLine;
     @Nullable private SubtitleLine previousLine;
@@ -58,8 +58,8 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         this.viewInterface = viewInterface;
         this.currentLineHadUncommittedChanges = internalState.isCurrentLineHadUncommittedChanges();
 
-        this.editedLineNumbers.clear();
-        this.editedLineNumbers.addAll(internalState.getEditedLineNumbers());
+        this.editedLineIds.clear();
+        this.editedLineIds.addAll(internalState.getEditedLineIds());
 
         SubtitleFile subtitleFile = subtitleController.getCurrentSubtitleFile();
         if(subtitleFile == null) {
@@ -147,7 +147,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         SubtitleLine updatedLine = subtitleLineBuilder.build();
         if(currentLine.isIdenticalTo(updatedLine)) return; // no changes then
 
-        editedLineNumbers.add(currentLine.getLineNumber());
+        editedLineIds.add(currentLine.getId());
         subtitleController.updateLine(updatedLine);
 
         currentLine = updatedLine;
@@ -181,13 +181,8 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public boolean hasHadChangesToSubtitleMade() {
-        return currentLineHadUncommittedChanges;
-    }
-
-    @Override
-    public Set<Integer> getEditedLineNumbers() {
-        return editedLineNumbers;
+    public Set<Long> getEditedLineIds() {
+        return editedLineIds;
     }
 
     @Override
@@ -210,7 +205,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @Override @NonNull
     public TranslatorMVP.InternalState getInternalState() {
         return new TranslatorMVP.InternalState(
-                currentLineHadUncommittedChanges, currentLine.getId(), editedLineNumbers);
+                currentLineHadUncommittedChanges, currentLine.getId(), editedLineIds);
     }
 
     @Override @Nullable
