@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
-import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 
 public interface EditorMVP {
@@ -23,10 +22,6 @@ public interface EditorMVP {
         void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos,
                                @NonNull DiffUtil.DiffResult result);
         void updateSubtitleLines(@NonNull List<SubtitleLineVso> editedVsos);
-
-        /** Should activate/deactivate appropriate controls in the UI. The actual presentation of
-         *  subtitle lines according to settings is not done here. */
-        void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings);
 
         void showTranslatorScreen(long lineId);
 

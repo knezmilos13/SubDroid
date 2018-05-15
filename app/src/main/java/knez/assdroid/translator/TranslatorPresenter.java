@@ -8,7 +8,7 @@ import java.util.Set;
 
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
-import knez.assdroid.subtitle.ParserHelper;
+import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
@@ -21,7 +21,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @NonNull private final SubtitleLine.Builder subtitleLineBuilder;
     @NonNull private final Timber.Tree logger;
-    @NonNull private final StringPreference tagReplacementPreference;
+    @Nullable private final TagPrettifier tagPrettifier;
 
     private TranslatorMVP.ViewInterface viewInterface;
     private boolean currentLineHadUncommittedChanges;
@@ -40,7 +40,8 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         super(subtitleController, fileHandler);
         this.subtitleLineBuilder = subtitleLineBuilder;
         this.logger = logger;
-        this.tagReplacementPreference = tagReplacementPreference;
+        this.tagPrettifier = subtitleController.
+                getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get());
     }
 
 
@@ -224,10 +225,16 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         if(viewInterface == null) return;
 
         String currentLineText = currentLine.getText();
-        String prevLineText = previousLine == null?
-                null : ParserHelper.izbaciTagove(previousLine.getText(), tagReplacementPreference.get());
-        String nextLineText = nextLine == null?
-                null : ParserHelper.izbaciTagove(nextLine.getText(), tagReplacementPreference.get());
+
+        String prevLineText = null;
+        if(previousLine != null)
+            prevLineText = tagPrettifier == null?
+                    previousLine.getText() : tagPrettifier.prettifyTags(previousLine.getText());
+
+        String nextLineText = null;
+        if(nextLine != null)
+            nextLineText = tagPrettifier == null?
+                    nextLine.getText() : tagPrettifier.prettifyTags(nextLine.getText());
 
         viewInterface.showSubtitleTexts(currentLineText, prevLineText, nextLineText);
     }

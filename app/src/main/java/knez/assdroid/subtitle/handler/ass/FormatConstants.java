@@ -2,6 +2,8 @@ package knez.assdroid.subtitle.handler.ass;
 
 public interface FormatConstants {
 
+    String EXTENSION_ASS = "ass";
+
     String SECTION_SUBTITLE_LINES = "[Events]";
     String SECTION_STYLE = "[V4+ styles]";
     String SECTION_STYLE_OLD = "[V4 styles]"; // TODO da lepo zajebemo ovo? ne znam ni sta da radim sa njime. Konvertovati u + ako moze

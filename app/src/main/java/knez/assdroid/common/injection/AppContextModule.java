@@ -14,7 +14,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import knez.assdroid.App;
-import knez.assdroid.common.StorageHelper;
 import knez.assdroid.editor.EditorMVP;
 import knez.assdroid.editor.EditorPresenter;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
@@ -24,6 +23,7 @@ import knez.assdroid.translator.TranslatorMVP;
 import knez.assdroid.translator.TranslatorPresenter;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
+import knez.assdroid.util.preferences.IntPreference;
 import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
@@ -54,9 +54,13 @@ class AppContextModule {
     @Provides
     EditorMVP.PresenterInterface getEditorPresenter(
             SubtitleController subtitleController, SubtitleLineVsoFactory subtitleLineVsoFactory,
-            StorageHelper storageHelper, FileHandler fileHandler) {
+            FileHandler fileHandler,
+            @Named("tagReplacement") StringPreference tagReplacementPreference,
+            @Named("subLineTextSize")IntPreference subLineTextSizePreference,
+            @Named("subLineOtherSize") IntPreference subLineOtherSizePreference) {
         return new EditorPresenter(
-                subtitleController, subtitleLineVsoFactory, storageHelper, fileHandler);
+                subtitleController, subtitleLineVsoFactory, fileHandler, tagReplacementPreference,
+                subLineTextSizePreference, subLineOtherSizePreference);
     }
 
     @Provides

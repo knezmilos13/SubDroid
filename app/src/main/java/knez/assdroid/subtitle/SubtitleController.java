@@ -17,6 +17,9 @@ import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.SubtitleFormatter;
 import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
 import knez.assdroid.subtitle.handler.SubtitleParser;
+import knez.assdroid.subtitle.handler.TagPrettifier;
+import knez.assdroid.subtitle.handler.ass.AssTagsPrettifier;
+import knez.assdroid.subtitle.handler.ass.FormatConstants;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
 import solid.collections.Pair;
@@ -102,6 +105,20 @@ public class SubtitleController extends AbstractRepo {
 
     public boolean canWriteSubtitle(@NonNull String subtitleExtension) {
         return subtitleHandlerRepository.canSaveToSubtitleFormat(subtitleExtension);
+    }
+
+    // TODO oces i ovo sa repoom kao za load/write titlova?
+    public TagPrettifier getTagPrettifierForCurrentSubtitle(@NonNull String tagReplacement) {
+        if(currentSubtitleFile == null) return null;
+        String extension = currentSubtitleFile.getExtension();
+        if(extension == null)
+            return new AssTagsPrettifier(tagReplacement);
+        else if(extension.equals(FormatConstants.EXTENSION_ASS))
+            return new AssTagsPrettifier(tagReplacement);
+        else {
+            logger.e("Requested tag prettifier for an unknown subtitle format - %s", extension);
+            return null;
+        }
     }
 
     public void parseSubtitle(@NonNull Uri subtitlePath) {

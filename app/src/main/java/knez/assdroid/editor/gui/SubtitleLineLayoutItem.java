@@ -16,9 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knez.assdroid.R;
-import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVso;
-import knez.assdroid.subtitle.ParserHelper;
 
 public class SubtitleLineLayoutItem extends FrameLayout {
 
@@ -81,7 +79,7 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         handleStyleAndActorLineDisplay(subtitleLineVso);
         handleSubtitleLineDisplay(subtitleLineVso);
 
-        setFontSizes(subtitleLineVso.getSubtitleLineSettings());
+        setFontSizes(subtitleLineVso.getTextSize(), subtitleLineVso.getOtherSize());
         setBackgroundResource(vso.getBackgroundDrawable());
     }
 
@@ -93,47 +91,38 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     // ----------------------------------------------------------------------------------------- GUI
 
     private void handleTimingLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        if(subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
+//        if(subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
             timingsView.setVisibility(View.VISIBLE);
             timingsView.setText(getResources().getString(R.string.subtitle_line_timings,
                     subtitleLineVso.getStart(), subtitleLineVso.getEnd()));
-        }  else {
-            timingsView.setVisibility(View.GONE);
-        }
+//        }  else {
+//            timingsView.setVisibility(View.GONE);
+//        } // TODO
     }
 
     /** Shows or hides the second of the three lines with subtitle data (style/actor in particular). */
     private void handleStyleAndActorLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        if(subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
+//        if(subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
             styleView.setVisibility(View.VISIBLE);
             actorView.setVisibility(View.VISIBLE);
             styleView.setText(getResources().getString(
                     R.string.subtitle_line_style, subtitleLineVso.getStyle()));
             actorView.setText(getResources().getString(
                     R.string.subtitle_line_actor, subtitleLineVso.getActorName()));
-        } else {
-            styleView.setVisibility(View.GONE);
-            actorView.setVisibility(View.GONE);
-        }
+//        } else {
+//            styleView.setVisibility(View.GONE);
+//            actorView.setVisibility(View.GONE);
+//        } // TODO
     }
 
     private void handleSubtitleLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        // TODO a vso shouldn't have this kind of logic. String should already have either tag
-        // content or tag replacement. When that is done, it won't be needed in settings either.
-        String textToShow = subtitleLineVso.getText();
-        if(!subtitleLineVso.getSubtitleLineSettings().isShowTagContents())
-            textToShow = ParserHelper.izbaciTagove(textToShow,
-                    subtitleLineVso.getSubtitleLineSettings().getTagReplacement());
-
-        subtitleTextView.setText(textToShow);
+        subtitleTextView.setText(subtitleLineVso.getText());
     }
 
-    private void setFontSizes(@NonNull SubtitleLineSettings settings) {
+    private void setFontSizes(int textSizeDp, int otherSizeDp) {
         TextView tv[] = {lineNumberView, timingsView, actorView, styleView};
-        for(TextView view : tv)
-            view.setTextSize(TypedValue.COMPLEX_UNIT_DIP, settings.getOtherTextSizeDp());
-
-        subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, settings.getSubtitleTextSizeDp());
+        for(TextView view : tv) view.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeDp);
+        subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, otherSizeDp);
     }
 
 

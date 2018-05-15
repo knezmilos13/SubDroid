@@ -8,30 +8,29 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import knez.assdroid.Constants;
-import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
-import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.util.FileHandler;
+import knez.assdroid.util.preferences.IntPreference;
+import knez.assdroid.util.preferences.StringPreference;
 import solid.collections.SolidList;
 
 public class EditorPresenter extends CommonSubtitlePresenter
         implements EditorMVP.PresenterInterface {
 
-    private static final String STORAGE_KEY_SUBTITLE_LINE_SETTINGS = "subtitle_line_settings";
-
     @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
-    @NonNull private final StorageHelper storageHelper;
+    @NonNull private final StringPreference tagReplacementPreference;
+    @NonNull private final IntPreference subLineTextSizePreference;
+    @NonNull private final IntPreference subLineOtherSizePreference;
 
     private EditorMVP.ViewInterface viewInterface;
-    private SubtitleLineSettings subtitleLineSettings;
     private boolean presenterInitialized = false;
 
     @NonNull private final Object vsoCreationSyncObject = new Object();
@@ -48,11 +47,15 @@ public class EditorPresenter extends CommonSubtitlePresenter
     public EditorPresenter(
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
-            @NonNull StorageHelper storageHelper,
-            @NonNull FileHandler fileHandler) {
+            @NonNull FileHandler fileHandler,
+            @NonNull StringPreference tagReplacementPreference,
+            @NonNull IntPreference subLineTextSizePreference,
+            @NonNull IntPreference subLineOtherSizePreference) {
         super(subtitleController, fileHandler);
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
-        this.storageHelper = storageHelper;
+        this.tagReplacementPreference = tagReplacementPreference;
+        this.subLineTextSizePreference = subLineTextSizePreference;
+        this.subLineOtherSizePreference = subLineOtherSizePreference;
     }
 
 
@@ -78,15 +81,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         presenterInitialized = true;
 
-        subtitleLineSettings = storageHelper.readJson(
-                STORAGE_KEY_SUBTITLE_LINE_SETTINGS, SubtitleLineSettings.class);
-
-        if(subtitleLineSettings == null) {
-            subtitleLineSettings = createDefaultSubtitleLineSettings();
-            storageHelper.writeJson(STORAGE_KEY_SUBTITLE_LINE_SETTINGS, subtitleLineSettings);
-        }
-
-        viewInterface.showCurrentSubtitleLineSettings(subtitleLineSettings);
+//        viewInterface.showCurrentSubtitleLineSettings(subLineTextSizePreference.get(),
+//                subLineOtherSizePreference.get());
 
         if(subtitleController.getCurrentSubtitleFile() != null) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
@@ -159,8 +155,12 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         //noinspection unchecked
         new CreateVsosTask( // TODO zabelezi i ovaj, pa ako dodje onaj full, neka otkaze ovaj
-                subtitleLineVsoFactory, subtitleLineSettings,
-                this::onSelectedLinesConversionToVsosCompleted, vsoCreationSyncObject)
+                subtitleLineVsoFactory,
+                subtitleController.getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get()),
+                this::onSelectedLinesConversionToVsosCompleted,
+                vsoCreationSyncObject,
+                subLineTextSizePreference.get(),
+                subLineOtherSizePreference.get())
                 .execute(new SolidList<>(editedLines));
     }
 
@@ -216,23 +216,16 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
-    @NonNull
-    private SubtitleLineSettings createDefaultSubtitleLineSettings() {
-        return new SubtitleLineSettings(
-                Constants.SUB_LINE_DEFAULT_SHOW_TIMINGS,
-                Constants.SUB_LINE_DEFAULT_SHOW_STYLE_ACTOR,
-                Constants.SUB_LINE_DEFAULT_SHOW_TAG_CONTENT,
-                Constants.DEFAULT_TAG_REPLACEMENT,
-                Constants.SUB_LINE_DEFAULT_SUB_TEXT_SIZE_DP,
-                Constants.SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP);
-    }
-
     private void asyncCreateSubtitleLineVsos(@NonNull SolidList<SubtitleLine> lines) {
         if(createVsosTask != null) createVsosTask.cancel(true);
 
         createVsosTask = new CreateVsosTask(
-                subtitleLineVsoFactory, subtitleLineSettings,
-                this::onCreateAllVsosTaskCompleted, vsoCreationSyncObject);
+                subtitleLineVsoFactory,
+                subtitleController.getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get()),
+                this::onCreateAllVsosTaskCompleted,
+                vsoCreationSyncObject,
+                subLineTextSizePreference.get(),
+                subLineOtherSizePreference.get());
         //noinspection unchecked
         createVsosTask.execute(lines);
     }
@@ -266,17 +259,23 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private static class CreateVsosTask
             extends AsyncTask<SolidList<SubtitleLine>, Void, List<SubtitleLineVso>> {
 
-        @NonNull private final Callback callback;
         @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
-        @NonNull private final SubtitleLineSettings subtitleLineSettings;
+        @Nullable private final TagPrettifier tagPrettifier;
+        @NonNull private final Callback callback;
         @NonNull private final Object syncObject;
+        private final int textSizeDp;
+        private final int otherSizeDp;
 
         CreateVsosTask(@NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
-                       @NonNull SubtitleLineSettings subtitleLineSettings,
+                       @Nullable TagPrettifier tagPrettifier,
                        @NonNull Callback callback,
-                       @NonNull Object syncObject) {
+                       @NonNull Object syncObject,
+                       int textSizeDp,
+                       int otherSizeDp) {
             this.subtitleLineVsoFactory = subtitleLineVsoFactory;
-            this.subtitleLineSettings = subtitleLineSettings;
+            this.tagPrettifier = tagPrettifier;
+            this.textSizeDp = textSizeDp;
+            this.otherSizeDp = otherSizeDp;
             this.callback = callback;
             this.syncObject = syncObject;
         }
@@ -285,7 +284,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
         @Override
         protected final List<SubtitleLineVso> doInBackground(SolidList<SubtitleLine>... params) {
             synchronized (syncObject) {
-                return subtitleLineVsoFactory.createSubtitleLineVsos(params[0], subtitleLineSettings);
+                return subtitleLineVsoFactory.createSubtitleLineVsos(
+                        params[0], tagPrettifier, textSizeDp, otherSizeDp);
             }
         }
 

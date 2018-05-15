@@ -9,7 +9,6 @@ import knez.assdroid.translator.TranslatorActivity;
 import knez.assdroid.R;
 import knez.assdroid.common.adapter.IdentifiableAdapter;
 import knez.assdroid.editor.adapter.SubtitleLineAdapterPack;
-import knez.assdroid.editor.data.SubtitleLineSettings;
 import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 import knez.assdroid.util.gui.BgpEditText;
@@ -195,11 +194,6 @@ public class EditorActivity extends CommonSubtitleActivity
         subtitleLinesAdapter.setItemsDontNotify(subtitleLineVsos);
         diffResult.dispatchUpdatesTo(subtitleLinesAdapter);
         updateCenterText();
-    }
-
-    @Override
-    public void showCurrentSubtitleLineSettings(@NonNull SubtitleLineSettings subtitleLineSettings) {
-        // TODO should activate/deactivate options in menu
     }
 
     @Override
