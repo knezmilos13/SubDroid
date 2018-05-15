@@ -29,6 +29,9 @@ public class AssFormatter implements SubtitleFormatter {
         return extension.toLowerCase().equals("ass");
     }
 
+    // TODO nije u praksi sposoban da serijalizaje novi titl. Moras da generises sve one script info
+    // linije itd.
+
     @Override @NonNull
     public List<String> serializeSubtitle(@NonNull SubtitleContent subtitleContent) {
         List<String> result = new ArrayList<>();

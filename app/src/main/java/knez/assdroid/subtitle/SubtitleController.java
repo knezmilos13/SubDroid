@@ -135,15 +135,11 @@ public class SubtitleController extends AbstractRepo {
         executorService.execute(() -> _writeSubtitle(uri));
     }
 
-    @NonNull
-    public SubtitleFile createNewSubtitleFile() {
-        SubtitleFile subtitleFile = new SubtitleFile(false, null, null, null,
+    public void createNewSubtitleFile() {
+        currentSubtitleFile = new SubtitleFile(false, null, null, null,
                 new SubtitleContent(new ArrayList<>(), new HashMap<>()));
-        currentSubtitleFile = subtitleFile;
         storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
         subtitleContentDao.clearSubtitle();
-
-        return subtitleFile;
     }
 
     @Nullable

@@ -130,7 +130,7 @@ public class EditorActivity extends CommonSubtitleActivity
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_item_create_subtitle:
-//				kreirajNoviPrevod(); // TODO
+			    presenter.onNewSubtitleRequested();
 				break;
 			case R.id.menu_item_load_subtitle:
 				showFileOpenSelector();

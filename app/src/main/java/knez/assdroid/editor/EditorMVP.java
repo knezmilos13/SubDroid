@@ -39,6 +39,8 @@ public interface EditorMVP {
         void onSubtitleLineClicked(long id);
 
         void onSubtitleEditedExternally(@NonNull ArrayList<Integer> editedLineNumbers);
+
+        void onNewSubtitleRequested();
     }
 
 }

@@ -93,10 +93,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
             subtitleController.reloadCurrentSubtitleFile();
         }
         else {
-            SubtitleFile newlyCreatedSubtitleFile = subtitleController.createNewSubtitleFile();
-            showSubtitleTitle(newlyCreatedSubtitleFile);
-            asyncCreateSubtitleLineVsos(
-                    new SolidList<>(newlyCreatedSubtitleFile.getSubtitleContent().getSubtitleLines()));
+            onNewSubtitleRequested();
         }
 
     }
@@ -108,7 +105,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
 
-    // --------------------------------------------------------------------------- USER & APP EVENTS
+    // ------------------------------------------------------------------------- PRESENTER INTERFACE
 
     @Override
     public void onSearchSubmitted(@NonNull final String text) {
@@ -162,6 +159,16 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 subLineTextSizePreference.get(),
                 subLineOtherSizePreference.get())
                 .execute(new SolidList<>(editedLines));
+    }
+
+    @Override
+    public void onNewSubtitleRequested() {
+        subtitleController.createNewSubtitleFile();
+        SubtitleFile newlyCreatedSubtitleFile = subtitleController.getCurrentSubtitleFile();
+        showSubtitleTitle(newlyCreatedSubtitleFile);
+        if(newlyCreatedSubtitleFile != null) // defensive & IDE - it should really not be null here
+            asyncCreateSubtitleLineVsos(
+                    new SolidList<>(newlyCreatedSubtitleFile.getSubtitleContent().getSubtitleLines()));
     }
 
 
