@@ -156,6 +156,11 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
         presenter.onNextLineRequested();
     }
 
+    @OnClick(R.id.translator_current_line)
+    protected void onCurrentLineClicked() {
+        presenter.onCopyCurrentLineToInputRequested();
+    }
+
     @OnClick(R.id.translator_prev_button)
     protected void onPrevButtonClicked() {
         presenter.onPrevLineRequested();
