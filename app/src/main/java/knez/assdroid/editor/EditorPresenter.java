@@ -18,6 +18,7 @@ import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.util.FileHandler;
+import knez.assdroid.util.preferences.BooleanPreference;
 import knez.assdroid.util.preferences.IntPreference;
 import knez.assdroid.util.preferences.StringPreference;
 import solid.collections.SolidList;
@@ -29,6 +30,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull private final StringPreference tagReplacementPreference;
     @NonNull private final IntPreference subLineTextSizePreference;
     @NonNull private final IntPreference subLineOtherSizePreference;
+    @NonNull private final BooleanPreference subLineShowTimingsPreference;
+    @NonNull private final BooleanPreference subLineShowActorStylePreference;
 
     private EditorMVP.ViewInterface viewInterface;
     private boolean presenterInitialized = false;
@@ -50,12 +53,16 @@ public class EditorPresenter extends CommonSubtitlePresenter
             @NonNull FileHandler fileHandler,
             @NonNull StringPreference tagReplacementPreference,
             @NonNull IntPreference subLineTextSizePreference,
-            @NonNull IntPreference subLineOtherSizePreference) {
+            @NonNull IntPreference subLineOtherSizePreference,
+            @NonNull BooleanPreference subLineShowTimingsPreference,
+            @NonNull BooleanPreference subLineShowActorStylePreference) {
         super(subtitleController, fileHandler);
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
         this.tagReplacementPreference = tagReplacementPreference;
         this.subLineTextSizePreference = subLineTextSizePreference;
         this.subLineOtherSizePreference = subLineOtherSizePreference;
+        this.subLineShowTimingsPreference = subLineShowTimingsPreference;
+        this.subLineShowActorStylePreference = subLineShowActorStylePreference;
     }
 
 
@@ -156,6 +163,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 subtitleController.getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get()),
                 this::onSelectedLinesConversionToVsosCompleted,
                 vsoCreationSyncObject,
+                subLineShowTimingsPreference.get(),
+                subLineShowActorStylePreference.get(),
                 subLineTextSizePreference.get(),
                 subLineOtherSizePreference.get())
                 .execute(new SolidList<>(editedLines));
@@ -231,6 +240,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 subtitleController.getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get()),
                 this::onCreateAllVsosTaskCompleted,
                 vsoCreationSyncObject,
+                subLineShowTimingsPreference.get(),
+                subLineShowActorStylePreference.get(),
                 subLineTextSizePreference.get(),
                 subLineOtherSizePreference.get());
         //noinspection unchecked
@@ -272,15 +283,21 @@ public class EditorPresenter extends CommonSubtitlePresenter
         @NonNull private final Object syncObject;
         private final int textSizeDp;
         private final int otherSizeDp;
+        private final boolean showTimings;
+        private final boolean showActorAndStyle;
 
         CreateVsosTask(@NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
                        @Nullable TagPrettifier tagPrettifier,
                        @NonNull Callback callback,
                        @NonNull Object syncObject,
+                       boolean showTimings,
+                       boolean showActorAndStyle,
                        int textSizeDp,
                        int otherSizeDp) {
             this.subtitleLineVsoFactory = subtitleLineVsoFactory;
             this.tagPrettifier = tagPrettifier;
+            this.showTimings = showTimings;
+            this.showActorAndStyle = showActorAndStyle;
             this.textSizeDp = textSizeDp;
             this.otherSizeDp = otherSizeDp;
             this.callback = callback;
@@ -292,7 +309,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         protected final List<SubtitleLineVso> doInBackground(SolidList<SubtitleLine>... params) {
             synchronized (syncObject) {
                 return subtitleLineVsoFactory.createSubtitleLineVsos(
-                        params[0], tagPrettifier, textSizeDp, otherSizeDp);
+                        params[0], tagPrettifier, showTimings, showActorAndStyle, textSizeDp, otherSizeDp);
             }
         }
 

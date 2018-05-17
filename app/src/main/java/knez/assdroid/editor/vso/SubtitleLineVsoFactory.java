@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knez.assdroid.subtitle.handler.TagPrettifier;
-import knez.assdroid.subtitle.handler.ass.AssTagsPrettifier;
 import knez.assdroid.subtitle.data.SubtitleLine;
 
 public class SubtitleLineVsoFactory {
@@ -22,14 +21,19 @@ public class SubtitleLineVsoFactory {
 
     public List<SubtitleLineVso> createSubtitleLineVsos(
             @NonNull List<SubtitleLine> subtitleLines,
+            boolean showTimings,
+            boolean showActorAndStyle,
             int textSizeDp,
             int otherSizeDp) {
-        return createSubtitleLineVsos(subtitleLines, null, textSizeDp, otherSizeDp);
+        return createSubtitleLineVsos(
+                subtitleLines, null, showTimings, showActorAndStyle, textSizeDp, otherSizeDp);
     }
 
     public List<SubtitleLineVso> createSubtitleLineVsos(
             @NonNull List<SubtitleLine> subtitleLines,
             @Nullable TagPrettifier tagPrettifier,
+            boolean showTimings,
+            boolean showActorAndStyle,
             int textSizeDp,
             int otherSizeDp) {
         List<SubtitleLineVso> vsos = new ArrayList<>();
@@ -51,7 +55,9 @@ public class SubtitleLineVsoFactory {
                             subtitleLine.getStyle(),
                             subtitleLine.getLineNumber(),
                             textSizeDp,
-                            otherSizeDp)
+                            otherSizeDp,
+                            showTimings,
+                            showActorAndStyle)
             );
         }
 

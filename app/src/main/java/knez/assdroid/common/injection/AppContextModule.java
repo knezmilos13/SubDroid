@@ -23,6 +23,7 @@ import knez.assdroid.translator.TranslatorMVP;
 import knez.assdroid.translator.TranslatorPresenter;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
+import knez.assdroid.util.preferences.BooleanPreference;
 import knez.assdroid.util.preferences.IntPreference;
 import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
@@ -57,10 +58,13 @@ class AppContextModule {
             FileHandler fileHandler,
             @Named("tagReplacement") StringPreference tagReplacementPreference,
             @Named("subLineTextSize")IntPreference subLineTextSizePreference,
-            @Named("subLineOtherSize") IntPreference subLineOtherSizePreference) {
+            @Named("subLineOtherSize") IntPreference subLineOtherSizePreference,
+            @Named("subLineShowTimings") BooleanPreference subLineShowTimingsPreference,
+            @Named("subLineShowStyleActor") BooleanPreference subLineShowStyleActorPreference) {
         return new EditorPresenter(
                 subtitleController, subtitleLineVsoFactory, fileHandler, tagReplacementPreference,
-                subLineTextSizePreference, subLineOtherSizePreference);
+                subLineTextSizePreference, subLineOtherSizePreference, subLineShowTimingsPreference,
+                subLineShowStyleActorPreference);
     }
 
     @Provides

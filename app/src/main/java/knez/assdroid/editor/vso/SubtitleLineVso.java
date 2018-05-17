@@ -19,6 +19,8 @@ public class SubtitleLineVso extends IdentifiableImpl {
     private final int lineNumber;
     private final int textSize;
     private final int otherSize;
+    private final boolean showTimings;
+    private final boolean showActorAndStyle;
 
     public SubtitleLineVso(
             long id,
@@ -30,7 +32,9 @@ public class SubtitleLineVso extends IdentifiableImpl {
             @Nullable String style,
             int lineNumber,
             int textSize,
-            int otherSize) {
+            int otherSize,
+            boolean showTimings,
+            boolean showActorAndStyle) {
         super(id);
         this.backgroundDrawable = backgroundDrawable;
         this.text = text;
@@ -41,6 +45,8 @@ public class SubtitleLineVso extends IdentifiableImpl {
         this.lineNumber = lineNumber;
         this.textSize = textSize;
         this.otherSize = otherSize;
+        this.showTimings = showTimings;
+        this.showActorAndStyle = showActorAndStyle;
     }
 
     public int getBackgroundDrawable() { return backgroundDrawable; }
@@ -52,6 +58,8 @@ public class SubtitleLineVso extends IdentifiableImpl {
     public int getLineNumber() { return lineNumber; }
     public int getTextSize() { return textSize; }
     public int getOtherSize() { return otherSize; }
+    public boolean isShowActorAndStyle() { return showActorAndStyle; }
+    public boolean isShowTimings() { return showTimings; }
 
     public boolean isIdenticalTo(@NonNull SubtitleLineVso line) {
         return getId() == line.getId()

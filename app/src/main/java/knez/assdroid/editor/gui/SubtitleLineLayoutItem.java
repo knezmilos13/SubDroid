@@ -91,28 +91,28 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     // ----------------------------------------------------------------------------------------- GUI
 
     private void handleTimingLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-//        if(subtitleLineVso.getSubtitleLineSettings().isShowTimings()) {
+        if(subtitleLineVso.isShowTimings()) {
             timingsView.setVisibility(View.VISIBLE);
             timingsView.setText(getResources().getString(R.string.subtitle_line_timings,
                     subtitleLineVso.getStart(), subtitleLineVso.getEnd()));
-//        }  else {
-//            timingsView.setVisibility(View.GONE);
-//        } // TODO
+        }  else {
+            timingsView.setVisibility(View.GONE);
+        }
     }
 
     /** Shows or hides the second of the three lines with subtitle data (style/actor in particular). */
     private void handleStyleAndActorLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-//        if(subtitleLineVso.getSubtitleLineSettings().isShowStyleAndActor()) {
+        if(subtitleLineVso.isShowActorAndStyle()) {
             styleView.setVisibility(View.VISIBLE);
             actorView.setVisibility(View.VISIBLE);
             styleView.setText(getResources().getString(
                     R.string.subtitle_line_style, subtitleLineVso.getStyle()));
             actorView.setText(getResources().getString(
                     R.string.subtitle_line_actor, subtitleLineVso.getActorName()));
-//        } else {
-//            styleView.setVisibility(View.GONE);
-//            actorView.setVisibility(View.GONE);
-//        } // TODO
+        } else {
+            styleView.setVisibility(View.GONE);
+            actorView.setVisibility(View.GONE);
+        }
     }
 
     private void handleSubtitleLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
@@ -121,8 +121,8 @@ public class SubtitleLineLayoutItem extends FrameLayout {
 
     private void setFontSizes(int textSizeDp, int otherSizeDp) {
         TextView tv[] = {lineNumberView, timingsView, actorView, styleView};
-        for(TextView view : tv) view.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeDp);
-        subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, otherSizeDp);
+        for(TextView view : tv) view.setTextSize(TypedValue.COMPLEX_UNIT_DIP, otherSizeDp);
+        subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeDp);
     }
 
 
