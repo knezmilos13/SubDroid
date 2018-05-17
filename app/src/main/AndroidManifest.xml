@@ -59,19 +59,19 @@
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name=".podesavanja.KategorijePodesavanjaAktivnost"
+            android:name=".settings.SettingsActivity"
             android:label="@string/podesavanja_kategorije_naslov" >
         </activity>
         <activity
-            android:name=".podesavanja.PodesavanjaGlobalAktivnost"
+            android:name=".settings.PodesavanjaGlobalAktivnost"
             android:label="@string/podesavanja_globalna_naslov" >
         </activity>
         <activity
-            android:name=".podesavanja.PodesavanjaEditorAktivnost"
+            android:name=".settings.PodesavanjaEditorAktivnost"
             android:label="@string/podesavanja_editor_naslov" >
         </activity>
         <activity
-            android:name=".podesavanja.PodesavanjaPrevodilacAktivnost"
+            android:name=".settings.PodesavanjaPrevodilacAktivnost"
             android:label="@string/podesavanja_prevodilac_naslov" >
         </activity>
         <activity

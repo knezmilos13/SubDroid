@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="settings_editor_text_dp_size_default_value">15</integer>
+    <integer name="settings_editor_other_dp_size_default_value">12</integer>
+
+</resources>

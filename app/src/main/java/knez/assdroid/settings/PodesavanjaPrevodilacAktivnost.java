@@ -1,4 +1,4 @@
-package knez.assdroid.podesavanja;
+package knez.assdroid.settings;
 
 import knez.assdroid.R;
 import android.os.Bundle;

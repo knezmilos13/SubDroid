@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/settings_category_editor" >
+
+        <knez.assdroid.util.gui.ResetEditTextPreference
+            android:key="tag_replacement"
+            android:defaultValue="@string/settings_editor_tag_replacement_default_value"
+            android:title="@string/settings_editor_tag_replacement_title"
+            android:summary="@string/settings_editor_tag_replacement_summary"
+            app:reset_button_text="@string/settings_editor_tag_replacement_reset"
+            app:empty_allowed="false" />
+
+        <knez.assdroid.util.gui.IntListPreference
+            android:key="subtitle_line_text_size_dp"
+            android:defaultValue="@integer/settings_editor_text_dp_size_default_value"
+            android:title="@string/settings_editor_text_dp_size_title"
+            android:entries="@array/settings_editor_font_dp_size_entries"
+            android:entryValues="@array/settings_editor_font_dp_size_entries" />
+
+        <knez.assdroid.util.gui.IntListPreference
+            android:key="subtitle_line_other_size_dp"
+            android:defaultValue="@integer/settings_editor_other_dp_size_default_value"
+            android:title="@string/settings_editor_other_dp_size_title"
+            android:entries="@array/settings_editor_font_dp_size_entries"
+            android:entryValues="@array/settings_editor_font_dp_size_entries" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

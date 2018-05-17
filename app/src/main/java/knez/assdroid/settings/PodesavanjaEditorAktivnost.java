@@ -1,4 +1,4 @@
-package knez.assdroid.podesavanja;
+package knez.assdroid.settings;
 
 import knez.assdroid.R;
 import knez.assdroid.util.gui.ResetEditTextPreference;
@@ -17,7 +17,7 @@ public class PodesavanjaEditorAktivnost extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.podesavanja_editor);
+		addPreferencesFromResource(R.xml.preferences);
 		
 		kontroler = new Kontroler();
 
@@ -45,7 +45,7 @@ public class PodesavanjaEditorAktivnost extends PreferenceActivity {
 	}
 	
 	private void namestiPrefTagSummary(String znak) {
-		String summary = getResources().getString(R.string.podesavanja_editor_znak_zamena_taga_summary);
+		String summary = getResources().getString(R.string.settings_editor_tag_replacement_summary);
 		summary += ". " + getResources().getString(R.string.podesavanja_global_trenutno_podesavanje)+ " ";
 		summary += znak;
 		prefTagZnak.setSummary(summary);

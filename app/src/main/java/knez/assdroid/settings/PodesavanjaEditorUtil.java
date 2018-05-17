@@ -1,4 +1,4 @@
-package knez.assdroid.podesavanja;
+package knez.assdroid.settings;
 
 import knez.assdroid.R;
 import knez.assdroid.App;
@@ -16,7 +16,7 @@ public class PodesavanjaEditorUtil {
 	public static String getMinimizedCharTag() {
 		Context apkont = App.getAppComponent().getContext();
 		return PreferenceManager.getDefaultSharedPreferences(apkont).getString(EDITOR_MINIMIZED_TAG_CHAR, 
-			apkont.getResources().getString(R.string.podesavanja_editor_default_zamena_taga));
+			apkont.getResources().getString(R.string.settings_editor_tag_replacement_default_value));
 	}
 	
 	/** Vraca velicinu fonta za tekst (u pikselima) */

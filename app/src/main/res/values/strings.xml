@@ -52,7 +52,18 @@
     <string name="translator_no_subtitle_data">Error - no subtitle data available!</string>
 
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - SETTINGS ACTIVITY -->
 
+    <string name="settings_category_editor">Editor settings</string>
+
+    <string name="settings_editor_tag_replacement_title">Tag replacement</string>
+    <string name="settings_editor_tag_replacement_summary">Character to use for "minimized" tags</string>
+    <string name="settings_editor_tag_replacement_default_value">田</string>
+    <string name="settings_editor_tag_replacement_reset">Reset</string>
+
+    <string name="settings_editor_text_dp_size_title">Subtitle font size</string>
+
+    <string name="settings_editor_other_dp_size_title">Other lines font size</string>
 
 
 
@@ -62,8 +73,7 @@
     <!-- Podesavanja -->
     <string name="podesavanja_global">Global</string>
     <string name="podesavanja_global_trenutno_podesavanje">Currently:</string>
-    <string name="podesavanja_global_reset">Reset</string>
-    
+
     <string name="podesavanja_kategorije_naslov">Settings</string>
     <string name="podesavanja_globalna_naslov">Global Settings</string>
     <string name="podesavanja_editor_naslov">Editor Settings</string>
@@ -88,15 +98,7 @@
     
     	<!-- Podesavanja Editor -->
     <string name="podesavanja_editor">Editor</string>
-    
-    <string name="podesavanja_editor_kategorija_prevod">Subtitle lines</string>
-    <string name="podesavanja_editor_znak_zamena_taga_title">Tag replacement</string>
-    <string name="podesavanja_editor_znak_zamena_taga_summary">Character to use for "minimized" tags</string>
-    <string name="podesavanja_editor_default_zamena_taga">田</string>
-    <string name="podesavanja_editor_default_dp_velicina_teksta">15</string>
-    <string name="podesavanja_editor_default_dp_velicina_ostalog">12</string>
-    <string name="podesavanja_editor_title_size">Title size</string>
-    <string name="podesavanja_editor_ostalo_size">Other lines size</string>
+
     
     <string name="podesavanja_editor_kategorija_kontrole">Controls</string>
     <string name="podesavanja_editor_min_transp_title">Transparency in minimized state</string>

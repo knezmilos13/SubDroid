@@ -9,4 +9,9 @@
         <attr name="noFullScreen" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="ResetEditTextPreferenceAttributes">        
+        <attr name="reset_button_text" format="string"/>
+        <attr name="empty_allowed" format="boolean"/>
+    </declare-styleable>
+
 </resources>

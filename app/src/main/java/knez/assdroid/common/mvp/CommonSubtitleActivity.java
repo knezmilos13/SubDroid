@@ -3,6 +3,7 @@ package knez.assdroid.common.mvp;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,7 @@ import butterknife.BindView;
 import knez.assdroid.App;
 import knez.assdroid.R;
 import knez.assdroid.help.KategorijeHelpaAktivnost;
-import knez.assdroid.podesavanja.KategorijePodesavanjaAktivnost;
+import knez.assdroid.settings.SettingsActivity;
 import knez.assdroid.util.gui.FadeAnimationHelper;
 import timber.log.Timber;
 
@@ -33,6 +34,8 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         logger = App.getAppComponent().getLogger();
     }
@@ -109,7 +112,7 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
 
     @Override
     public void showSettingsScreen() {
-        Intent settingsIntent = new Intent(this, KategorijePodesavanjaAktivnost.class); // TODO
+        Intent settingsIntent = new Intent(this, SettingsActivity.class); // TODO
         startActivityForResult(settingsIntent, REQUEST_CODE_SETTINGS_ACTIVITY);
     }
 
