@@ -6,8 +6,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
+import knez.assdroid.common.SharedPreferenceKey;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
@@ -227,6 +229,25 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @Override @Nullable
     public CommonSubtitleMVP.ViewInterface getViewInterface() {
         return viewInterface;
+    }
+
+    @Override
+    public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
+        if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP)) {
+            for(SubtitleLineVso vso : allSubtitleLineVsos)
+                vso.setTextSize(subLineTextSizePreference.get());
+            viewInterface.showSubtitleLines(allSubtitleLineVsos);
+        }
+
+        if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_OTHER_SIZE_DP)) {
+            for(SubtitleLineVso vso : allSubtitleLineVsos)
+                vso.setOtherSize(subLineOtherSizePreference.get());
+            viewInterface.showSubtitleLines(allSubtitleLineVsos);
+        }
+
+        if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)) {
+            // TODO recreate everything - but maybe rework the whole thing with the task and async access first
+        }
     }
 
 

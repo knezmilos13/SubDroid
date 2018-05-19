@@ -213,6 +213,11 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         return viewInterface;
     }
 
+    @Override
+    public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
+
+    }
+
 
     // ------------------------------------------------------------------------------------ INTERNAL
 

@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashSet;
+
 import butterknife.BindView;
 import knez.assdroid.App;
 import knez.assdroid.R;
@@ -67,16 +69,24 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (resultCode != RESULT_OK) return;
 
         if (requestCode == REQUEST_CODE_SAVE_SUBTITLE) {
-            if (data == null) return;
+            if (intent == null) return;
 
-            Uri uri = data.getData();
+            Uri uri = intent.getData();
             if (uri == null) return;
 
             getPresenter().onFileSelectedForSaveAs(uri);
+            return;
+        }
+        else if(requestCode == REQUEST_CODE_SETTINGS_ACTIVITY) {
+            if (intent == null) return;
+            HashSet<String> changedSettings
+                    = (HashSet<String>) intent.getSerializableExtra(SettingsActivity.OUTPUT_CHANGED_SETTINGS);
+            if(changedSettings.size() > 0)
+                getPresenter().onSettingsChanged(changedSettings);
             return;
         }
     }

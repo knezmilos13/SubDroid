@@ -17,8 +17,8 @@ public class SubtitleLineVso extends IdentifiableImpl {
     @Nullable private final String actorName;
     @Nullable private final String style;
     private final int lineNumber;
-    private final int textSize;
-    private final int otherSize;
+    private int textSize;
+    private int otherSize;
     private final boolean showTimings;
     private final boolean showActorAndStyle;
 
@@ -60,6 +60,9 @@ public class SubtitleLineVso extends IdentifiableImpl {
     public int getOtherSize() { return otherSize; }
     public boolean isShowActorAndStyle() { return showActorAndStyle; }
     public boolean isShowTimings() { return showTimings; }
+
+    public void setTextSize(int textSize) { this.textSize = textSize; }
+    public void setOtherSize(int otherSize) { this.otherSize = otherSize; }
 
     public boolean isIdenticalTo(@NonNull SubtitleLineVso line) {
         return getId() == line.getId()
