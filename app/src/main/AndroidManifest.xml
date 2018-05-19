@@ -63,22 +63,6 @@
             android:label="@string/podesavanja_kategorije_naslov" >
         </activity>
         <activity
-            android:name=".settings.PodesavanjaGlobalAktivnost"
-            android:label="@string/podesavanja_globalna_naslov" >
-        </activity>
-        <activity
-            android:name=".settings.PodesavanjaEditorAktivnost"
-            android:label="@string/podesavanja_editor_naslov" >
-        </activity>
-        <activity
-            android:name=".settings.PodesavanjaPrevodilacAktivnost"
-            android:label="@string/podesavanja_prevodilac_naslov" >
-        </activity>
-        <activity
-            android:name=".help.KategorijeHelpaAktivnost"
-            android:label="@string/help_kategorije_naslov" >
-        </activity>
-        <activity
             android:name=".help.HelpEditorAkt"
             android:label="@string/help_editor" >
         </activity>
