@@ -5,6 +5,7 @@ import android.os.Looper;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +42,11 @@ class AppContextModule {
         return new ThreadPoolExecutor(0, 2, 20, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000));
     }
 
+    @Provides @Named("singleThreadExecutor")
+    ExecutorService getSingleThreadExecutor() {
+        return Executors.newSingleThreadExecutor();
+    }
+
     @Provides @Named("mainThreader")
     Threader getMainThreader() { return new Threader(Looper.getMainLooper()); }
 
@@ -54,17 +60,22 @@ class AppContextModule {
 
     @Provides
     EditorMVP.PresenterInterface getEditorPresenter(
-            SubtitleController subtitleController, SubtitleLineVsoFactory subtitleLineVsoFactory,
+            SubtitleController subtitleController,
+            SubtitleLineVsoFactory subtitleLineVsoFactory,
             FileHandler fileHandler,
+            @Named("singleThreadExecutor") ExecutorService singleThreadExecutor,
+            @Named("mainThreader") Threader mainThreader,
+            Timber.Tree logger,
             @Named("tagReplacement") StringPreference tagReplacementPreference,
             @Named("subLineTextSize")IntPreference subLineTextSizePreference,
             @Named("subLineOtherSize") IntPreference subLineOtherSizePreference,
             @Named("subLineShowTimings") BooleanPreference subLineShowTimingsPreference,
             @Named("subLineShowStyleActor") BooleanPreference subLineShowStyleActorPreference) {
         return new EditorPresenter(
-                subtitleController, subtitleLineVsoFactory, fileHandler, tagReplacementPreference,
-                subLineTextSizePreference, subLineOtherSizePreference, subLineShowTimingsPreference,
-                subLineShowStyleActorPreference);
+                subtitleController, subtitleLineVsoFactory, fileHandler, singleThreadExecutor,
+                mainThreader, logger,
+                tagReplacementPreference, subLineTextSizePreference, subLineOtherSizePreference,
+                subLineShowTimingsPreference, subLineShowStyleActorPreference);
     }
 
     @Provides

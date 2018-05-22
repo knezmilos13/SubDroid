@@ -1,13 +1,15 @@
 package knez.assdroid.editor;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import knez.assdroid.common.SharedPreferenceKey;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
@@ -18,17 +20,22 @@ import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
-import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.util.FileHandler;
+import knez.assdroid.util.Threader;
 import knez.assdroid.util.preferences.BooleanPreference;
 import knez.assdroid.util.preferences.IntPreference;
 import knez.assdroid.util.preferences.StringPreference;
 import solid.collections.SolidList;
+import timber.log.Timber;
 
 public class EditorPresenter extends CommonSubtitlePresenter
         implements EditorMVP.PresenterInterface {
 
     @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
+    @NonNull private final ExecutorService singleThreadExecutor;
+    @NonNull private final Threader mainThreader;
+    @NonNull private final Timber.Tree logger;
+
     @NonNull private final StringPreference tagReplacementPreference;
     @NonNull private final IntPreference subLineTextSizePreference;
     @NonNull private final IntPreference subLineOtherSizePreference;
@@ -40,10 +47,14 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @NonNull private final Object vsoCreationSyncObject = new Object();
 
-    // TODO: vidi settings, ima ona fora gde je svaki setting svoj objekat, jer ti je dependensi uvek
-    // na samo nekim podesavanjima
+    // TODO koje se sve procesiranje radi ovde?
+    // - kada se promeni velicina fonta prodjes kroz njih i samo to promenis
+    //   * ako se loaduje fajl odustani, sve drugo sacekaj
+    // - kada se promeni tag replacement najlakse ti da ih kreiras ponovo
+    //   * ako se loaduje fajl odustani, sve drugo sacekaj
 
-    @Nullable private CreateVsosTask createVsosTask = null;
+    private Future<?> vsosCreationFuture;
+    private Future<?> vsosPartialCreationFuture;
 
 //    @NonNull private String[] currentSearchQuery = new String[0];
     @NonNull private List<SubtitleLineVso> allSubtitleLineVsos = new ArrayList<>();
@@ -53,6 +64,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
             @NonNull FileHandler fileHandler,
+            @NonNull ExecutorService singleThreadExecutor,
+            @NonNull Threader mainThreader,
+            @NonNull Timber.Tree logger,
             @NonNull StringPreference tagReplacementPreference,
             @NonNull IntPreference subLineTextSizePreference,
             @NonNull IntPreference subLineOtherSizePreference,
@@ -60,6 +74,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
             @NonNull BooleanPreference subLineShowActorStylePreference) {
         super(subtitleController, fileHandler);
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
+        this.singleThreadExecutor = singleThreadExecutor;
+        this.mainThreader = mainThreader;
+        this.logger = logger;
+
         this.tagReplacementPreference = tagReplacementPreference;
         this.subLineTextSizePreference = subLineTextSizePreference;
         this.subLineOtherSizePreference = subLineOtherSizePreference;
@@ -95,8 +113,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         if(subtitleController.getCurrentSubtitleFile() != null) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
-            asyncCreateSubtitleLineVsos(new SolidList<>(subtitleController.getCurrentSubtitleFile()
-                    .getSubtitleContent().getSubtitleLines()));
+            asyncCreateAllVsos(
+                    subtitleController.getCurrentSubtitleFile().getSubtitleContent().getSubtitleLines());
         }
         else if(subtitleController.hasStoredSubtitle()) {
             subtitleController.reloadCurrentSubtitleFile();
@@ -159,17 +177,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
             editedLines.add(line);
         }
 
-        //noinspection unchecked
-        new CreateVsosTask( // TODO zabelezi i ovaj, pa ako dodje onaj full, neka otkaze ovaj
-                subtitleLineVsoFactory,
-                subtitleController.getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get()),
-                this::onSelectedLinesConversionToVsosCompleted,
-                vsoCreationSyncObject,
-                subLineShowTimingsPreference.get(),
-                subLineShowActorStylePreference.get(),
-                subLineTextSizePreference.get(),
-                subLineOtherSizePreference.get())
-                .execute(new SolidList<>(editedLines));
+        asyncRecreateSomeVsos(editedLines);
     }
 
     @Override
@@ -177,9 +185,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
         subtitleController.createNewSubtitleFile();
         SubtitleFile newlyCreatedSubtitleFile = subtitleController.getCurrentSubtitleFile();
         showSubtitleTitle(newlyCreatedSubtitleFile);
-        if(newlyCreatedSubtitleFile != null) // defensive & IDE - it should really not be null here
-            asyncCreateSubtitleLineVsos(
-                    new SolidList<>(newlyCreatedSubtitleFile.getSubtitleContent().getSubtitleLines()));
+        allSubtitleLineVsos = new ArrayList<>();
+
+        if(viewInterface == null) return;
+        viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
     }
 
 
@@ -215,15 +224,13 @@ public class EditorPresenter extends CommonSubtitlePresenter
             viewInterface.hideProgress();
         }
 
-        asyncCreateSubtitleLineVsos(
-                new SolidList<>(subtitleFile.getSubtitleContent().getSubtitleLines()));
+        asyncCreateAllVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 
     @Override
     public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {
         showSubtitleTitle(subtitleFile);
-        asyncCreateSubtitleLineVsos(
-                new SolidList<>(subtitleFile.getSubtitleContent().getSubtitleLines()));
+        asyncCreateAllVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 
     @Override @Nullable
@@ -253,98 +260,82 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
-    private void asyncCreateSubtitleLineVsos(@NonNull SolidList<SubtitleLine> lines) {
-        if(createVsosTask != null) createVsosTask.cancel(true);
+    private void asyncCreateAllVsos(@NonNull List<SubtitleLine> subtitleLines) {
+        // TODO kad ti dodje zahtev za ovo, canceluj promenu fonta i taga
 
-        createVsosTask = new CreateVsosTask(
-                subtitleLineVsoFactory,
-                subtitleController.getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get()),
-                this::onCreateAllVsosTaskCompleted,
-                vsoCreationSyncObject,
-                subLineShowTimingsPreference.get(),
-                subLineShowActorStylePreference.get(),
-                subLineTextSizePreference.get(),
-                subLineOtherSizePreference.get());
-        //noinspection unchecked
-        createVsosTask.execute(lines);
+        if(vsosPartialCreationFuture != null && !vsosPartialCreationFuture.isDone())
+            vsosPartialCreationFuture.cancel(true);
+
+            // If this happens, fuck it, just wait until the previous task is complete; [defensive]
+        if(vsosCreationFuture != null && !vsosCreationFuture.isDone())
+            try { vsosCreationFuture.get(); }
+            catch (InterruptedException | ExecutionException e) {
+                logger.e(e, "Vso full creation crashed while synchronously executing!");
+            }
+        vsosCreationFuture = singleThreadExecutor.submit(() -> {
+            synchronized (vsoCreationSyncObject) {
+                List<SubtitleLineVso> vsos = subtitleLineVsoFactory.createSubtitleLineVsos(
+                        subtitleLines,
+                        subtitleController.getTagPrettifierForCurrentSubtitle(
+                                tagReplacementPreference.get()),
+                        subLineShowTimingsPreference.get(),
+                        subLineShowActorStylePreference.get(),
+                        subLineTextSizePreference.get(),
+                        subLineOtherSizePreference.get());
+
+                if(Thread.interrupted()) return;
+
+                allSubtitleLineVsos = new ArrayList<>(vsos);
+
+                if(viewInterface == null) return;
+
+                // Copy serves 2 purposes - makes us safe from changes by the view (which shouldn't
+                // happen, but better safe than sorry), and makes us safe from any changes that
+                // could happen to allSubtitleLineVsos between this thread and the main thread
+                List<SubtitleLineVso> listCopy = new ArrayList<>(allSubtitleLineVsos);
+                mainThreader.justExecute(() -> viewInterface.showSubtitleLines(listCopy));
+            }
+        });
     }
 
-    private void onCreateAllVsosTaskCompleted(List<SubtitleLineVso> result) {
-        createVsosTask = null;
-        allSubtitleLineVsos = new ArrayList<>(result);
+    private void asyncRecreateSomeVsos(@NonNull List<SubtitleLine> subtitleLines) {
+        // TODO ako ide promena velicine fonta sacekaj; ako ide tag replacement bem li ga sackeaj
 
-        if(viewInterface == null) return;
+        // If full vso creation task is already in progress, just give up.
+        if(vsosCreationFuture != null && !vsosCreationFuture.isDone())
+            return;
 
-        viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
-    }
+            // If this happens, fuck it, just wait until the previous task is complete; [defensive]
+        if(vsosPartialCreationFuture != null && !vsosPartialCreationFuture.isDone())
+            try { vsosPartialCreationFuture.get(); }
+            catch (InterruptedException | ExecutionException e) {
+                logger.e(e, "Vso partial creation crashed while synchronously executing!");
+            }
+        vsosPartialCreationFuture = singleThreadExecutor.submit(() -> {
+            synchronized (vsoCreationSyncObject) {
+                List<SubtitleLineVso> vsos = subtitleLineVsoFactory.createSubtitleLineVsos(
+                        new SolidList<>(subtitleLines),
+                        subtitleController.getTagPrettifierForCurrentSubtitle(
+                                tagReplacementPreference.get()),
+                        subLineShowTimingsPreference.get(),
+                        subLineShowActorStylePreference.get(),
+                        subLineTextSizePreference.get(),
+                        subLineOtherSizePreference.get());
 
-    private void onSelectedLinesConversionToVsosCompleted(@NonNull List<SubtitleLineVso> editedVsos) {
-        for(SubtitleLineVso editedVso : editedVsos) {
-            for (int i = 0; i < allSubtitleLineVsos.size(); i++) {
-                if (allSubtitleLineVsos.get(i).getId() == editedVso.getId()) {
-                    allSubtitleLineVsos.set(i, editedVso);
-                    break;
+                for(SubtitleLineVso editedVso : vsos) {
+                    for (int i = 0; i < allSubtitleLineVsos.size(); i++) {
+                        if (allSubtitleLineVsos.get(i).getId() == editedVso.getId()) {
+                            allSubtitleLineVsos.set(i, editedVso);
+                            break;
+                        }
+                    }
                 }
+
+                if(viewInterface == null) return;
+
+                mainThreader.justExecute(() -> viewInterface.updateSubtitleLines(vsos));
             }
-        }
-
-        if(viewInterface == null) return;
-        viewInterface.updateSubtitleLines(editedVsos);
-    }
-
-
-    // ------------------------------------------------------------------------------------- CLASSES
-
-    private static class CreateVsosTask
-            extends AsyncTask<SolidList<SubtitleLine>, Void, List<SubtitleLineVso>> {
-
-        @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
-        @Nullable private final TagPrettifier tagPrettifier;
-        @NonNull private final Callback callback;
-        @NonNull private final Object syncObject;
-        private final int textSizeDp;
-        private final int otherSizeDp;
-        private final boolean showTimings;
-        private final boolean showActorAndStyle;
-
-        CreateVsosTask(@NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
-                       @Nullable TagPrettifier tagPrettifier,
-                       @NonNull Callback callback,
-                       @NonNull Object syncObject,
-                       boolean showTimings,
-                       boolean showActorAndStyle,
-                       int textSizeDp,
-                       int otherSizeDp) {
-            this.subtitleLineVsoFactory = subtitleLineVsoFactory;
-            this.tagPrettifier = tagPrettifier;
-            this.showTimings = showTimings;
-            this.showActorAndStyle = showActorAndStyle;
-            this.textSizeDp = textSizeDp;
-            this.otherSizeDp = otherSizeDp;
-            this.callback = callback;
-            this.syncObject = syncObject;
-        }
-
-        @SuppressWarnings("unchecked") // something about safe varargs
-        @Override
-        protected final List<SubtitleLineVso> doInBackground(SolidList<SubtitleLine>... params) {
-            synchronized (syncObject) {
-                return subtitleLineVsoFactory.createSubtitleLineVsos(
-                        params[0], tagPrettifier, showTimings, showActorAndStyle, textSizeDp, otherSizeDp);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<SubtitleLineVso> result) {
-            callback.onVsoFactoryTaskCompleted(result);
-        }
-
-        @Override protected void onPreExecute() {}
-        @Override protected void onProgressUpdate(Void... values) {}
-
-        interface Callback {
-            void onVsoFactoryTaskCompleted(@NonNull List<SubtitleLineVso> result);
-        }
+        });
     }
 
 }
