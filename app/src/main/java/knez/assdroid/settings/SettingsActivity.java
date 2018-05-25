@@ -4,10 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.ArrayList;
-
-import knez.assdroid.R;
-
 public class SettingsActivity extends AppCompatActivity {
 
     public static final String OUTPUT_CHANGED_SETTINGS = "changed_settings";

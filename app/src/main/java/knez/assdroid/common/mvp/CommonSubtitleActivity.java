@@ -122,7 +122,7 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
 
     @Override
     public void showSettingsScreen() {
-        Intent settingsIntent = new Intent(this, SettingsActivity.class); // TODO
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
         startActivityForResult(settingsIntent, REQUEST_CODE_SETTINGS_ACTIVITY);
     }
 

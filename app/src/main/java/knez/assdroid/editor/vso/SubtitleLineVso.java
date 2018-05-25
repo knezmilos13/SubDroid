@@ -11,7 +11,7 @@ import knez.assdroid.common.data.IdentifiableImpl;
 public class SubtitleLineVso extends IdentifiableImpl {
 
     @DrawableRes private final int backgroundDrawable;
-    @NonNull private final String text;
+    @NonNull private String text;
     @NonNull private final String start;
     @NonNull private final String end;
     @Nullable private final String actorName;
@@ -63,6 +63,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
 
     public void setTextSize(int textSize) { this.textSize = textSize; }
     public void setOtherSize(int otherSize) { this.otherSize = otherSize; }
+    public void setText(@NonNull String text) { this.text = text; }
 
     public boolean isIdenticalTo(@NonNull SubtitleLineVso line) {
         return getId() == line.getId()

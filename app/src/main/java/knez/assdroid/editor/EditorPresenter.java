@@ -45,16 +45,11 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private EditorMVP.ViewInterface viewInterface;
     private boolean presenterInitialized = false;
 
-    @NonNull private final Object vsoCreationSyncObject = new Object();
-
-    // TODO koje se sve procesiranje radi ovde?
-    // - kada se promeni velicina fonta prodjes kroz njih i samo to promenis
-    //   * ako se loaduje fajl odustani, sve drugo sacekaj
-    // - kada se promeni tag replacement najlakse ti da ih kreiras ponovo
-    //   * ako se loaduje fajl odustani, sve drugo sacekaj
+    @NonNull private final Object vsoSyncObject = new Object();
 
     private Future<?> vsosCreationFuture;
     private Future<?> vsosPartialCreationFuture;
+    private Future<?> vsosTagReplacementChangeFuture;
 
 //    @NonNull private String[] currentSearchQuery = new String[0];
     @NonNull private List<SubtitleLineVso> allSubtitleLineVsos = new ArrayList<>();
@@ -252,8 +247,12 @@ public class EditorPresenter extends CommonSubtitlePresenter
             viewInterface.showSubtitleLines(allSubtitleLineVsos);
         }
 
+        // TODO kada se promeni velicina fonta prodjes kroz njih i samo to promenis
+        //   * ako se loaduje fajl odustani, sve drugo sacekaj
+
+
         if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)) {
-            // TODO recreate everything - but maybe rework the whole thing with the task and async access first
+            asyncChangeTagReplacement();
         }
     }
 
@@ -261,10 +260,13 @@ public class EditorPresenter extends CommonSubtitlePresenter
     // ------------------------------------------------------------------------------------ INTERNAL
 
     private void asyncCreateAllVsos(@NonNull List<SubtitleLine> subtitleLines) {
-        // TODO kad ti dodje zahtev za ovo, canceluj promenu fonta i taga
+        // TODO kad ti dodje zahtev za ovo, canceluj promenu fonta
 
         if(vsosPartialCreationFuture != null && !vsosPartialCreationFuture.isDone())
             vsosPartialCreationFuture.cancel(true);
+
+        if(vsosTagReplacementChangeFuture != null && !vsosTagReplacementChangeFuture.isDone())
+            vsosTagReplacementChangeFuture.cancel(true);
 
             // If this happens, fuck it, just wait until the previous task is complete; [defensive]
         if(vsosCreationFuture != null && !vsosCreationFuture.isDone())
@@ -273,7 +275,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 logger.e(e, "Vso full creation crashed while synchronously executing!");
             }
         vsosCreationFuture = singleThreadExecutor.submit(() -> {
-            synchronized (vsoCreationSyncObject) {
+            synchronized (vsoSyncObject) {
                 List<SubtitleLineVso> vsos = subtitleLineVsoFactory.createSubtitleLineVsos(
                         subtitleLines,
                         subtitleController.getTagPrettifierForCurrentSubtitle(
@@ -299,7 +301,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     private void asyncRecreateSomeVsos(@NonNull List<SubtitleLine> subtitleLines) {
-        // TODO ako ide promena velicine fonta sacekaj; ako ide tag replacement bem li ga sackeaj
+        // TODO ako ide promena velicine fonta sacekaj;
 
         // If full vso creation task is already in progress, just give up.
         if(vsosCreationFuture != null && !vsosCreationFuture.isDone())
@@ -312,7 +314,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 logger.e(e, "Vso partial creation crashed while synchronously executing!");
             }
         vsosPartialCreationFuture = singleThreadExecutor.submit(() -> {
-            synchronized (vsoCreationSyncObject) {
+            synchronized (vsoSyncObject) {
                 List<SubtitleLineVso> vsos = subtitleLineVsoFactory.createSubtitleLineVsos(
                         new SolidList<>(subtitleLines),
                         subtitleController.getTagPrettifierForCurrentSubtitle(
@@ -334,6 +336,39 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 if(viewInterface == null) return;
 
                 mainThreader.justExecute(() -> viewInterface.updateSubtitleLines(vsos));
+            }
+        });
+    }
+
+    private void asyncChangeTagReplacement() {
+
+        if(vsosTagReplacementChangeFuture != null && !vsosTagReplacementChangeFuture.isDone())
+            vsosTagReplacementChangeFuture.cancel(true);
+
+        // whatever other task is in progress, just execute this one. It will convert current vsos
+        // whatever they may be after the current task completes (since a single thread is used)
+
+        vsosTagReplacementChangeFuture = singleThreadExecutor.submit(() -> {
+            synchronized (vsoSyncObject) {
+
+                // If current subtitle lines and their vsos are not the same, just call a full recreate
+                // Note: should also check if IDs are the same
+                if(subtitleController.getCurrentSubtitleFile() == null) return;
+                List<SubtitleLine> lines =
+                        subtitleController.getCurrentSubtitleFile().getSubtitleContent().getSubtitleLines();
+                if(lines.size() != allSubtitleLineVsos.size()) {
+                    asyncCreateAllVsos(lines);
+                    return;
+                }
+
+                subtitleLineVsoFactory.modifyTagReplacements(
+                        lines, allSubtitleLineVsos, tagReplacementPreference.get(),
+                        subtitleController.getTagPrettifierForCurrentSubtitle(
+                                tagReplacementPreference.get()));
+
+                if(viewInterface == null) return;
+
+                mainThreader.justExecute(() -> viewInterface.updateSubtitleLines(allSubtitleLineVsos));
             }
         });
     }

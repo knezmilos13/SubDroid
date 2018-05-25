@@ -64,4 +64,18 @@ public class SubtitleLineVsoFactory {
         return vsos;
     }
 
+    /** Iterates through given SubtitleLineVso objects and recreates their text strings using new
+     *  tag replacement */
+    public void modifyTagReplacements(@NonNull List<SubtitleLine> subtitleLines,
+                                      @NonNull List<SubtitleLineVso> vsos,
+                                      @NonNull String tagReplacement,
+                                      @NonNull TagPrettifier tagPrettifier) {
+        // TODO ako nisu iste duzine odustani, i ako nisu isti idjevi
+        for(int i = 0; i < subtitleLines.size(); i++) {
+            String textToShow = subtitleLines.get(i).getText();
+            textToShow = tagPrettifier.prettifyTags(textToShow);
+            vsos.get(i).setText(textToShow);
+        }
+    }
+
 }
