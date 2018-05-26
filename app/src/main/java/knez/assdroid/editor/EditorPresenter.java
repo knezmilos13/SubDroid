@@ -50,6 +50,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private Future<?> vsosCreationFuture;
     private Future<?> vsosPartialCreationFuture;
     private Future<?> vsosTagReplacementChangeFuture;
+    private Future<?> vsosChangeFontSizeFuture;
 
 //    @NonNull private String[] currentSearchQuery = new String[0];
     @NonNull private List<SubtitleLineVso> allSubtitleLineVsos = new ArrayList<>();
@@ -235,21 +236,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
-        if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP)) {
-            for(SubtitleLineVso vso : allSubtitleLineVsos)
-                vso.setTextSize(subLineTextSizePreference.get());
-            viewInterface.showSubtitleLines(allSubtitleLineVsos);
+        if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP)
+                || changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_OTHER_SIZE_DP)) {
+            asyncChangeFontSizes();
         }
-
-        if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_OTHER_SIZE_DP)) {
-            for(SubtitleLineVso vso : allSubtitleLineVsos)
-                vso.setOtherSize(subLineOtherSizePreference.get());
-            viewInterface.showSubtitleLines(allSubtitleLineVsos);
-        }
-
-        // TODO kada se promeni velicina fonta prodjes kroz njih i samo to promenis
-        //   * ako se loaduje fajl odustani, sve drugo sacekaj
-
 
         if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)) {
             asyncChangeTagReplacement();
@@ -260,11 +250,11 @@ public class EditorPresenter extends CommonSubtitlePresenter
     // ------------------------------------------------------------------------------------ INTERNAL
 
     private void asyncCreateAllVsos(@NonNull List<SubtitleLine> subtitleLines) {
-        // TODO kad ti dodje zahtev za ovo, canceluj promenu fonta
-
+        // Cancel all other tasks, if any are in progress
         if(vsosPartialCreationFuture != null && !vsosPartialCreationFuture.isDone())
             vsosPartialCreationFuture.cancel(true);
-
+        if(vsosChangeFontSizeFuture != null && !vsosChangeFontSizeFuture.isDone())
+            vsosChangeFontSizeFuture.cancel(true);
         if(vsosTagReplacementChangeFuture != null && !vsosTagReplacementChangeFuture.isDone())
             vsosTagReplacementChangeFuture.cancel(true);
 
@@ -301,8 +291,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     private void asyncRecreateSomeVsos(@NonNull List<SubtitleLine> subtitleLines) {
-        // TODO ako ide promena velicine fonta sacekaj;
-
         // If full vso creation task is already in progress, just give up.
         if(vsosCreationFuture != null && !vsosCreationFuture.isDone())
             return;
@@ -368,6 +356,26 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
                 if(viewInterface == null) return;
 
+                mainThreader.justExecute(() -> viewInterface.showSubtitleLines(allSubtitleLineVsos));
+            }
+        });
+    }
+
+    private void asyncChangeFontSizes() {
+
+        if(vsosChangeFontSizeFuture != null && !vsosChangeFontSizeFuture.isDone())
+            vsosChangeFontSizeFuture.cancel(true);
+
+        // whatever other task is in progress, just execute this one. It will convert current vsos
+        // whatever they may be after the current task completes (since a single thread is used)
+
+        vsosChangeFontSizeFuture = singleThreadExecutor.submit(() -> {
+            synchronized (vsoSyncObject) {
+                for(SubtitleLineVso vso : allSubtitleLineVsos) {
+                    vso.setTextSize(subLineTextSizePreference.get());
+                    vso.setOtherSize(subLineOtherSizePreference.get());
+                }
+                if(viewInterface == null) return;
                 mainThreader.justExecute(() -> viewInterface.updateSubtitleLines(allSubtitleLineVsos));
             }
         });
