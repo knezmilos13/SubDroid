@@ -54,7 +54,11 @@
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - SETTINGS ACTIVITY -->
 
+    <string name="settings_category_global">Global settings</string>
     <string name="settings_category_editor">Editor settings</string>
+
+    <string name="settings_global_theme">App theme</string>
+    <string name="settings_global_theme_default_value">light</string>
 
     <string name="settings_editor_tag_replacement_title">Tag replacement</string>
     <string name="settings_editor_tag_replacement_summary">Character to use for "minimized" tags</string>

@@ -215,7 +215,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
-
+        super.onSettingsChanged(changedSettings);
     }
 
 

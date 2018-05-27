@@ -14,4 +14,7 @@
         <attr name="empty_allowed" format="boolean"/>
     </declare-styleable>
 
+    <attr name="translator_secondary_subtitle_line" format="reference" />
+    <attr name="standard_input_field" format="reference" />
+
 </resources>

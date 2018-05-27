@@ -236,6 +236,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
+        super.onSettingsChanged(changedSettings);
+
         if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP)
                 || changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_OTHER_SIZE_DP)) {
             asyncChangeFontSizes();

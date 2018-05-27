@@ -3,28 +3,57 @@
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  THEMES -->
 
-    <style name="SubDroid.Theme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="SubDroid.Theme_Light" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:textColor">@color/text_color_light</item>
+        <item name="translator_secondary_subtitle_line">@style/translator_secondary_subtitle_line.light</item>
+        <item name="standard_input_field">@style/standard_input_field_light</item>
+    </style>
+
+    <style name="SubDroid.Theme_Dark" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/background_dark</item>
+        <item name="android:textColor">@color/text_color_dark</item>
+        <item name="android:popupMenuStyle">@style/Widget.AppCompat.PopupMenu</item>
+        <item name="translator_secondary_subtitle_line">@style/translator_secondary_subtitle_line.dark</item>
+        <item name="standard_input_field">@style/standard_input_field_dark</item>
     </style>
 
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  STYLES -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - COMMON STYLES -->
 
     <style name="common_progress_text">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16dp</item>
     </style>
 
-    <style name="translator_subtitle_line_separator">
+    <style name="BaseSearchViewStyle" >
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1.5dp</item>
-        <item name="android:background">@color/gray_4_medium_light</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="hasXIcon">true</item>
+        <item name="android:background">@android:color/white</item>
     </style>
+
+    <style name="standard_input_field_light">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/hint_light</item>
+        <item name="android:background">@drawable/bg_standard_input_light</item>
+    </style>
+    <style name="standard_input_field_dark">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorHint">@color/hint_dark</item>
+        <item name="android:background">@drawable/bg_standard_input_dark</item>
+    </style>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  TRANSLATOR -->
 
     <style name="translator_secondary_subtitle_line">
         <item name="android:paddingTop">6dp</item>
@@ -37,6 +66,12 @@
         <item name="android:background">@color/gray_8_lightest</item>
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
+    </style>
+    <style name="translator_secondary_subtitle_line.light">
+        <item name="android:background">@color/gray_8_lightest</item>
+    </style>
+    <style name="translator_secondary_subtitle_line.dark">
+        <item name="android:background">@color/gray_1_dark</item>
     </style>
 
     <style name="translator_primary_subtitle_line">
@@ -52,19 +87,6 @@
         <item name="android:layout_width">@dimen/translator_main_button_dimension</item>
         <item name="android:layout_height">@dimen/translator_main_button_dimension</item>
         <item name="android:textSize" tools:ignore="SpUsage">30dp</item>
-    </style>
-
-    <style name="BaseSearchViewStyle" >
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="hasXIcon">true</item>
-        <item name="android:background">@android:color/white</item>
-    </style>
-
-    <style name="standard_input_field">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textColorHint">@color/hint</item>
-        <item name="android:background">@drawable/bg_standard_input</item>
     </style>
     
 </resources>

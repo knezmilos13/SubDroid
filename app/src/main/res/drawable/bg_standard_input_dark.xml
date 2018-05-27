@@ -13,7 +13,7 @@
                 android:right="8dp"
                 android:bottom="6dp" />
 
-            <solid android:color="@color/bg_input" />
+            <solid android:color="#abb8ff" />
         </shape>
     </item>
 </layer-list>

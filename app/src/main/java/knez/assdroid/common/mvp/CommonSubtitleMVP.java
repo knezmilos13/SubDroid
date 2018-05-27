@@ -23,6 +23,8 @@ public interface CommonSubtitleMVP {
         void showErrorWritingSubtitleInvalidFormat(@NonNull String filename);
         void showErrorCantSaveMissingFile();
         void showErrorWritingFailed(@NonNull String destFilename);
+
+        void updateTheme();
     }
 
     interface PresenterInterface {

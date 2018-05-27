@@ -3,6 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory android:title="@string/settings_category_global" >
+
+        <ListPreference
+            android:key="theme"
+            android:defaultValue="@string/settings_global_theme_default_value"
+            android:title="@string/settings_global_theme"
+            android:entries="@array/themes_human_readable"
+            android:entryValues="@array/themes_values" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/settings_category_editor" >
 
         <knez.assdroid.util.gui.ResetEditTextPreference

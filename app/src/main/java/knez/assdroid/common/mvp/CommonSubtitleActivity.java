@@ -22,7 +22,7 @@ import knez.assdroid.settings.SettingsActivity;
 import knez.assdroid.util.gui.FadeAnimationHelper;
 import timber.log.Timber;
 
-public abstract class CommonSubtitleActivity extends AppCompatActivity
+public abstract class CommonSubtitleActivity extends CommonThemeableActivity
         implements CommonSubtitleMVP.ViewInterface {
 
     private static final int REQUEST_CODE_SETTINGS_ACTIVITY = 501;
@@ -168,6 +168,13 @@ public abstract class CommonSubtitleActivity extends AppCompatActivity
     public void showErrorWritingFailed(@NonNull String filename) {
         Toast.makeText(this, getString(R.string.common_error_writing_failed, filename),
                 Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void updateTheme() {
+        recreate();
+        // Note: new theme will be set in onCreate where we will access current theme before
+        // presenter is instantiated
     }
 
 }

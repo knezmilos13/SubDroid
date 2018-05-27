@@ -46,4 +46,10 @@ class PreferencesModule {
                 Constants.SUB_LINE_DEFAULT_OTHER_TEXT_SIZE_DP);
     }
 
+    @Provides @Singleton @Named("theme")
+    static StringPreference getThemePreference(SharedPreferences sharedPreferences) {
+        return new StringPreference(
+                sharedPreferences, SharedPreferenceKey.THEME, Constants.THEME_DEFAULT);
+    }
+
 }

@@ -66,7 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                style="@style/translator_secondary_subtitle_line"
+                style="?translator_secondary_subtitle_line"
                 tools:text="Previous sentence..."/>
 
             <FrameLayout
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/translator_current_line_frame_1"
-                style="@style/translator_secondary_subtitle_line"
+                style="?translator_secondary_subtitle_line"
                 tools:text="Following sentence..." />
 
             <EditText
@@ -108,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/translator_next_line"
                 android:layout_marginTop="@dimen/standard_content_margin"
-                style="@style/standard_input_field"
+                style="?standard_input_field"
                 android:gravity="top|start"
                 android:inputType="textMultiLine"
                 android:imeOptions="actionNext"/>

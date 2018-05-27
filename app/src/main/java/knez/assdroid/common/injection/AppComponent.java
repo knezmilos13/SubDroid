@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.squareup.leakcanary.RefWatcher;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.BindsInstance;
@@ -13,6 +14,7 @@ import knez.assdroid.common.util.AppConfig;
 import knez.assdroid.editor.EditorMVP;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.translator.TranslatorMVP;
+import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 @Singleton
@@ -35,5 +37,6 @@ public interface AppComponent {
     EditorMVP.PresenterInterface getEditorPresenter();
     TranslatorMVP.PresenterInterface getTranslatorPresenter();
     Context getContext(); // TODO: ko koristi ovo da predje na druge klase
+    @Named("theme") StringPreference getThemePreference();
 
 }

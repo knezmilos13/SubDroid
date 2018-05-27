@@ -4,6 +4,9 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.HashSet;
+
+import knez.assdroid.common.SharedPreferenceKey;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.util.FileHandler;
@@ -94,6 +97,15 @@ public abstract class CommonSubtitlePresenter
 
         if(getViewInterface() != null) getViewInterface().showProgressSavingFile();
         subtitleController.writeSubtitle(currentSubtitleFile.getUriPath());
+    }
+
+    @Override
+    public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
+        if(changedSettings.contains(SharedPreferenceKey.THEME)) {
+            if(getViewInterface() != null) getViewInterface().updateTheme();
+            // Note: view will have to access current theme on its own because it must be done
+            // before presenter is attached. So we pass nothing to view above.
+        }
     }
 
 

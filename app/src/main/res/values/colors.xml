@@ -16,11 +16,16 @@
 
     <color name="border">@color/gray_4_medium_light</color>
 
-    <color name="background">#ffffff</color>
+    <color name="background_light">#ffffff</color>
+    <color name="background_dark">#000000</color>
+
+    <color name="text_color_light">#000000</color>
+    <color name="text_color_dark">#ffffff</color>
 
     <color name="whitish_transparent">#b4ffffff</color>
 
-    <color name="hint">#80ffffff</color>
+    <color name="hint_light">#80ffffff</color>
+    <color name="hint_dark">#404040</color>
     <color name="bg_input">#5362b5</color>
 
 
