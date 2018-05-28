@@ -22,6 +22,7 @@ import knez.assdroid.subtitle.handler.ass.AssTagsPrettifier;
 import knez.assdroid.subtitle.handler.ass.FormatConstants;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
+import knez.assdroid.util.apache.FilenameUtils;
 import solid.collections.Pair;
 import timber.log.Timber;
 
@@ -191,7 +192,7 @@ public class SubtitleController extends AbstractRepo {
     @WorkerThread
     private void _parseSubtitle(@NonNull Uri subtitlePath) {
         String subtitleFilename = fileHandler.getFileNameFromUri(subtitlePath);
-        String subtitleExtension = subtitleFilename.substring(subtitleFilename.lastIndexOf(".")+1);
+        String subtitleExtension = FilenameUtils.getExtension(subtitleFilename);
 
         SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
         if(subtitleParser == null) {
@@ -217,7 +218,7 @@ public class SubtitleController extends AbstractRepo {
         List<ParsingError> parsingErrors = result.second;
 
         // Filename should be kept without the extension since the app itself is format-neutral
-        String subtitleName = subtitleFilename.substring(0, subtitleFilename.lastIndexOf("."));
+        String subtitleName = FilenameUtils.getName(subtitleFilename);
 
         currentSubtitleFile = new SubtitleFile(
                 false, subtitlePath, subtitleName, subtitleExtension, result.first);
@@ -268,9 +269,12 @@ public class SubtitleController extends AbstractRepo {
 
         // TODO: ovaj baca java.lang.SecurityException... napravi metodu tipa "proveri permisije" koje ce da frljne to
         String destFilename = fileHandler.getFileNameFromUri(destPath);
-        String destExtension = destFilename.substring(destFilename.lastIndexOf(".") + 1);
+        String destExtension = FilenameUtils.getExtension(destFilename);
 
-        SubtitleFormatter subtitleFormatter =
+        if(destExtension.trim().equals("")) destExtension = currentSubtitleFile.getExtension();
+
+        SubtitleFormatter subtitleFormatter = null;
+        if(destExtension != null) subtitleFormatter =
                 subtitleHandlerRepository.getFormatterForSubtitleFormat(destExtension);
 
         if(subtitleFormatter == null) {
@@ -295,7 +299,7 @@ public class SubtitleController extends AbstractRepo {
             return;
         }
 
-        String subtitleName = destFilename.substring(0, destFilename.lastIndexOf("."));
+        String subtitleName = FilenameUtils.getName(destFilename);
         currentSubtitleFile = new SubtitleFile(false, destPath, subtitleName, destExtension,
                 currentSubtitleFile.getSubtitleContent());
 

@@ -22,6 +22,7 @@ import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
+import knez.assdroid.util.apache.FilenameUtils;
 import knez.assdroid.util.preferences.BooleanPreference;
 import knez.assdroid.util.preferences.IntPreference;
 import knez.assdroid.util.preferences.StringPreference;
@@ -141,7 +142,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @Override
     public void onFileSelectedForLoad(@NonNull Uri uri) {
         String filename = fileHandler.getFileNameFromUri(uri);
-        String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
+        String subtitleExtension = FilenameUtils.getExtension(filename);
 
         if(!subtitleController.canLoadExtension(subtitleExtension)) {
             viewInterface.showErrorLoadingSubtitleInvalidFormat(filename);

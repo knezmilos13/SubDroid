@@ -10,6 +10,7 @@ import knez.assdroid.common.SharedPreferenceKey;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.util.FileHandler;
+import knez.assdroid.util.apache.FilenameUtils;
 
 public abstract class CommonSubtitlePresenter
         implements CommonSubtitleMVP.PresenterInterface, SubtitleController.Callback {
@@ -50,15 +51,14 @@ public abstract class CommonSubtitlePresenter
     @Override
     public void onFileSelectedForSaveAs(@NonNull Uri uri) {
         String filename = fileHandler.getFileNameFromUri(uri);
-        String subtitleExtension = filename.substring(filename.lastIndexOf(".")+1);
+        String subtitleExtension = FilenameUtils.getExtension(filename);
 
-        if(!subtitleController.canWriteSubtitle(subtitleExtension)) {
+        if(subtitleExtension == null || !subtitleController.canWriteSubtitle(subtitleExtension)) {
             if(getViewInterface() != null)
                 getViewInterface().showErrorWritingSubtitleInvalidFormat(filename);
             return;
         }
 
-        // This mostly just refreshes the permission (which you got when loading file)
         fileHandler.takePermissionForUri(uri);
 
         if(getViewInterface() != null) getViewInterface().showProgressSavingFile();
