@@ -16,5 +16,6 @@
 
     <attr name="translator_secondary_subtitle_line" format="reference" />
     <attr name="standard_input_field" format="reference" />
+    <attr name="common_transparent_background" format="reference" />
 
 </resources>

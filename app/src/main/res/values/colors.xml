@@ -23,6 +23,7 @@
     <color name="text_color_dark">#ffffff</color>
 
     <color name="whitish_transparent">#b4ffffff</color>
+    <color name="blackish_transparent">#b4000000</color>
 
     <color name="hint_light">#80ffffff</color>
     <color name="hint_dark">#404040</color>
