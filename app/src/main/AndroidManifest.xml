@@ -14,7 +14,7 @@
         android:theme="@style/SubDroid.Theme_Light" >
         <activity
             android:name=".editor.EditorActivity"
-            android:windowSoftInputMode="stateUnchanged" >
+            android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,7 +56,7 @@
         </activity>
         <activity
             android:name=".translator.TranslatorActivity"
-            android:windowSoftInputMode="stateUnchanged" >
+            android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
             android:name=".settings.SettingsActivity"
