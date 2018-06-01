@@ -34,6 +34,12 @@ class PreferencesModule {
                 Constants.SUB_LINE_DEFAULT_SHOW_STYLE_ACTOR);
     }
 
+    @Provides @Singleton @Named("simplifyTags")
+    static BooleanPreference getSimplifyTagsPreference(SharedPreferences sharedPreferences) {
+        return new BooleanPreference(sharedPreferences, SharedPreferenceKey.SUBTITLE_LINE_SIMPLIFY_TAGS,
+                Constants.SUB_LINE_DEFAULT_SIMPLIFY_TAGS);
+    }
+
     @Provides @Singleton @Named("subLineTextSize")
     static IntPreference provideSubLineTextSizePreference(SharedPreferences sharedPreferences) {
         return new IntPreference(sharedPreferences, SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP,

@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -49,6 +50,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     @BindView(R.id.translator_next_line) protected TextView nextLineTextView;
     @BindView(R.id.translator_input) protected EditText inputView;
     @BindView(R.id.translator_commit_indicator) protected ImageView commitIndicatorView;
+    @BindView(R.id.toolbar) protected Toolbar toolbar;
 
     private PresenterInterface presenter;
 
@@ -91,6 +93,8 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     }
 
     private void setUpViews() {
+        setSupportActionBar(toolbar);
+
         // hack - allows enter to work as ime action even though the field is multiline
         inputView.setHorizontallyScrolling(false);
         inputView.setMaxLines(200); // 200 is a random value not likely to be hit ever

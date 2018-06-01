@@ -19,14 +19,21 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +46,23 @@ public class EditorActivity extends CommonSubtitleActivity
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
     private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
 
+    private static final long DRAWER_ID_SHOW_TIMING = 1;
+    private static final long DRAWER_ID_SHOW_ACTOR_STYLE = 2;
+    private static final long DRAWER_ID_SIMPLIFY_TAGS = 3;
+
     @BindView(R.id.editor_subtitle_list) protected RecyclerView itemListRecycler;
     @BindView(R.id.editor_search_view) protected BgpEditText searchView;
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
+    @BindView(R.id.toolbar) protected Toolbar toolbar;
 
     private PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
     private LinearLayoutManager linearLayoutManager;
+
+    private Drawer drawer;
+    private SwitchDrawerItem showTimingsDrawerItem;
+    private SwitchDrawerItem showActorStyleDrawerItem;
+    private SwitchDrawerItem simplifyTagsDrawerItem;
 
 
     // --------------------------------------------------------------------------- LIFECYCLE & SETUP
@@ -56,7 +73,7 @@ public class EditorActivity extends CommonSubtitleActivity
 		setContentView(R.layout.activity_editor);
         ButterKnife.bind(this);
 
-        setUpInterface();
+        setUpInterface(savedInstanceState);
 
         Object retainedInstance = getLastCustomNonConfigurationInstance();
         if(retainedInstance != null && retainedInstance instanceof PresenterInterface) {
@@ -97,9 +114,54 @@ public class EditorActivity extends CommonSubtitleActivity
         super.onDestroy();
     }
 
-    private void setUpInterface() {
+    private void setUpInterface(@Nullable Bundle savedInstanceState) {
+	    setUpToolbar();
         setUpAdapter();
         setUpList();
+        setUpDrawer(savedInstanceState);
+    }
+
+    private void setUpToolbar() {
+        setSupportActionBar(toolbar);
+    }
+
+    private void setUpDrawer(@Nullable Bundle savedInstanceState) {
+	    showTimingsDrawerItem = new SwitchDrawerItem()
+                .withName(R.string.editor_drawer_show_timing)
+                .withIdentifier(DRAWER_ID_SHOW_TIMING)
+                .withChecked(true)
+                .withOnCheckedChangeListener(
+                        (drawerItem, buttonView, isChecked) -> onShowTimingsCheckChanged(isChecked));
+
+	    showActorStyleDrawerItem = new SwitchDrawerItem()
+                .withName(R.string.editor_drawer_show_actor_style)
+                .withIdentifier(DRAWER_ID_SHOW_ACTOR_STYLE)
+                .withChecked(true)
+                .withOnCheckedChangeListener((drawerItem, buttonView, isChecked)
+                        -> onShowActorStyleCheckChanged(isChecked));
+
+	    simplifyTagsDrawerItem = new SwitchDrawerItem()
+                .withName(R.string.editor_drawer_simplify_tags)
+                .withIdentifier(DRAWER_ID_SIMPLIFY_TAGS)
+                .withChecked(true)
+                .withOnCheckedChangeListener((drawerItem, buttonView, isChecked)
+                        -> onSimplifyTagsCheckChanged(isChecked));
+
+        drawer = new DrawerBuilder(this)
+                .withRootView(R.id.drawer_container)
+                .withToolbar(toolbar)
+                .withDisplayBelowStatusBar(false)
+                .withActionBarDrawerToggleAnimated(true)
+                .addDrawerItems(
+                        new SectionDrawerItem()
+                                .withName(R.string.editor_drawer_lines_display),
+                        showTimingsDrawerItem,
+                        showActorStyleDrawerItem,
+                        simplifyTagsDrawerItem
+                )
+                .withSelectedItem(-1)
+                .withSavedInstance(savedInstanceState)
+                .build();
     }
 
     private void setUpAdapter() {
@@ -123,10 +185,22 @@ public class EditorActivity extends CommonSubtitleActivity
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState = drawer.saveInstanceState(outState);
+        super.onSaveInstanceState(outState);
+    }
+
 
 	// --------------------------------------------------------------------------------- USER EVENTS
 
-	@Override
+    @Override
+    public void onBackPressed() {
+        if (drawer != null && drawer.isDrawerOpen()) drawer.closeDrawer();
+        else super.onBackPressed();
+    }
+
+    @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_item_create_subtitle:
@@ -180,6 +254,18 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
     public void onLetterInputted(@NonNull String text) {}
 
+    private void onShowTimingsCheckChanged(boolean isChecked) {
+        presenter.onShowTimingsSettingChanged(isChecked);
+    }
+
+    private void onShowActorStyleCheckChanged(boolean isChecked) {
+        presenter.onShowActorStyleSettingChanged(isChecked);
+    }
+
+    private void onSimplifyTagsCheckChanged(boolean isChecked) {
+        presenter.onSimplifyTagsSettingChanged(isChecked);
+    }
+
 
     // ------------------------------------------------------------------------------ VIEW INTERFACE
 
@@ -219,6 +305,16 @@ public class EditorActivity extends CommonSubtitleActivity
     public void showProgressLoadingFile() {
         progressLabel.setText(R.string.common_loading_file);
         FadeAnimationHelper.fadeView(true, progressBar, false);
+    }
+
+    @Override
+    public void showCurrentQuickSettings(boolean showTimings, boolean showActorStyle, boolean simplifyTags) {
+        if(showTimingsDrawerItem.isChecked() ^ showTimings)
+            drawer.updateItem(showTimingsDrawerItem.withChecked(showTimings));
+        if(showActorStyleDrawerItem.isChecked() ^ showActorStyle)
+            drawer.updateItem(showActorStyleDrawerItem.withChecked(showActorStyle));
+        if(simplifyTagsDrawerItem.isChecked() ^ simplifyTags)
+            drawer.updateItem(simplifyTagsDrawerItem.withChecked(simplifyTags));
     }
 
     @Override

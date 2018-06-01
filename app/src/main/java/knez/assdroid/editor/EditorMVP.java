@@ -26,6 +26,9 @@ public interface EditorMVP {
         void showTranslatorScreen(long lineId);
 
         void showProgressLoadingFile();
+
+        void showCurrentQuickSettings(
+                boolean showTimings, boolean showActorStyle, boolean simplifyTags);
     }
 
     interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
@@ -41,6 +44,10 @@ public interface EditorMVP {
         void onSubtitleEditedExternally(@NonNull ArrayList<Long> editedLineIds);
 
         void onNewSubtitleRequested();
+
+        void onShowTimingsSettingChanged(boolean isChecked);
+        void onShowActorStyleSettingChanged(boolean isChecked);
+        void onSimplifyTagsSettingChanged(boolean isChecked);
     }
 
 }

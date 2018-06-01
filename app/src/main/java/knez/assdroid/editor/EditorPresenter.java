@@ -20,6 +20,7 @@ import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
 import knez.assdroid.util.apache.FilenameUtils;
@@ -42,6 +43,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull private final IntPreference subLineOtherSizePreference;
     @NonNull private final BooleanPreference subLineShowTimingsPreference;
     @NonNull private final BooleanPreference subLineShowActorStylePreference;
+    @NonNull private final BooleanPreference simplifyTagsPreference; // TODO
 
     private EditorMVP.ViewInterface viewInterface;
     private boolean presenterInitialized = false;
@@ -68,7 +70,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
             @NonNull IntPreference subLineTextSizePreference,
             @NonNull IntPreference subLineOtherSizePreference,
             @NonNull BooleanPreference subLineShowTimingsPreference,
-            @NonNull BooleanPreference subLineShowActorStylePreference) {
+            @NonNull BooleanPreference subLineShowActorStylePreference,
+            @NonNull BooleanPreference simplifyTagsPreference) {
         super(subtitleController, fileHandler);
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
         this.singleThreadExecutor = singleThreadExecutor;
@@ -80,6 +83,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         this.subLineOtherSizePreference = subLineOtherSizePreference;
         this.subLineShowTimingsPreference = subLineShowTimingsPreference;
         this.subLineShowActorStylePreference = subLineShowActorStylePreference;
+        this.simplifyTagsPreference = simplifyTagsPreference;
     }
 
 
@@ -105,8 +109,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         presenterInitialized = true;
 
-//        viewInterface.showCurrentSubtitleLineSettings(subLineTextSizePreference.get(),
-//                subLineOtherSizePreference.get());
+        viewInterface.showCurrentQuickSettings(
+                subLineShowTimingsPreference.get(),
+                subLineShowActorStylePreference.get(),
+                simplifyTagsPreference.get());
 
         if(subtitleController.getCurrentSubtitleFile() != null) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
@@ -188,6 +194,24 @@ public class EditorPresenter extends CommonSubtitlePresenter
         viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
     }
 
+    @Override
+    public void onShowTimingsSettingChanged(boolean isChecked) {
+        subLineShowTimingsPreference.set(isChecked);
+        // TODO apdejtuj prikaz - i daj leba ti vidi da ovo bude na nivou adaptera
+    }
+
+    @Override
+    public void onShowActorStyleSettingChanged(boolean isChecked) {
+        subLineShowActorStylePreference.set(isChecked);
+        // TODO apdejtuj prikaz
+    }
+
+    @Override
+    public void onSimplifyTagsSettingChanged(boolean isChecked) {
+        simplifyTagsPreference.set(isChecked);
+        asyncChangeTagReplacement();
+    }
+
 
     // ------------------------------------------------------------------------------- REPO CALLBACK
 
@@ -244,7 +268,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
             asyncChangeFontSizes();
         }
 
-        if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)) {
+        if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)
+                && simplifyTagsPreference.get()) {
+            // ^ don't recreate tag replacements if tags are not simplified
             asyncChangeTagReplacement();
         }
     }
@@ -267,12 +293,15 @@ public class EditorPresenter extends CommonSubtitlePresenter
             catch (InterruptedException | ExecutionException e) {
                 logger.e(e, "Vso full creation crashed while synchronously executing!");
             }
+
+        TagPrettifier tagPrettifier = simplifyTagsPreference.get()?
+                subtitleController.getTagPrettifierForCurrentSubtitle(tagReplacementPreference.get())
+                : null;
         vsosCreationFuture = singleThreadExecutor.submit(() -> {
             synchronized (vsoSyncObject) {
                 List<SubtitleLineVso> vsos = subtitleLineVsoFactory.createSubtitleLineVsos(
                         subtitleLines,
-                        subtitleController.getTagPrettifierForCurrentSubtitle(
-                                tagReplacementPreference.get()),
+                        tagPrettifier,
                         subLineShowTimingsPreference.get(),
                         subLineShowActorStylePreference.get(),
                         subLineTextSizePreference.get(),
@@ -336,6 +365,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
         if(vsosTagReplacementChangeFuture != null && !vsosTagReplacementChangeFuture.isDone())
             vsosTagReplacementChangeFuture.cancel(true);
 
+        boolean simplifyTags = simplifyTagsPreference.get();
+
         // whatever other task is in progress, just execute this one. It will convert current vsos
         // whatever they may be after the current task completes (since a single thread is used)
 
@@ -352,10 +383,13 @@ public class EditorPresenter extends CommonSubtitlePresenter
                     return;
                 }
 
-                subtitleLineVsoFactory.modifyTagReplacements(
-                        lines, allSubtitleLineVsos, tagReplacementPreference.get(),
-                        subtitleController.getTagPrettifierForCurrentSubtitle(
-                                tagReplacementPreference.get()));
+                if(simplifyTags)
+                    subtitleLineVsoFactory.modifyTagReplacements(
+                            lines, allSubtitleLineVsos, tagReplacementPreference.get(),
+                            subtitleController.getTagPrettifierForCurrentSubtitle(
+                                    tagReplacementPreference.get()));
+                else
+                    subtitleLineVsoFactory.removeTagReplacements(lines, allSubtitleLineVsos);
 
                 if(viewInterface == null) return;
 

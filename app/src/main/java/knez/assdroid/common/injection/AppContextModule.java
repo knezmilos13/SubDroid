@@ -70,12 +70,14 @@ class AppContextModule {
             @Named("subLineTextSize")IntPreference subLineTextSizePreference,
             @Named("subLineOtherSize") IntPreference subLineOtherSizePreference,
             @Named("subLineShowTimings") BooleanPreference subLineShowTimingsPreference,
-            @Named("subLineShowStyleActor") BooleanPreference subLineShowStyleActorPreference) {
+            @Named("subLineShowStyleActor") BooleanPreference subLineShowStyleActorPreference,
+            @Named("simplifyTags") BooleanPreference simplifyTagsPreference) {
         return new EditorPresenter(
                 subtitleController, subtitleLineVsoFactory, fileHandler, singleThreadExecutor,
                 mainThreader, logger,
                 tagReplacementPreference, subLineTextSizePreference, subLineOtherSizePreference,
-                subLineShowTimingsPreference, subLineShowStyleActorPreference);
+                subLineShowTimingsPreference, subLineShowStyleActorPreference,
+                simplifyTagsPreference);
     }
 
     @Provides
