@@ -79,7 +79,8 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         handleStyleAndActorLineDisplay(subtitleLineVso);
         handleSubtitleLineDisplay(subtitleLineVso);
 
-        setFontSizes(subtitleLineVso.getTextSize(), subtitleLineVso.getOtherSize());
+        setFontSizes(subtitleLineVso.getSharedSettings().getTextSize(),
+                subtitleLineVso.getSharedSettings().getOtherSize());
         setBackgroundResource(vso.getBackgroundDrawable());
     }
 
@@ -91,7 +92,7 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     // ----------------------------------------------------------------------------------------- GUI
 
     private void handleTimingLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        if(subtitleLineVso.isShowTimings()) {
+        if(subtitleLineVso.getSharedSettings().isShowTimings()) {
             timingsView.setVisibility(View.VISIBLE);
             timingsView.setText(getResources().getString(R.string.subtitle_line_timings,
                     subtitleLineVso.getStart(), subtitleLineVso.getEnd()));
@@ -102,7 +103,7 @@ public class SubtitleLineLayoutItem extends FrameLayout {
 
     /** Shows or hides the second of the three lines with subtitle data (style/actor in particular). */
     private void handleStyleAndActorLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        if(subtitleLineVso.isShowActorAndStyle()) {
+        if(subtitleLineVso.getSharedSettings().isShowActorAndStyle()) {
             styleView.setVisibility(View.VISIBLE);
             actorView.setVisibility(View.VISIBLE);
             styleView.setText(getResources().getString(

@@ -17,10 +17,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
     @Nullable private final String actorName;
     @Nullable private final String style;
     private final int lineNumber;
-    private int textSize;
-    private int otherSize;
-    private final boolean showTimings;
-    private final boolean showActorAndStyle;
+    @NonNull private final SharedSettings sharedSettings;
 
     public SubtitleLineVso(
             long id,
@@ -31,10 +28,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
             @Nullable String actorName,
             @Nullable String style,
             int lineNumber,
-            int textSize,
-            int otherSize,
-            boolean showTimings,
-            boolean showActorAndStyle) {
+            @NonNull SharedSettings sharedSettings) {
         super(id);
         this.backgroundDrawable = backgroundDrawable;
         this.text = text;
@@ -43,10 +37,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
         this.actorName = actorName;
         this.style = style;
         this.lineNumber = lineNumber;
-        this.textSize = textSize;
-        this.otherSize = otherSize;
-        this.showTimings = showTimings;
-        this.showActorAndStyle = showActorAndStyle;
+        this.sharedSettings = sharedSettings;
     }
 
     public int getBackgroundDrawable() { return backgroundDrawable; }
@@ -56,17 +47,13 @@ public class SubtitleLineVso extends IdentifiableImpl {
     @Nullable public String getActorName() { return actorName; }
     @Nullable public String getStyle() { return style; }
     public int getLineNumber() { return lineNumber; }
-    public int getTextSize() { return textSize; }
-    public int getOtherSize() { return otherSize; }
-    public boolean isShowActorAndStyle() { return showActorAndStyle; }
-    public boolean isShowTimings() { return showTimings; }
+    @NonNull public SharedSettings getSharedSettings() { return sharedSettings; }
 
-    public void setTextSize(int textSize) { this.textSize = textSize; }
-    public void setOtherSize(int otherSize) { this.otherSize = otherSize; }
     public void setText(@NonNull String text) { this.text = text; }
 
     public boolean isIdenticalTo(@NonNull SubtitleLineVso line) {
-        return getId() == line.getId()
+        return this == line || (
+                getId() == line.getId()
                 && backgroundDrawable == line.getBackgroundDrawable()
                 && lineNumber == line.getLineNumber()
                 && start.equals(line.getStart())
@@ -74,8 +61,49 @@ public class SubtitleLineVso extends IdentifiableImpl {
                 && Objects.equals(style, line.getStyle())
                 && Objects.equals(actorName, line.getActorName())
                 && text.equals(line.getText())
-                && textSize == line.getTextSize()
-                && otherSize == line.getOtherSize();
+                && sharedSettings.isIdenticalTo(line.getSharedSettings())
+        );
+    }
+
+    public static class SharedSettings {
+        private int textSize;
+        private int otherSize;
+        private boolean showTimings;
+        private boolean showActorAndStyle;
+
+        public SharedSettings(
+                int textSize,
+                int otherSize,
+                boolean showTimings,
+                boolean showActorAndStyle) {
+            this.textSize = textSize;
+            this.otherSize = otherSize;
+            this.showTimings = showTimings;
+            this.showActorAndStyle = showActorAndStyle;
+        }
+
+        public int getTextSize() { return textSize; }
+        public int getOtherSize() { return otherSize; }
+        public boolean isShowActorAndStyle() { return showActorAndStyle; }
+        public boolean isShowTimings() { return showTimings; }
+
+        public void setTextSize(int textSize) { this.textSize = textSize; }
+        public void setOtherSize(int otherSize) { this.otherSize = otherSize; }
+        public void setShowActorAndStyle(boolean showActorAndStyle) {
+            this.showActorAndStyle = showActorAndStyle;
+        }
+        public void setShowTimings(boolean showTimings) {
+            this.showTimings = showTimings;
+        }
+
+        public boolean isIdenticalTo(@NonNull SharedSettings settings) {
+            return this == settings || (
+                    textSize == settings.getTextSize()
+                            && otherSize == settings.getOtherSize()
+                            && showActorAndStyle == settings.isShowActorAndStyle()
+                            && showTimings == settings.isShowTimings()
+            );
+        }
     }
 
 }

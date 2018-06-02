@@ -20,22 +20,14 @@ public class SubtitleLineVsoFactory {
     }
 
     public List<SubtitleLineVso> createSubtitleLineVsos(
-            @NonNull List<SubtitleLine> subtitleLines,
-            boolean showTimings,
-            boolean showActorAndStyle,
-            int textSizeDp,
-            int otherSizeDp) {
-        return createSubtitleLineVsos(
-                subtitleLines, null, showTimings, showActorAndStyle, textSizeDp, otherSizeDp);
+            @NonNull List<SubtitleLine> subtitleLines, @NonNull SubtitleLineVso.SharedSettings settings) {
+        return createSubtitleLineVsos(subtitleLines, null, settings);
     }
 
     public List<SubtitleLineVso> createSubtitleLineVsos(
             @NonNull List<SubtitleLine> subtitleLines,
             @Nullable TagPrettifier tagPrettifier,
-            boolean showTimings,
-            boolean showActorAndStyle,
-            int textSizeDp,
-            int otherSizeDp) {
+            @NonNull SubtitleLineVso.SharedSettings settings) {
         List<SubtitleLineVso> vsos = new ArrayList<>();
         for(SubtitleLine subtitleLine : subtitleLines) {
             String start = subtitleTimeFormatter.format(subtitleLine.getStart());
@@ -54,10 +46,7 @@ public class SubtitleLineVsoFactory {
                             subtitleLine.getActorName(),
                             subtitleLine.getStyle(),
                             subtitleLine.getLineNumber(),
-                            textSizeDp,
-                            otherSizeDp,
-                            showTimings,
-                            showActorAndStyle)
+                            settings)
             );
         }
 

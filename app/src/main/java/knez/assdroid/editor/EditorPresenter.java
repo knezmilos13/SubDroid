@@ -27,7 +27,6 @@ import knez.assdroid.util.apache.FilenameUtils;
 import knez.assdroid.util.preferences.BooleanPreference;
 import knez.assdroid.util.preferences.IntPreference;
 import knez.assdroid.util.preferences.StringPreference;
-import solid.collections.SolidList;
 import timber.log.Timber;
 
 public class EditorPresenter extends CommonSubtitlePresenter
@@ -53,10 +52,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private Future<?> vsosCreationFuture;
     private Future<?> vsosPartialCreationFuture;
     private Future<?> vsosTagReplacementChangeFuture;
-    private Future<?> vsosChangeFontSizeFuture;
 
 //    @NonNull private String[] currentSearchQuery = new String[0];
     @NonNull private List<SubtitleLineVso> allSubtitleLineVsos = new ArrayList<>();
+    @NonNull private final SubtitleLineVso.SharedSettings sharedSubtitleLineSettings;
 //    @NonNull private SolidList<SubtitleLineVso> filteredSubtitleLineVsos = SolidList.empty();
 
     public EditorPresenter(
@@ -84,6 +83,13 @@ public class EditorPresenter extends CommonSubtitlePresenter
         this.subLineShowTimingsPreference = subLineShowTimingsPreference;
         this.subLineShowActorStylePreference = subLineShowActorStylePreference;
         this.simplifyTagsPreference = simplifyTagsPreference;
+
+        this.sharedSubtitleLineSettings = new SubtitleLineVso.SharedSettings(
+                subLineTextSizePreference.get(),
+                subLineOtherSizePreference.get(),
+                subLineShowTimingsPreference.get(),
+                subLineShowActorStylePreference.get()
+        );
     }
 
 
@@ -197,13 +203,15 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @Override
     public void onShowTimingsSettingChanged(boolean isChecked) {
         subLineShowTimingsPreference.set(isChecked);
-        // TODO apdejtuj prikaz - i daj leba ti vidi da ovo bude na nivou adaptera
+        sharedSubtitleLineSettings.setShowTimings(isChecked);
+        if(viewInterface != null) viewInterface.updateSubtitleLines();
     }
 
     @Override
     public void onShowActorStyleSettingChanged(boolean isChecked) {
         subLineShowActorStylePreference.set(isChecked);
-        // TODO apdejtuj prikaz
+        sharedSubtitleLineSettings.setShowActorAndStyle(isChecked);
+        if(viewInterface != null) viewInterface.updateSubtitleLines();
     }
 
     @Override
@@ -265,7 +273,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP)
                 || changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_OTHER_SIZE_DP)) {
-            asyncChangeFontSizes();
+            updateSubtitleLineSharedSettings();
         }
 
         if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)
@@ -278,12 +286,19 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
+    private void updateSubtitleLineSharedSettings() {
+        sharedSubtitleLineSettings.setTextSize(subLineTextSizePreference.get());
+        sharedSubtitleLineSettings.setOtherSize(subLineOtherSizePreference.get());
+        sharedSubtitleLineSettings.setShowTimings(subLineShowTimingsPreference.get());
+        sharedSubtitleLineSettings.setShowActorAndStyle(subLineShowActorStylePreference.get());
+
+        if(viewInterface != null) viewInterface.updateSubtitleLines();
+    }
+
     private void asyncCreateAllVsos(@NonNull List<SubtitleLine> subtitleLines) {
         // Cancel all other tasks, if any are in progress
         if(vsosPartialCreationFuture != null && !vsosPartialCreationFuture.isDone())
             vsosPartialCreationFuture.cancel(true);
-        if(vsosChangeFontSizeFuture != null && !vsosChangeFontSizeFuture.isDone())
-            vsosChangeFontSizeFuture.cancel(true);
         if(vsosTagReplacementChangeFuture != null && !vsosTagReplacementChangeFuture.isDone())
             vsosTagReplacementChangeFuture.cancel(true);
 
@@ -302,10 +317,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 List<SubtitleLineVso> vsos = subtitleLineVsoFactory.createSubtitleLineVsos(
                         subtitleLines,
                         tagPrettifier,
-                        subLineShowTimingsPreference.get(),
-                        subLineShowActorStylePreference.get(),
-                        subLineTextSizePreference.get(),
-                        subLineOtherSizePreference.get());
+                        sharedSubtitleLineSettings
+                );
 
                 if(Thread.interrupted()) return;
 
@@ -336,13 +349,11 @@ public class EditorPresenter extends CommonSubtitlePresenter
         vsosPartialCreationFuture = singleThreadExecutor.submit(() -> {
             synchronized (vsoSyncObject) {
                 List<SubtitleLineVso> vsos = subtitleLineVsoFactory.createSubtitleLineVsos(
-                        new SolidList<>(subtitleLines),
+                        subtitleLines,
                         subtitleController.getTagPrettifierForCurrentSubtitle(
                                 tagReplacementPreference.get()),
-                        subLineShowTimingsPreference.get(),
-                        subLineShowActorStylePreference.get(),
-                        subLineTextSizePreference.get(),
-                        subLineOtherSizePreference.get());
+                        sharedSubtitleLineSettings
+                );
 
                 for(SubtitleLineVso editedVso : vsos) {
                     for (int i = 0; i < allSubtitleLineVsos.size(); i++) {
@@ -394,26 +405,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 if(viewInterface == null) return;
 
                 mainThreader.justExecute(() -> viewInterface.showSubtitleLines(allSubtitleLineVsos));
-            }
-        });
-    }
-
-    private void asyncChangeFontSizes() {
-
-        if(vsosChangeFontSizeFuture != null && !vsosChangeFontSizeFuture.isDone())
-            vsosChangeFontSizeFuture.cancel(true);
-
-        // whatever other task is in progress, just execute this one. It will convert current vsos
-        // whatever they may be after the current task completes (since a single thread is used)
-
-        vsosChangeFontSizeFuture = singleThreadExecutor.submit(() -> {
-            synchronized (vsoSyncObject) {
-                for(SubtitleLineVso vso : allSubtitleLineVsos) {
-                    vso.setTextSize(subLineTextSizePreference.get());
-                    vso.setOtherSize(subLineOtherSizePreference.get());
-                }
-                if(viewInterface == null) return;
-                mainThreader.justExecute(() -> viewInterface.updateSubtitleLines(allSubtitleLineVsos));
             }
         });
     }

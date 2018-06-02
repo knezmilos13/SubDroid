@@ -302,6 +302,11 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
+    public void updateSubtitleLines() {
+        subtitleLinesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void showProgressLoadingFile() {
         progressLabel.setText(R.string.common_loading_file);
         FadeAnimationHelper.fadeView(true, progressBar, false);

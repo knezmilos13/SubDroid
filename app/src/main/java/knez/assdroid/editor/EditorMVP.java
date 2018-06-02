@@ -22,6 +22,7 @@ public interface EditorMVP {
         void showSubtitleLines(@NonNull List<SubtitleLineVso> subtitleLineVsos,
                                @NonNull DiffUtil.DiffResult result);
         void updateSubtitleLines(@NonNull List<SubtitleLineVso> editedVsos);
+        void updateSubtitleLines();
 
         void showTranslatorScreen(long lineId);
 
