@@ -130,6 +130,7 @@ public class EditorActivity extends CommonSubtitleActivity
                 .withName(R.string.editor_drawer_show_timing)
                 .withIdentifier(DRAWER_ID_SHOW_TIMING)
                 .withChecked(true)
+                .withSelectable(false)
                 .withOnCheckedChangeListener(
                         (drawerItem, buttonView, isChecked) -> onShowTimingsCheckChanged(isChecked));
 
@@ -137,6 +138,7 @@ public class EditorActivity extends CommonSubtitleActivity
                 .withName(R.string.editor_drawer_show_actor_style)
                 .withIdentifier(DRAWER_ID_SHOW_ACTOR_STYLE)
                 .withChecked(true)
+                .withSelectable(false)
                 .withOnCheckedChangeListener((drawerItem, buttonView, isChecked)
                         -> onShowActorStyleCheckChanged(isChecked));
 
@@ -144,6 +146,7 @@ public class EditorActivity extends CommonSubtitleActivity
                 .withName(R.string.editor_drawer_simplify_tags)
                 .withIdentifier(DRAWER_ID_SIMPLIFY_TAGS)
                 .withChecked(true)
+                .withSelectable(false)
                 .withOnCheckedChangeListener((drawerItem, buttonView, isChecked)
                         -> onSimplifyTagsCheckChanged(isChecked));
 
