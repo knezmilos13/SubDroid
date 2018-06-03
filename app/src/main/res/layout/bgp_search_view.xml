@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize">
+
+    <EditText
+        android:id="@+id/bgp_search_view_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:inputType="text"
+        android:layout_toStartOf="@+id/bgp_search_view_num_results"
+        android:layout_alignParentStart="true"
+        android:paddingStart="@dimen/standard_half_padding"
+        android:imeOptions="actionSearch"
+        android:textSize="16dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:background="@null"
+        android:hint="@string/search_view_find_in_subtitle"
+        tools:ignore="LabelFor"
+        tools:text="Bla bla"/>
+
+    <TextView
+        android:id="@+id/bgp_search_view_num_results"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@id/search_view_separator"
+        android:layout_marginRight="@dimen/standard_half_margin"
+        android:layout_marginLeft="@dimen/standard_half_margin"
+        android:gravity="center"
+        android:textSize="16dp"
+        android:textColor="@color/gray_4_medium_light"
+        tools:text="1/20"/>
+
+    <View
+        android:id="@+id/search_view_separator"
+        android:layout_width="0.5dp"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@+id/bgp_search_view_prev_icon"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/gray_6_light"/>
+
+    <ImageView
+        android:id="@+id/bgp_search_view_prev_icon"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/bgp_search_view_next_icon"
+        android:scaleType="center"
+        android:background="?attr/selectableItemBackground"/>
+
+    <ImageView
+        android:id="@+id/bgp_search_view_next_icon"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/bgp_search_view_close_icon"
+        android:scaleType="center"
+        android:background="?attr/selectableItemBackground"/>
+
+    <ImageView
+        android:id="@+id/bgp_search_view_close_icon"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:scaleType="center"
+        android:background="?attr/selectableItemBackground"/>
+
+</RelativeLayout>

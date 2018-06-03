@@ -10,7 +10,7 @@ import knez.assdroid.R;
 
 public abstract class CommonThemeableActivity extends AppCompatActivity {
 
-    private String currentTheme;
+    protected String currentTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="BgpEditTextAttributes">        
-        <attr name="hasXIcon" format="boolean"/>
-        <attr name="showMessageIcon" format="boolean"/>
-        <attr name="editable" format="boolean"/>
+    <declare-styleable name="BgpSearchViewAttributes">        
         <attr name="hint" format="string"/>
         <attr name="noFullScreen" format="boolean"/>
     </declare-styleable>

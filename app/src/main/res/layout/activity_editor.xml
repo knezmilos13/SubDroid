@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     android:id="@+id/activity_editor_root_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,7 +9,6 @@
     android:fitsSystemWindows="true"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    android:orientation="vertical"
     tools:context=".editor.EditorActivity">
 
     <android.support.v7.widget.Toolbar
@@ -17,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        android:layout_alignParentTop="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:elevation="4dp" />
@@ -34,18 +34,41 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <knez.assdroid.util.gui.BgpEditText
-                android:id="@+id/editor_search_view"
-                style="@style/BaseSearchViewStyle"
-                app:hint="@string/editor_subtitle_search_hint"
+            <LinearLayout
+                android:id="@+id/editor_search_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:visibility="gone"
-                app:noFullScreen="true"/>
+                android:orientation="vertical">
+
+                <knez.assdroid.util.gui.BgpSearchView
+                    android:id="@+id/editor_search_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:hint="@string/editor_subtitle_search_hint"
+                    app:noFullScreen="true"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/gray_4_medium_light"/>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/editor_search_view_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_below="@id/editor_search_view_container"
+                android:background="@drawable/shadow_below"
+                android:visibility="gone"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/editor_subtitle_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/editor_search_view"
+                android:layout_below="@id/editor_search_view_container"
                 android:clipToPadding="false"
                 app:fastScrollEnabled="true"
                 app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
@@ -71,4 +94,4 @@
         </RelativeLayout>
     </FrameLayout>
 
-</LinearLayout>
+</RelativeLayout>

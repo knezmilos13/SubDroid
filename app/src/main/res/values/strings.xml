@@ -42,6 +42,9 @@
     <string name="editor_drawer_show_actor_style">Show actor &amp; style</string>
     <string name="editor_drawer_simplify_tags">Simplify tags</string>
 
+    <string name="search_view_find_in_subtitle">Find in subtitle</string>
+    <string name="editor_search">Search</string>
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - SUBTITLE LINE -->
 
@@ -105,7 +108,7 @@
     <string name="podesavanja_prevodilac_copy_original_title">Always copy original</string>
     <string name="podesavanja_prevodilac_copy_original_summary">Original lines are copied into input field</string>
     
-    	<!-- Podesavanja Editor -->
+    <!-- Podesavanja Editor -->
     <string name="podesavanja_editor">Editor</string>
 
     

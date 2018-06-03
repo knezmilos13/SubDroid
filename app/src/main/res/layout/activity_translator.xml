@@ -19,7 +19,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/standard_content_padding"
+        android:padding="@dimen/standard_half_padding"
         android:baselineAligned="false"
         android:orientation="horizontal" >
 
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:padding="@dimen/standard_content_padding"
+        android:padding="@dimen/standard_half_padding"
         android:scrollbarStyle="outsideOverlay">
 
         <RelativeLayout
@@ -117,7 +117,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/translator_next_line"
-                android:layout_marginTop="@dimen/standard_content_margin"
+                android:layout_marginTop="@dimen/standard_half_margin"
                 style="?standard_input_field"
                 android:gravity="top|start"
                 android:inputType="textMultiLine"

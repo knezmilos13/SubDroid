@@ -65,13 +65,6 @@
         <item name="android:background">@color/blackish_transparent</item>
     </style>
 
-    <style name="BaseSearchViewStyle" >
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="hasXIcon">true</item>
-        <item name="android:background">@android:color/white</item>
-    </style>
-
     <style name="standard_input_field_light">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textColorHint">@color/hint_light</item>
@@ -89,10 +82,10 @@
     <style name="translator_secondary_subtitle_line">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:layout_marginLeft">@dimen/standard_content_margin</item>
-        <item name="android:paddingLeft">@dimen/standard_content_padding</item>
-        <item name="android:layout_marginRight">@dimen/standard_content_margin</item>
-        <item name="android:paddingRight">@dimen/standard_content_padding</item>
+        <item name="android:layout_marginLeft">@dimen/standard_half_margin</item>
+        <item name="android:paddingLeft">@dimen/standard_half_padding</item>
+        <item name="android:layout_marginRight">@dimen/standard_half_margin</item>
+        <item name="android:paddingRight">@dimen/standard_half_padding</item>
         <item name="android:textSize">16dp</item>
         <item name="android:background">@color/gray_8_lightest</item>
         <item name="android:maxLines">2</item>
@@ -108,8 +101,8 @@
     <style name="translator_primary_subtitle_line">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:paddingLeft">@dimen/standard_content_padding</item>
-        <item name="android:paddingRight">@dimen/standard_content_padding</item>
+        <item name="android:paddingLeft">@dimen/standard_half_padding</item>
+        <item name="android:paddingRight">@dimen/standard_half_padding</item>
         <item name="android:textSize">20dp</item>
         <item name="android:background">@drawable/bg_border</item>
     </style>

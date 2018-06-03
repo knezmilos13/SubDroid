@@ -3,6 +3,7 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
+import knez.assdroid.Constants;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.translator.TranslatorActivity;
@@ -11,11 +12,12 @@ import knez.assdroid.common.adapter.IdentifiableAdapter;
 import knez.assdroid.editor.adapter.SubtitleLineAdapterPack;
 import knez.assdroid.editor.gui.SubtitleLineLayoutItem;
 import knez.assdroid.editor.vso.SubtitleLineVso;
-import knez.assdroid.util.gui.BgpEditText;
+import knez.assdroid.util.gui.BgpSearchView;
 import knez.assdroid.util.gui.DividerItemDecoration;
 import knez.assdroid.util.gui.FadeAnimationHelper;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +32,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.MaterialIcons;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
@@ -41,7 +45,7 @@ import java.util.List;
 import static knez.assdroid.editor.EditorMVP.*;
 
 public class EditorActivity extends CommonSubtitleActivity
-        implements ViewInterface, SubtitleLineLayoutItem.Callback, BgpEditText.Listener {
+        implements ViewInterface, SubtitleLineLayoutItem.Callback, BgpSearchView.Listener {
 
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
     private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
@@ -51,7 +55,9 @@ public class EditorActivity extends CommonSubtitleActivity
     private static final long DRAWER_ID_SIMPLIFY_TAGS = 3;
 
     @BindView(R.id.editor_subtitle_list) protected RecyclerView itemListRecycler;
-    @BindView(R.id.editor_search_view) protected BgpEditText searchView;
+    @BindView(R.id.editor_search_view_container) protected View searchViewContainer;
+    @BindView(R.id.editor_search_view) protected BgpSearchView searchView;
+    @BindView(R.id.editor_search_view_shadow) protected View searchViewShadow;
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
     @BindView(R.id.toolbar) protected Toolbar toolbar;
 
@@ -185,6 +191,8 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_editor, menu);
+        menu.getItem(0).setIcon(
+                new IconDrawable(this, MaterialIcons.md_search).color(Color.WHITE).sizeDp(24));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -206,6 +214,10 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		    case R.id.menu_item_search:
+                searchViewContainer.setVisibility(View.VISIBLE);
+                searchViewShadow.setVisibility(View.VISIBLE);
+		        break;
 			case R.id.menu_item_create_subtitle:
 			    presenter.onNewSubtitleRequested();
 				break;
@@ -251,11 +263,19 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void onXClicked() {}
+    public void onXClicked() {
+	    // TODO temp
+        searchViewContainer.setVisibility(View.GONE);
+        searchViewShadow.setVisibility(View.GONE);
+    }
     @Override
     public void onSearchSubmitted(@NonNull String text) {}
     @Override
     public void onLetterInputted(@NonNull String text) {}
+    @Override
+    public void onPrevResultRequested() {}
+    @Override
+    public void onNextResultRequested() {}
 
     private void onShowTimingsCheckChanged(boolean isChecked) {
         presenter.onShowTimingsSettingChanged(isChecked);
