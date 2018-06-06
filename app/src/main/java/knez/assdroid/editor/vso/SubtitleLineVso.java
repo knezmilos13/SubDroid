@@ -70,22 +70,26 @@ public class SubtitleLineVso extends IdentifiableImpl {
         private int otherSize;
         private boolean showTimings;
         private boolean showActorAndStyle;
+        @Nullable private String searchQuery = null;
 
         public SharedSettings(
                 int textSize,
                 int otherSize,
                 boolean showTimings,
-                boolean showActorAndStyle) {
+                boolean showActorAndStyle,
+                @Nullable String searchQuery) {
             this.textSize = textSize;
             this.otherSize = otherSize;
             this.showTimings = showTimings;
             this.showActorAndStyle = showActorAndStyle;
+            this.searchQuery = searchQuery;
         }
 
         public int getTextSize() { return textSize; }
         public int getOtherSize() { return otherSize; }
         public boolean isShowActorAndStyle() { return showActorAndStyle; }
         public boolean isShowTimings() { return showTimings; }
+        @Nullable public String getSearchQuery() { return searchQuery; }
 
         public void setTextSize(int textSize) { this.textSize = textSize; }
         public void setOtherSize(int otherSize) { this.otherSize = otherSize; }
@@ -95,6 +99,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
         public void setShowTimings(boolean showTimings) {
             this.showTimings = showTimings;
         }
+        public void setSearchQuery(@Nullable String searchQuery) { this.searchQuery = searchQuery; }
 
         public boolean isIdenticalTo(@NonNull SharedSettings settings) {
             return this == settings || (
@@ -102,6 +107,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
                             && otherSize == settings.getOtherSize()
                             && showActorAndStyle == settings.isShowActorAndStyle()
                             && showTimings == settings.isShowTimings()
+                            && Objects.equals(searchQuery, settings.getSearchQuery())
             );
         }
     }

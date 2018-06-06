@@ -5,6 +5,8 @@
     <color name="primary_dark">#303F9F</color>
     <color name="accent">#FF4081</color>
 
+    <color name="primary_subdued">#5362b5</color>
+
     <color name="gray_1_dark">#484848</color>
     <color name="gray_2_darkish">#6b6b6b</color>
     <color name="gray_3_medium">#8c8c8c</color>
@@ -27,7 +29,7 @@
 
     <color name="hint_light">#80ffffff</color>
     <color name="hint_dark">#404040</color>
-    <color name="bg_input">#5362b5</color>
+    <color name="bg_input">@color/primary_subdued</color>
 
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  TRANSLATOR -->

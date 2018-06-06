@@ -14,6 +14,10 @@
         <item name="standard_input_field">@style/standard_input_field_light</item>
         <item name="common_transparent_background">@style/common_transparent_background_light</item>
 
+        <item name="highlight_color_text">?android:windowBackground</item>
+        <item name="highlight_color_bg">?android:textColor</item>
+        <item name="highlight_color_special">@color/primary_subdued</item>
+
         <!-- MaterialDrawer specific values -->
         <item name="material_drawer_background">@color/material_drawer_background</item>
         <item name="material_drawer_primary_text">@color/material_drawer_primary_text</item>
@@ -37,6 +41,10 @@
         <item name="translator_secondary_subtitle_line">@style/translator_secondary_subtitle_line.dark</item>
         <item name="standard_input_field">@style/standard_input_field_dark</item>
         <item name="common_transparent_background">@style/common_transparent_background_dark</item>
+
+        <item name="highlight_color_text">?android:windowBackground</item>
+        <item name="highlight_color_bg">?android:textColor</item>
+        <item name="highlight_color_special">@color/primary_subdued</item>
 
         <!-- MaterialDrawer specific values -->
         <item name="material_drawer_background">@color/material_drawer_dark_background</item>

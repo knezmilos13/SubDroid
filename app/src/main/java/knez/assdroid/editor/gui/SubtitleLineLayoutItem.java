@@ -2,9 +2,14 @@ package knez.assdroid.editor.gui;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.SpannableString;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -28,6 +33,10 @@ public class SubtitleLineLayoutItem extends FrameLayout {
 
     @Nullable private Callback listener;
     @Nullable private SubtitleLineVso subtitleLineVso;
+
+    @ColorInt private int highlightColorText;
+    @ColorInt private int highlightColorBg;
+    @ColorInt private int highlightColorSpecial;
 
     public SubtitleLineLayoutItem(Context context) {
         super(context);
@@ -53,6 +62,16 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     protected void init() {
         View view = inflate(getContext(), R.layout.item_subtitle_line, this);
         ButterKnife.bind(this);
+
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getContext().getTheme();
+
+        theme.resolveAttribute(R.attr.highlight_color_text, typedValue, true);
+        highlightColorText = typedValue.data;
+        theme.resolveAttribute(R.attr.highlight_color_bg, typedValue, true);
+        highlightColorBg = typedValue.data;
+        theme.resolveAttribute(R.attr.highlight_color_special, typedValue, true);
+        highlightColorSpecial = typedValue.data;
 
         view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -117,7 +136,24 @@ public class SubtitleLineLayoutItem extends FrameLayout {
     }
 
     private void handleSubtitleLineDisplay(@NonNull SubtitleLineVso subtitleLineVso) {
-        subtitleTextView.setText(subtitleLineVso.getText());
+
+        String query = subtitleLineVso.getSharedSettings().getSearchQuery();
+
+        if(query == null || query.length() == 0) {
+            subtitleTextView.setText(subtitleLineVso.getText());
+            return;
+        }
+
+        SpannableString spannableString = new SpannableString(subtitleLineVso.getText());
+        String searchableTextLowerCase = subtitleLineVso.getText().toLowerCase();
+        for (int idx = 0; (idx = searchableTextLowerCase.indexOf(query, idx)) >= 0; idx++) {
+            spannableString.setSpan(new BackgroundColorSpan(highlightColorBg),
+                    idx, idx + query.length(), 0);
+            spannableString.setSpan(new ForegroundColorSpan(highlightColorText),
+                    idx, idx + query.length(), 0);
+        }
+
+        subtitleTextView.setText(spannableString);
     }
 
     private void setFontSizes(int textSizeDp, int otherSizeDp) {

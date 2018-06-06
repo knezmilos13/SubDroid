@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -42,7 +43,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull private final IntPreference subLineOtherSizePreference;
     @NonNull private final BooleanPreference subLineShowTimingsPreference;
     @NonNull private final BooleanPreference subLineShowActorStylePreference;
-    @NonNull private final BooleanPreference simplifyTagsPreference; // TODO
+    @NonNull private final BooleanPreference simplifyTagsPreference;
 
     private EditorMVP.ViewInterface viewInterface;
     private boolean presenterInitialized = false;
@@ -53,10 +54,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private Future<?> vsosPartialCreationFuture;
     private Future<?> vsosTagReplacementChangeFuture;
 
-//    @NonNull private String[] currentSearchQuery = new String[0];
-    @NonNull private List<SubtitleLineVso> allSubtitleLineVsos = new ArrayList<>();
+    @Nullable private String currentSearchQuery = null;
+    @NonNull private final List<SubtitleLineVso> subtitleLineVsos = new ArrayList<>();
     @NonNull private final SubtitleLineVso.SharedSettings sharedSubtitleLineSettings;
-//    @NonNull private SolidList<SubtitleLineVso> filteredSubtitleLineVsos = SolidList.empty();
 
     public EditorPresenter(
             @NonNull SubtitleController subtitleController,
@@ -88,8 +88,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 subLineTextSizePreference.get(),
                 subLineOtherSizePreference.get(),
                 subLineShowTimingsPreference.get(),
-                subLineShowActorStylePreference.get()
-        );
+                subLineShowActorStylePreference.get(),
+                currentSearchQuery);
     }
 
 
@@ -105,7 +105,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
         // if reattaching to the same presenter (e.g. after orientation change)
         if(presenterInitialized) {
             showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
-            viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
+            viewInterface.showSubtitleLines(new ArrayList<>(subtitleLineVsos));
+
+            if(currentSearchQuery != null && currentSearchQuery.length() > 0)
+                viewInterface.showSearchQuery(currentSearchQuery);
 
             if(subtitleController.isLoadingFile()) viewInterface.showProgressLoadingFile();
             else if(subtitleController.isWritingFile()) viewInterface.showProgressSavingFile();
@@ -145,10 +148,42 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onSearchSubmitted(@NonNull final String text) {
-//        String[] newQuery = CommonTasks.getQueryPartsFromInput(text);
-//        if(CommonTasks.areSortedStringArraysEqual(currentSearchQuery, newQuery)) return;
-//        currentSearchQuery = newQuery;
-//        if(viewInterface == null) return;
+        if(Objects.equals(text, currentSearchQuery)) return;
+
+        currentSearchQuery = text;
+
+//        List<SubtitleLineVso> searchResults = getSearchResults(currentSearchQuery);
+        // TODO prebroj rezultate i to prikazi - ali pazi, sta ako ih brojis/cupas dok radi nesto na njima?
+        // zapravo najbolje da pricuvas sve rezultate, a kad se radi neka full promena moras da ih regenerises jbg
+        // u svakom slucaju async... i kad nadjes sve rezultate, oznacis prvi (i zabelezis na kojem si)
+
+        sharedSubtitleLineSettings.setSearchQuery(currentSearchQuery);
+
+        // TODO setuj koji je prvi rezultat da bi se hajlajtovao drugacije
+
+        if(viewInterface == null) return;
+
+        viewInterface.updateSubtitleLines();
+
+
+        // TODO ne zaboravi ciscenje search rezultata nakon loadovanja i slicno, ako ce da bude asinc task
+        // onda moras da otkazujes kad ugasi pretragu itd
+    }
+
+    @Override
+    public void onEndSearchRequested() {
+        currentSearchQuery = null;
+        viewInterface.endSearch();
+    }
+
+    @Override
+    public void onPrevSearchResultRequested() {
+        // TODO
+    }
+
+    @Override
+    public void onNextSearchResultRequested() {
+        // TODO
     }
 
     @Override
@@ -194,10 +229,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
         subtitleController.createNewSubtitleFile();
         SubtitleFile newlyCreatedSubtitleFile = subtitleController.getCurrentSubtitleFile();
         showSubtitleTitle(newlyCreatedSubtitleFile);
-        allSubtitleLineVsos = new ArrayList<>();
+        subtitleLineVsos.clear();
 
         if(viewInterface == null) return;
-        viewInterface.showSubtitleLines(new ArrayList<>(allSubtitleLineVsos));
+        viewInterface.showSubtitleLines(new ArrayList<>(subtitleLineVsos));
     }
 
     @Override
@@ -322,14 +357,14 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
                 if(Thread.interrupted()) return;
 
-                allSubtitleLineVsos = new ArrayList<>(vsos);
+                subtitleLineVsos.addAll(vsos);
 
                 if(viewInterface == null) return;
 
                 // Copy serves 2 purposes - makes us safe from changes by the view (which shouldn't
                 // happen, but better safe than sorry), and makes us safe from any changes that
-                // could happen to allSubtitleLineVsos between this thread and the main thread
-                List<SubtitleLineVso> listCopy = new ArrayList<>(allSubtitleLineVsos);
+                // could happen to subtitleLineVsos between this thread and the main thread
+                List<SubtitleLineVso> listCopy = new ArrayList<>(subtitleLineVsos);
                 mainThreader.justExecute(() -> viewInterface.showSubtitleLines(listCopy));
             }
         });
@@ -356,9 +391,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 );
 
                 for(SubtitleLineVso editedVso : vsos) {
-                    for (int i = 0; i < allSubtitleLineVsos.size(); i++) {
-                        if (allSubtitleLineVsos.get(i).getId() == editedVso.getId()) {
-                            allSubtitleLineVsos.set(i, editedVso);
+                    for (int i = 0; i < subtitleLineVsos.size(); i++) {
+                        if (subtitleLineVsos.get(i).getId() == editedVso.getId()) {
+                            subtitleLineVsos.set(i, editedVso);
                             break;
                         }
                     }
@@ -389,22 +424,22 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 if(subtitleController.getCurrentSubtitleFile() == null) return;
                 List<SubtitleLine> lines =
                         subtitleController.getCurrentSubtitleFile().getSubtitleContent().getSubtitleLines();
-                if(lines.size() != allSubtitleLineVsos.size()) {
+                if(lines.size() != subtitleLineVsos.size()) {
                     asyncCreateAllVsos(lines);
                     return;
                 }
 
                 if(simplifyTags)
                     subtitleLineVsoFactory.modifyTagReplacements(
-                            lines, allSubtitleLineVsos, tagReplacementPreference.get(),
+                            lines, subtitleLineVsos, tagReplacementPreference.get(),
                             subtitleController.getTagPrettifierForCurrentSubtitle(
                                     tagReplacementPreference.get()));
                 else
-                    subtitleLineVsoFactory.removeTagReplacements(lines, allSubtitleLineVsos);
+                    subtitleLineVsoFactory.removeTagReplacements(lines, subtitleLineVsos);
 
                 if(viewInterface == null) return;
 
-                mainThreader.justExecute(() -> viewInterface.showSubtitleLines(allSubtitleLineVsos));
+                mainThreader.justExecute(() -> viewInterface.showSubtitleLines(subtitleLineVsos));
             }
         });
     }

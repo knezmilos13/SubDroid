@@ -3,7 +3,6 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
-import knez.assdroid.Constants;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.translator.TranslatorActivity;
@@ -264,18 +263,24 @@ public class EditorActivity extends CommonSubtitleActivity
 
     @Override
     public void onXClicked() {
-	    // TODO temp
-        searchViewContainer.setVisibility(View.GONE);
-        searchViewShadow.setVisibility(View.GONE);
+	    presenter.onEndSearchRequested();
     }
     @Override
-    public void onSearchSubmitted(@NonNull String text) {}
+    public void onSearchSubmitted(@NonNull String text) {
+	    presenter.onSearchSubmitted(text);
+    }
     @Override
-    public void onLetterInputted(@NonNull String text) {}
+    public void onLetterInputted(@NonNull String text) {
+	    onSearchSubmitted(text);
+    }
     @Override
-    public void onPrevResultRequested() {}
+    public void onPrevResultRequested() {
+	    presenter.onPrevSearchResultRequested();
+    }
     @Override
-    public void onNextResultRequested() {}
+    public void onNextResultRequested() {
+	    presenter.onNextSearchResultRequested();
+    }
 
     private void onShowTimingsCheckChanged(boolean isChecked) {
         presenter.onShowTimingsSettingChanged(isChecked);
@@ -346,6 +351,20 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
+    public void endSearch() {
+	    searchView.setText("");
+        searchViewContainer.setVisibility(View.GONE);
+        searchViewShadow.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showSearchQuery(@NonNull String currentSearchQuery) {
+        searchViewContainer.setVisibility(View.VISIBLE);
+        searchViewShadow.setVisibility(View.VISIBLE);
+        searchView.setText(currentSearchQuery);
+    }
+
+    @Override
     public void hideProgress() {
 	    FadeAnimationHelper.fadeView(false, progressBar, false);
     }
@@ -367,9 +386,7 @@ public class EditorActivity extends CommonSubtitleActivity
 
     private void updateCenterText() {
         if(subtitleLinesAdapter.getItemCount() == 0 && centerTextView.getVisibility() == View.GONE) {
-            centerTextView.setText(searchView.getText().length() > 0?
-                    R.string.editor_subtitle_list_no_results_for_query
-                    : R.string.editor_subtitle_list_no_lines_in_file);
+            centerTextView.setText(R.string.editor_subtitle_list_no_lines_in_file);
             FadeAnimationHelper.fadeView(true, centerTextView, false);
         }
         else if(subtitleLinesAdapter.getItemCount() != 0 && centerTextView.getVisibility() == View.VISIBLE)

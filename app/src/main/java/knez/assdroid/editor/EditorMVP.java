@@ -30,6 +30,10 @@ public interface EditorMVP {
 
         void showCurrentQuickSettings(
                 boolean showTimings, boolean showActorStyle, boolean simplifyTags);
+
+        void endSearch();
+
+        void showSearchQuery(@NonNull String currentSearchQuery);
     }
 
     interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
@@ -49,6 +53,10 @@ public interface EditorMVP {
         void onShowTimingsSettingChanged(boolean isChecked);
         void onShowActorStyleSettingChanged(boolean isChecked);
         void onSimplifyTagsSettingChanged(boolean isChecked);
+
+        void onEndSearchRequested();
+        void onPrevSearchResultRequested();
+        void onNextSearchResultRequested();
     }
 
 }
