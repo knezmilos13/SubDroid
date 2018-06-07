@@ -34,6 +34,12 @@ public interface EditorMVP {
         void endSearch();
 
         void showSearchQuery(@NonNull String currentSearchQuery);
+
+        void showSearchNumbers(int size, int currentItem);
+
+        void updateSubtitleLine(@NonNull SubtitleLineVso subtitleLineVso);
+
+        void scrollToLine(@NonNull SubtitleLineVso subtitleLineVso);
     }
 
     interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {

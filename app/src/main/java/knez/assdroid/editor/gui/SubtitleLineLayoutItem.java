@@ -147,7 +147,8 @@ public class SubtitleLineLayoutItem extends FrameLayout {
         SpannableString spannableString = new SpannableString(subtitleLineVso.getText());
         String searchableTextLowerCase = subtitleLineVso.getText().toLowerCase();
         for (int idx = 0; (idx = searchableTextLowerCase.indexOf(query, idx)) >= 0; idx++) {
-            spannableString.setSpan(new BackgroundColorSpan(highlightColorBg),
+            spannableString.setSpan(new BackgroundColorSpan(
+                    subtitleLineVso.isPrimarySearchResult()? highlightColorSpecial : highlightColorBg),
                     idx, idx + query.length(), 0);
             spannableString.setSpan(new ForegroundColorSpan(highlightColorText),
                     idx, idx + query.length(), 0);

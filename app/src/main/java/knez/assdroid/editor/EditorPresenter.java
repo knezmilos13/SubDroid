@@ -53,10 +53,14 @@ public class EditorPresenter extends CommonSubtitlePresenter
     private Future<?> vsosCreationFuture;
     private Future<?> vsosPartialCreationFuture;
     private Future<?> vsosTagReplacementChangeFuture;
+    private Future<?> searchFuture;
 
     @Nullable private String currentSearchQuery = null;
     @NonNull private final List<SubtitleLineVso> subtitleLineVsos = new ArrayList<>();
     @NonNull private final SubtitleLineVso.SharedSettings sharedSubtitleLineSettings;
+    @Nullable private SubtitleLineVso currentSearchResultVso = null;
+    @NonNull private ArrayList<SubtitleLineVso> searchResults = new ArrayList<>();
+    private int currentSearchResultIndex = -1;
 
     public EditorPresenter(
             @NonNull SubtitleController subtitleController,
@@ -152,14 +156,9 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         currentSearchQuery = text;
 
-//        List<SubtitleLineVso> searchResults = getSearchResults(currentSearchQuery);
-        // TODO prebroj rezultate i to prikazi - ali pazi, sta ako ih brojis/cupas dok radi nesto na njima?
-        // zapravo najbolje da pricuvas sve rezultate, a kad se radi neka full promena moras da ih regenerises jbg
-        // u svakom slucaju async... i kad nadjes sve rezultate, oznacis prvi (i zabelezis na kojem si)
+        asyncSearch();
 
         sharedSubtitleLineSettings.setSearchQuery(currentSearchQuery);
-
-        // TODO setuj koji je prvi rezultat da bi se hajlajtovao drugacije
 
         if(viewInterface == null) return;
 
@@ -178,12 +177,50 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onPrevSearchResultRequested() {
-        // TODO
+        if(currentSearchResultIndex == -1 || searchResults.isEmpty() || currentSearchResultVso == null) return;
+        if(searchResults.size() == 1) return;
+
+        currentSearchResultVso.setPrimarySearchResult(false);
+        if(viewInterface != null) viewInterface.updateSubtitleLine(currentSearchResultVso);
+
+        if(currentSearchResultIndex == 0)
+            currentSearchResultIndex = searchResults.size() - 1;
+        else
+            currentSearchResultIndex--;
+
+        currentSearchResultVso = searchResults.get(currentSearchResultIndex);
+        currentSearchResultVso.setPrimarySearchResult(true);
+
+        if(viewInterface == null) return;
+
+        viewInterface.showSearchNumbers(searchResults.size(), currentSearchResultIndex);
+        viewInterface.updateSubtitleLine(currentSearchResultVso);
+        viewInterface.scrollToLine(currentSearchResultVso);
     }
+
+    // TODO ovo next/prev dira stvari koje mozda cackas sa drugog threada
 
     @Override
     public void onNextSearchResultRequested() {
-        // TODO
+        if(currentSearchResultIndex == -1 || searchResults.isEmpty() || currentSearchResultVso == null) return;
+        if(searchResults.size() == 1) return;
+
+        currentSearchResultVso.setPrimarySearchResult(false);
+        if(viewInterface != null) viewInterface.updateSubtitleLine(currentSearchResultVso);
+
+        if(currentSearchResultIndex == searchResults.size() - 1)
+            currentSearchResultIndex = 0;
+        else
+            currentSearchResultIndex++;
+
+        currentSearchResultVso = searchResults.get(currentSearchResultIndex);
+        currentSearchResultVso.setPrimarySearchResult(true);
+
+        if(viewInterface == null) return;
+
+        viewInterface.showSearchNumbers(searchResults.size(), currentSearchResultIndex);
+        viewInterface.updateSubtitleLine(currentSearchResultVso);
+        viewInterface.scrollToLine(currentSearchResultVso);
     }
 
     @Override
@@ -328,6 +365,53 @@ public class EditorPresenter extends CommonSubtitlePresenter
         sharedSubtitleLineSettings.setShowActorAndStyle(subLineShowActorStylePreference.get());
 
         if(viewInterface != null) viewInterface.updateSubtitleLines();
+    }
+
+    private void asyncSearch() {
+        String searchQuery = currentSearchQuery;
+        if(searchQuery == null) return;
+
+        if(searchFuture != null && !searchFuture.isDone())
+            searchFuture.cancel(true);
+
+        searchFuture = singleThreadExecutor.submit(() -> {
+            synchronized (vsoSyncObject) {
+                if(currentSearchResultVso != null) {
+                    currentSearchResultVso.setPrimarySearchResult(false);
+                    if(viewInterface != null)
+                        viewInterface.updateSubtitleLine(currentSearchResultVso);
+                }
+
+
+                searchResults.clear();
+                for(SubtitleLineVso subtitleLineVso : subtitleLineVsos) {
+                    if(subtitleLineVso.getText().contains(searchQuery))
+                        searchResults.add(subtitleLineVso);
+                }
+
+                if(searchResults.size() > 0) {
+                    currentSearchResultVso = searchResults.get(0);
+                    currentSearchResultIndex = 0;
+                } else {
+                    currentSearchResultVso = null;
+                    currentSearchResultIndex = -1;
+                }
+
+                if(viewInterface == null) return;
+
+
+                mainThreader.justExecute(() -> {
+                    if(searchResults.size() == 0) {
+                        viewInterface.showSearchNumbers(searchResults.size(), 0);
+                        return;
+                    }
+
+                    viewInterface.showSearchNumbers(searchResults.size(), 1);
+                    viewInterface.updateSubtitleLine(currentSearchResultVso);
+                    viewInterface.scrollToLine(currentSearchResultVso);
+                });
+            }
+        });
     }
 
     private void asyncCreateAllVsos(@NonNull List<SubtitleLine> subtitleLines) {

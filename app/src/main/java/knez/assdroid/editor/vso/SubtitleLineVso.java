@@ -18,6 +18,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
     @Nullable private final String style;
     private final int lineNumber;
     @NonNull private final SharedSettings sharedSettings;
+    private boolean isPrimarySearchResult;
 
     public SubtitleLineVso(
             long id,
@@ -28,6 +29,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
             @Nullable String actorName,
             @Nullable String style,
             int lineNumber,
+            boolean isPrimarySearchResult,
             @NonNull SharedSettings sharedSettings) {
         super(id);
         this.backgroundDrawable = backgroundDrawable;
@@ -37,6 +39,7 @@ public class SubtitleLineVso extends IdentifiableImpl {
         this.actorName = actorName;
         this.style = style;
         this.lineNumber = lineNumber;
+        this.isPrimarySearchResult = isPrimarySearchResult;
         this.sharedSettings = sharedSettings;
     }
 
@@ -48,8 +51,12 @@ public class SubtitleLineVso extends IdentifiableImpl {
     @Nullable public String getStyle() { return style; }
     public int getLineNumber() { return lineNumber; }
     @NonNull public SharedSettings getSharedSettings() { return sharedSettings; }
+    public boolean isPrimarySearchResult() { return isPrimarySearchResult; }
 
     public void setText(@NonNull String text) { this.text = text; }
+    public void setPrimarySearchResult(boolean primarySearchResult) {
+        isPrimarySearchResult = primarySearchResult;
+    }
 
     public boolean isIdenticalTo(@NonNull SubtitleLineVso line) {
         return this == line || (

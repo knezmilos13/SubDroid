@@ -46,6 +46,7 @@ public class SubtitleLineVsoFactory {
                             subtitleLine.getActorName(),
                             subtitleLine.getStyle(),
                             subtitleLine.getLineNumber(),
+                            false,
                             settings)
             );
         }

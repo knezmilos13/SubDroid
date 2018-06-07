@@ -365,6 +365,24 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
+    public void showSearchNumbers(int size, int currentItem) {
+        // TODO temp
+        Toast.makeText(this, size + "/" + currentItem, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void updateSubtitleLine(@NonNull SubtitleLineVso subtitleLineVso) {
+        subtitleLinesAdapter.updateItem(subtitleLineVso);
+    }
+
+    @Override
+    public void scrollToLine(@NonNull SubtitleLineVso subtitleLineVso) {
+        int position = subtitleLinesAdapter.getItemPositionForId((int) subtitleLineVso.getId());
+        if(position == -1) return;
+        itemListRecycler.scrollToPosition(position);
+    }
+
+    @Override
     public void hideProgress() {
 	    FadeAnimationHelper.fadeView(false, progressBar, false);
     }
