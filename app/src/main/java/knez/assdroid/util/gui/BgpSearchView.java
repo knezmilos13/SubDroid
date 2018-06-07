@@ -134,6 +134,14 @@ public class BgpSearchView extends FrameLayout {
         editText.append(text); // this way the cursor will be at the end after setting text
     }
 
+    public void setNumResults(int current, int total) {
+        numResultsView.setText(current + "/" + total);
+    }
+
+    public void hideNumResults() {
+        numResultsView.setText("");
+    }
+
     public String getText() {
         return editText.getText().toString();
     }

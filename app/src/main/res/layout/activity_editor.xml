@@ -40,7 +40,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:visibility="visible">
 
                 <knez.assdroid.util.gui.BgpSearchView
                     android:id="@+id/editor_search_view"

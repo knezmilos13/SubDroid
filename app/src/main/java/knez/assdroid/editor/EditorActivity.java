@@ -365,9 +365,8 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void showSearchNumbers(int size, int currentItem) {
-        // TODO temp
-        Toast.makeText(this, size + "/" + currentItem, Toast.LENGTH_LONG).show();
+    public void showSearchNumbers(int total, int currentIndex) {
+	    searchView.setNumResults(currentIndex, total);
     }
 
     @Override

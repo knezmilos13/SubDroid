@@ -370,7 +370,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         if(viewInterface == null) return;
 
-        viewInterface.showSearchNumbers(searchResults.size(), currentSearchResultIndex);
+        viewInterface.showSearchNumbers(searchResults.size(), currentSearchResultIndex + 1);
         viewInterface.updateSubtitleLine(currentSearchResultVso);
         viewInterface.scrollToLine(currentSearchResultVso);
     }
@@ -400,11 +400,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
                 if(searchResults.size() == 0) {
                     currentSearchResultVso = null;
                     currentSearchResultIndex = -1;
-
-                    mainThreader.justExecute(() -> {
-                        viewInterface.showSearchNumbers(searchResults.size(), 0);
-                    });
-
+                    mainThreader.justExecute(() -> viewInterface.showSearchNumbers(0, 0));
                     return;
                 }
 
