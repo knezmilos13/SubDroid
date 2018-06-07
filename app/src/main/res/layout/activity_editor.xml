@@ -18,7 +18,7 @@
         android:background="?attr/colorPrimary"
         android:layout_alignParentTop="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:popupTheme="?popup_theme"
         android:elevation="4dp" />
 
     <!-- the layout which will contain (host) the drawerLayout -->

@@ -14,6 +14,7 @@
     <attr name="translator_secondary_subtitle_line" format="reference" />
     <attr name="standard_input_field" format="reference" />
     <attr name="common_transparent_background" format="reference" />
+    <attr name="popup_theme" format="reference" />
 
     <attr name="highlight_color_text" format="reference" />
     <attr name="highlight_color_bg" format="reference" />
