@@ -1,6 +1,7 @@
 package knez.assdroid.editor;
 
 import android.net.Uri;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -166,7 +167,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
 
         // TODO ne zaboravi ciscenje search rezultata nakon loadovanja i slicno, ako ce da bude asinc task
-        // onda moras da otkazujes kad ugasi pretragu itd
+        // onda moras da otkazujes kad ugasi pretragu itd. Moras da prodjes kroz sve da prekontrolises.
     }
 
     @Override
@@ -180,22 +181,14 @@ public class EditorPresenter extends CommonSubtitlePresenter
         if(currentSearchResultIndex == -1 || searchResults.isEmpty() || currentSearchResultVso == null) return;
         if(searchResults.size() == 1) return;
 
-        currentSearchResultVso.setPrimarySearchResult(false);
-        if(viewInterface != null) viewInterface.updateSubtitleLine(currentSearchResultVso);
+        clearCurrentSearchResult();
 
         if(currentSearchResultIndex == 0)
             currentSearchResultIndex = searchResults.size() - 1;
         else
             currentSearchResultIndex--;
 
-        currentSearchResultVso = searchResults.get(currentSearchResultIndex);
-        currentSearchResultVso.setPrimarySearchResult(true);
-
-        if(viewInterface == null) return;
-
-        viewInterface.showSearchNumbers(searchResults.size(), currentSearchResultIndex);
-        viewInterface.updateSubtitleLine(currentSearchResultVso);
-        viewInterface.scrollToLine(currentSearchResultVso);
+        updateCurrentSearchResult();
     }
 
     // TODO ovo next/prev dira stvari koje mozda cackas sa drugog threada
@@ -205,22 +198,14 @@ public class EditorPresenter extends CommonSubtitlePresenter
         if(currentSearchResultIndex == -1 || searchResults.isEmpty() || currentSearchResultVso == null) return;
         if(searchResults.size() == 1) return;
 
-        currentSearchResultVso.setPrimarySearchResult(false);
-        if(viewInterface != null) viewInterface.updateSubtitleLine(currentSearchResultVso);
+        clearCurrentSearchResult();
 
         if(currentSearchResultIndex == searchResults.size() - 1)
             currentSearchResultIndex = 0;
         else
             currentSearchResultIndex++;
 
-        currentSearchResultVso = searchResults.get(currentSearchResultIndex);
-        currentSearchResultVso.setPrimarySearchResult(true);
-
-        if(viewInterface == null) return;
-
-        viewInterface.showSearchNumbers(searchResults.size(), currentSearchResultIndex);
-        viewInterface.updateSubtitleLine(currentSearchResultVso);
-        viewInterface.scrollToLine(currentSearchResultVso);
+        updateCurrentSearchResult();
     }
 
     @Override
@@ -358,6 +343,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
+    @MainThread
     private void updateSubtitleLineSharedSettings() {
         sharedSubtitleLineSettings.setTextSize(subLineTextSizePreference.get());
         sharedSubtitleLineSettings.setOtherSize(subLineOtherSizePreference.get());
@@ -366,6 +352,31 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         if(viewInterface != null) viewInterface.updateSubtitleLines();
     }
+
+    @MainThread
+    private void clearCurrentSearchResult() {
+        if(currentSearchResultVso == null) return;
+
+        currentSearchResultVso.setPrimarySearchResult(false);
+        if(viewInterface != null) viewInterface.updateSubtitleLine(currentSearchResultVso);
+
+        currentSearchResultVso = null;
+    }
+
+    @MainThread
+    private void updateCurrentSearchResult() {
+        currentSearchResultVso = searchResults.get(currentSearchResultIndex);
+        currentSearchResultVso.setPrimarySearchResult(true);
+
+        if(viewInterface == null) return;
+
+        viewInterface.showSearchNumbers(searchResults.size(), currentSearchResultIndex);
+        viewInterface.updateSubtitleLine(currentSearchResultVso);
+        viewInterface.scrollToLine(currentSearchResultVso);
+    }
+
+
+    // ---------------------------------------------------------------------------- INTERNAL - ASYNC
 
     private void asyncSearch() {
         String searchQuery = currentSearchQuery;
@@ -376,12 +387,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         searchFuture = singleThreadExecutor.submit(() -> {
             synchronized (vsoSyncObject) {
-                if(currentSearchResultVso != null) {
-                    currentSearchResultVso.setPrimarySearchResult(false);
-                    if(viewInterface != null)
-                        viewInterface.updateSubtitleLine(currentSearchResultVso);
-                }
-
+                // Clear old results
+                mainThreader.justExecute(this::clearCurrentSearchResult);
 
                 searchResults.clear();
                 for(SubtitleLineVso subtitleLineVso : subtitleLineVsos) {
@@ -389,27 +396,21 @@ public class EditorPresenter extends CommonSubtitlePresenter
                         searchResults.add(subtitleLineVso);
                 }
 
-                if(searchResults.size() > 0) {
-                    currentSearchResultVso = searchResults.get(0);
-                    currentSearchResultIndex = 0;
-                } else {
+                // If zero results, clear stuff out and show 0/0 results
+                if(searchResults.size() == 0) {
                     currentSearchResultVso = null;
                     currentSearchResultIndex = -1;
+
+                    mainThreader.justExecute(() -> {
+                        viewInterface.showSearchNumbers(searchResults.size(), 0);
+                    });
+
+                    return;
                 }
 
-                if(viewInterface == null) return;
+                currentSearchResultIndex = 0;
 
-
-                mainThreader.justExecute(() -> {
-                    if(searchResults.size() == 0) {
-                        viewInterface.showSearchNumbers(searchResults.size(), 0);
-                        return;
-                    }
-
-                    viewInterface.showSearchNumbers(searchResults.size(), 1);
-                    viewInterface.updateSubtitleLine(currentSearchResultVso);
-                    viewInterface.scrollToLine(currentSearchResultVso);
-                });
+                mainThreader.justExecute(this::updateCurrentSearchResult);
             }
         });
     }
