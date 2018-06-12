@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -160,6 +161,12 @@ public class BgpSearchView extends FrameLayout {
     @OnClick(R.id.bgp_search_view_next_icon)
     protected void onNextIconClicked() {
         if (listener != null) listener.onNextResultRequested();
+    }
+
+    public void focusToInputField() {
+        editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(imm != null) imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
     }
 
     public interface Listener {

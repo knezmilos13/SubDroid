@@ -218,7 +218,8 @@ public class EditorActivity extends CommonSubtitleActivity
 		    case R.id.menu_item_search:
                 searchViewContainer.setVisibility(View.VISIBLE);
                 searchViewShadow.setVisibility(View.VISIBLE);
-		        break;
+                searchView.focusToInputField();
+                break;
 			case R.id.menu_item_create_subtitle:
 			    presenter.onNewSubtitleRequested();
 				break;
