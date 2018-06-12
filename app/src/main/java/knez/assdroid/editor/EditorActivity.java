@@ -3,7 +3,6 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
-import knez.assdroid.common.data.IdentifiableImpl;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.translator.TranslatorActivity;
@@ -321,9 +320,9 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void removeAllCurrentSubtitleData() {
+    public void removeAllSubtitleLines() {
 	    subtitleLinesAdapter.clear();
-        setSearchText("");
+        updateCenterText();
     }
 
     @Override

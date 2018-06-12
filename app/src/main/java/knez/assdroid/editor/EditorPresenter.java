@@ -295,7 +295,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
         onEndSearchRequested();
 
         if(viewInterface != null) {
-            viewInterface.removeAllCurrentSubtitleData(); // TODO obrisi ovu metodu pa imaj odvojeno za linije i za search (kao sto vec imas mozda)
+            if(currentSearchQuery != null) onEndSearchRequested();
+            viewInterface.removeAllSubtitleLines();
             showSubtitleTitle(subtitleFile);
             viewInterface.hideProgress();
         }

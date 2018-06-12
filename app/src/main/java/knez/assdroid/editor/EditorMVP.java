@@ -13,8 +13,6 @@ import knez.assdroid.editor.vso.SubtitleLineVso;
 public interface EditorMVP {
 
     interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
-        void removeAllCurrentSubtitleData();
-
         void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename);
         void showErrorLoadingFailed(@NonNull String subtitleFilename);
 
@@ -23,6 +21,7 @@ public interface EditorMVP {
                                @NonNull DiffUtil.DiffResult result);
         void updateSubtitleLines(@NonNull List<SubtitleLineVso> editedVsos);
         void updateSubtitleLines();
+        void removeAllSubtitleLines();
 
         void showTranslatorScreen(long lineId);
 
