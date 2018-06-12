@@ -31,15 +31,18 @@ public interface EditorMVP {
         void showCurrentQuickSettings(
                 boolean showTimings, boolean showActorStyle, boolean simplifyTags);
 
-        void endSearch();
+        void closeSearchSection();
 
-        void showSearchQuery(@NonNull String currentSearchQuery);
+        void showSearchSectionWithQuery(@NonNull String currentSearchQuery);
 
         void showSearchNumbers(int size, int currentItem);
+        void hideSearchNumbers();
 
         void updateSubtitleLine(@NonNull SubtitleLineVso subtitleLineVso);
 
         void scrollToLine(@NonNull SubtitleLineVso subtitleLineVso);
+
+        int getFirstShownLineNumber();
     }
 
     interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {

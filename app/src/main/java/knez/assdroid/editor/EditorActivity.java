@@ -3,6 +3,7 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.App;
+import knez.assdroid.common.data.IdentifiableImpl;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.translator.TranslatorActivity;
@@ -44,7 +45,7 @@ import java.util.List;
 import static knez.assdroid.editor.EditorMVP.*;
 
 public class EditorActivity extends CommonSubtitleActivity
-        implements ViewInterface, SubtitleLineLayoutItem.Callback, BgpSearchView.Listener {
+        implements ViewInterface, SubtitleLineLayoutItem.Callback {
 
     private static final int REQUEST_CODE_OPEN_SUBTITLE = 1234;
     private static final int REQUEST_CODE_TRANSLATOR_ACTIVITY = 500;
@@ -103,12 +104,14 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
     protected void onResume() {
         super.onResume();
-        searchView.setListener(this);
+        searchView.setListener(searchViewListener);
+        hasInitiallySetSearchListener = true;
     }
 
     @Override
     protected void onPause() {
         searchView.setListener(null);
+        hasInitiallySetSearchListener = false;
         super.onPause();
     }
 
@@ -261,26 +264,32 @@ public class EditorActivity extends CommonSubtitleActivity
 	    presenter.onSubtitleLineClicked(subtitleLineVso.getId());
     }
 
-    @Override
-    public void onXClicked() {
-	    presenter.onEndSearchRequested();
-    }
-    @Override
-    public void onSearchSubmitted(@NonNull String text) {
-	    presenter.onSearchSubmitted(text);
-    }
-    @Override
-    public void onLetterInputted(@NonNull String text) {
-	    onSearchSubmitted(text);
-    }
-    @Override
-    public void onPrevResultRequested() {
-	    presenter.onPrevSearchResultRequested();
-    }
-    @Override
-    public void onNextResultRequested() {
-	    presenter.onNextSearchResultRequested();
-    }
+    // Helps with listener complicating things when it gets fired because of automatic restore
+    // instance state. Needed when manually removing/adding listener to avoid firing when
+    // programmatically changing text
+    boolean hasInitiallySetSearchListener = false;
+    @NonNull BgpSearchView.Listener searchViewListener = new BgpSearchView.Listener() {
+        @Override
+        public void onXClicked() {
+            presenter.onEndSearchRequested();
+        }
+        @Override
+        public void onSearchSubmitted(@NonNull String text) {
+            presenter.onSearchSubmitted(text);
+        }
+        @Override
+        public void onLetterInputted(@NonNull String text) {
+            onSearchSubmitted(text);
+        }
+        @Override
+        public void onPrevResultRequested() {
+            presenter.onPrevSearchResultRequested();
+        }
+        @Override
+        public void onNextResultRequested() {
+            presenter.onNextSearchResultRequested();
+        }
+    };
 
     private void onShowTimingsCheckChanged(boolean isChecked) {
         presenter.onShowTimingsSettingChanged(isChecked);
@@ -314,7 +323,7 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
     public void removeAllCurrentSubtitleData() {
 	    subtitleLinesAdapter.clear();
-	    searchView.setText("");
+        setSearchText("");
     }
 
     @Override
@@ -351,22 +360,28 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    public void endSearch() {
-	    searchView.setText("");
+    public void closeSearchSection() {
+        setSearchText("");
         searchViewContainer.setVisibility(View.GONE);
         searchViewShadow.setVisibility(View.GONE);
     }
 
     @Override
-    public void showSearchQuery(@NonNull String currentSearchQuery) {
+    public void showSearchSectionWithQuery(@NonNull String currentSearchQuery) {
         searchViewContainer.setVisibility(View.VISIBLE);
         searchViewShadow.setVisibility(View.VISIBLE);
-        searchView.setText(currentSearchQuery);
+        setSearchText(currentSearchQuery);
+        // TODO nabaci fokus odmah na search view
     }
 
     @Override
     public void showSearchNumbers(int total, int currentIndex) {
 	    searchView.setNumResults(currentIndex, total);
+    }
+
+    @Override
+    public void hideSearchNumbers() {
+        searchView.hideNumResults();
     }
 
     @Override
@@ -379,6 +394,14 @@ public class EditorActivity extends CommonSubtitleActivity
         int position = subtitleLinesAdapter.getItemPositionForId((int) subtitleLineVso.getId());
         if(position == -1) return;
         itemListRecycler.scrollToPosition(position);
+    }
+
+    @Override
+    public int getFirstShownLineNumber() {
+        int firstVisiblePosition = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
+        if(firstVisiblePosition == RecyclerView.NO_POSITION) return 0;
+
+        return ((SubtitleLineVso) subtitleLinesAdapter.getItem(firstVisiblePosition)).getLineNumber();
     }
 
     @Override
@@ -400,6 +423,12 @@ public class EditorActivity extends CommonSubtitleActivity
 
 
     // ------------------------------------------------------------------------------------ INTERNAL
+
+    private void setSearchText(@NonNull String text) {
+        searchView.setListener(null);
+        searchView.setText(text);
+        if(hasInitiallySetSearchListener) searchView.setListener(searchViewListener);
+    }
 
     private void updateCenterText() {
         if(subtitleLinesAdapter.getItemCount() == 0 && centerTextView.getVisibility() == View.GONE) {
