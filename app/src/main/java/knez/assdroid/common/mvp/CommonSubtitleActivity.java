@@ -3,14 +3,14 @@ package knez.assdroid.common.mvp;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.jakewharton.processphoenix.ProcessPhoenix;
 
 import java.util.HashSet;
 
@@ -36,8 +36,6 @@ public abstract class CommonSubtitleActivity extends CommonThemeableActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         logger = App.getAppComponent().getLogger();
     }
@@ -172,9 +170,7 @@ public abstract class CommonSubtitleActivity extends CommonThemeableActivity
 
     @Override
     public void updateTheme() {
-        recreate();
-        // Note: new theme will be set in onCreate where we will access current theme before
-        // presenter is instantiated
+        ProcessPhoenix.triggerRebirth(this);
     }
 
 }
