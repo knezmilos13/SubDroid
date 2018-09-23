@@ -9,18 +9,18 @@ import javax.inject.Singleton;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import dagger.android.AndroidInjectionModule;
 import knez.assdroid.App;
 import knez.assdroid.common.util.AppConfig;
 import knez.assdroid.editor.EditorMVP;
-import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.translator.TranslatorMVP;
 import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 @Singleton
 @Component(modules = {
-        AppContextModule.class, SubtitleModule.class, ViewFactoryModule.class, DbModule.class,
-        PreferencesModule.class
+        AndroidInjectionModule.class, ActivityBuilderModule.class, AppContextModule.class,
+        SubtitleModule.class, ViewFactoryModule.class, DbModule.class, PreferencesModule.class
 })
 public interface AppComponent {
 
@@ -31,6 +31,8 @@ public interface AppComponent {
         @BindsInstance Builder refWatcherInstance(RefWatcher refWatcher);
         AppComponent build();
     }
+
+    void inject(App app);
 
     Timber.Tree getLogger();
     RefWatcher getRefWatcher();

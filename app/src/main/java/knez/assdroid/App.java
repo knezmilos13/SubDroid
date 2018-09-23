@@ -1,5 +1,6 @@
 package knez.assdroid;
 
+import android.app.Activity;
 import android.app.Application;
 import android.os.StrictMode;
 
@@ -10,6 +11,11 @@ import com.joanzapata.iconify.fonts.FontAwesomeModule;
 import com.joanzapata.iconify.fonts.MaterialModule;
 import com.squareup.leakcanary.LeakCanary;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
 import io.fabric.sdk.android.Fabric;
 import knez.assdroid.common.injection.AppComponent;
 import knez.assdroid.common.injection.DaggerAppComponent;
@@ -17,9 +23,15 @@ import knez.assdroid.common.util.AppConfig;
 import knez.assdroid.util.logging.CrashlyticsTree;
 import timber.log.Timber;
 
-public class App extends Application {
+public class App extends Application implements HasActivityInjector {
 
 	private static AppComponent appComponent;
+	@Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
+
+    @Override
+    public AndroidInjector<Activity> activityInjector() {
+        return dispatchingActivityInjector;
+    }
 
 	@Override
 	public void onCreate() {
@@ -31,6 +43,7 @@ public class App extends Application {
 
 
 		appComponent = buildDaggerComponent();
+		appComponent.inject(this);
 
 		Iconify.with(new FontAwesomeModule())
 				.with(new MaterialModule());

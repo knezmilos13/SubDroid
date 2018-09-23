@@ -15,6 +15,7 @@ import com.jakewharton.processphoenix.ProcessPhoenix;
 import java.util.HashSet;
 
 import butterknife.BindView;
+import dagger.android.AndroidInjection;
 import knez.assdroid.App;
 import knez.assdroid.R;
 import knez.assdroid.help.KategorijeHelpaAktivnost;
@@ -35,6 +36,8 @@ public abstract class CommonSubtitleActivity extends CommonThemeableActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
+
         super.onCreate(savedInstanceState);
 
         logger = App.getAppComponent().getLogger();

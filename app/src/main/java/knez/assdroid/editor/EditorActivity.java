@@ -2,6 +2,7 @@ package knez.assdroid.editor;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.AndroidInjection;
 import knez.assdroid.App;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
