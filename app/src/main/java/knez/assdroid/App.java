@@ -26,7 +26,9 @@ import timber.log.Timber;
 public class App extends Application implements HasActivityInjector {
 
 	private static AppComponent appComponent;
-	@Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
+
+    @Inject protected DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
+	@Inject protected Timber.Tree logger;
 
     @Override
     public AndroidInjector<Activity> activityInjector() {
@@ -53,7 +55,7 @@ public class App extends Application implements HasActivityInjector {
 		// this logger is configured in the following line, but you need a reference before that
 		setUpLoggingAndExceptionHandling();
 
-		appComponent.getLogger().v("Application class initialized");
+		logger.v("Application class initialized");
 	}
 
 	// Overridden in test app class (which is a subclass of this app class)

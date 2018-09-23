@@ -4,7 +4,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnEditorAction;
-import knez.assdroid.App;
 import knez.assdroid.R;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
@@ -30,6 +29,8 @@ import com.joanzapata.iconify.fonts.MaterialIcons;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import static knez.assdroid.translator.TranslatorMVP.*;
 
 public class TranslatorActivity extends CommonSubtitleActivity implements ViewInterface {
@@ -52,7 +53,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     @BindView(R.id.translator_commit_indicator) protected ImageView commitIndicatorView;
     @BindView(R.id.toolbar) protected Toolbar toolbar;
 
-    private PresenterInterface presenter;
+    @Inject protected PresenterInterface presenter;
 
 
     // ----------------------------------------------------------------------------------- LIFECYCLE
@@ -64,8 +65,6 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
         ButterKnife.bind(this);
 
         setUpViews();
-
-        presenter = App.getAppComponent().getTranslatorPresenter();
 
         if(savedInstanceState != null) {
             InternalState state = (InternalState)

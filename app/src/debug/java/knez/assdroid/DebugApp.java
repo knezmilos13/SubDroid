@@ -19,7 +19,7 @@ public class DebugApp extends App {
         super.setUpLoggingAndExceptionHandling();
         Timber.plant(new DebugTree(BuildConfig.DEBUG_LOG_CURRENT_THREAD));
 
-        registerActivityLifecycleCallbacks(new ActivityLifecycleLogger(getAppComponent().getLogger()));
+        registerActivityLifecycleCallbacks(new ActivityLifecycleLogger(logger));
     }
 
 }

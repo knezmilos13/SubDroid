@@ -15,18 +15,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import knez.assdroid.App;
-import knez.assdroid.editor.EditorMVP;
-import knez.assdroid.editor.EditorPresenter;
-import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
-import knez.assdroid.subtitle.SubtitleController;
-import knez.assdroid.subtitle.data.SubtitleLine;
-import knez.assdroid.translator.TranslatorMVP;
-import knez.assdroid.translator.TranslatorPresenter;
-import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
-import knez.assdroid.util.preferences.BooleanPreference;
-import knez.assdroid.util.preferences.IntPreference;
-import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 @Module(includes = { GsonModule.class, StorageHelperModule.class, FileHandlerModule.class })
@@ -53,41 +42,6 @@ class AppContextModule {
     @Provides @Singleton
     Timber.Tree getLogger() {
         return Timber.asTree();
-    }
-
-
-    // ---------------------------------------------------------------------------------- PRESENTERS
-
-    @Provides
-    EditorMVP.PresenterInterface getEditorPresenter(
-            SubtitleController subtitleController,
-            SubtitleLineVsoFactory subtitleLineVsoFactory,
-            FileHandler fileHandler,
-            @Named("singleThreadExecutor") ExecutorService singleThreadExecutor,
-            @Named("mainThreader") Threader mainThreader,
-            Timber.Tree logger,
-            @Named("tagReplacement") StringPreference tagReplacementPreference,
-            @Named("subLineTextSize")IntPreference subLineTextSizePreference,
-            @Named("subLineOtherSize") IntPreference subLineOtherSizePreference,
-            @Named("subLineShowTimings") BooleanPreference subLineShowTimingsPreference,
-            @Named("subLineShowStyleActor") BooleanPreference subLineShowStyleActorPreference,
-            @Named("simplifyTags") BooleanPreference simplifyTagsPreference,
-            @Named("theme") StringPreference themePreference) {
-        return new EditorPresenter(
-                subtitleController, subtitleLineVsoFactory, fileHandler, singleThreadExecutor,
-                mainThreader, logger,
-                tagReplacementPreference, subLineTextSizePreference, subLineOtherSizePreference,
-                subLineShowTimingsPreference, subLineShowStyleActorPreference,
-                simplifyTagsPreference);
-    }
-
-    @Provides
-    TranslatorMVP.PresenterInterface getTranslatorPresenter(
-            SubtitleController subtitleController, SubtitleLine.Builder subLineBuilder,
-            Timber.Tree logger, FileHandler fileHandler,
-            @Named("tagReplacement") StringPreference tagReplacementPreference) {
-        return new TranslatorPresenter(subtitleController, subLineBuilder, logger, fileHandler,
-                tagReplacementPreference);
     }
 
 }

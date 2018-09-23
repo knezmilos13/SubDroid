@@ -14,9 +14,10 @@ import com.jakewharton.processphoenix.ProcessPhoenix;
 
 import java.util.HashSet;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import dagger.android.AndroidInjection;
-import knez.assdroid.App;
 import knez.assdroid.R;
 import knez.assdroid.help.KategorijeHelpaAktivnost;
 import knez.assdroid.settings.SettingsActivity;
@@ -32,16 +33,7 @@ public abstract class CommonSubtitleActivity extends CommonThemeableActivity
     @BindView(R.id.subtitle_processing_progress) protected View progressBar;
     @BindView(R.id.subtitle_processing_text) protected TextView progressLabel;
 
-    protected Timber.Tree logger;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        AndroidInjection.inject(this);
-
-        super.onCreate(savedInstanceState);
-
-        logger = App.getAppComponent().getLogger();
-    }
+    @Inject protected Timber.Tree logger;
 
     protected abstract CommonSubtitleMVP.PresenterInterface getPresenter();
 

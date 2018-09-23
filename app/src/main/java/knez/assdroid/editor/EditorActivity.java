@@ -2,8 +2,6 @@ package knez.assdroid.editor;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import dagger.android.AndroidInjection;
-import knez.assdroid.App;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
 import knez.assdroid.common.mvp.CommonSubtitleMVP;
 import knez.assdroid.translator.TranslatorActivity;
@@ -42,6 +40,9 @@ import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import static knez.assdroid.editor.EditorMVP.*;
 
 public class EditorActivity extends CommonSubtitleActivity
@@ -61,6 +62,7 @@ public class EditorActivity extends CommonSubtitleActivity
     @BindView(R.id.editor_center_text) protected TextView centerTextView;
     @BindView(R.id.toolbar) protected Toolbar toolbar;
 
+    @Inject protected Provider<PresenterInterface> presenterProvider;
     private PresenterInterface presenter;
     private IdentifiableAdapter subtitleLinesAdapter;
     private LinearLayoutManager linearLayoutManager;
@@ -85,7 +87,7 @@ public class EditorActivity extends CommonSubtitleActivity
         if(retainedInstance != null && retainedInstance instanceof PresenterInterface) {
             presenter = (PresenterInterface) retainedInstance;
         } else {
-            presenter = App.getAppComponent().getEditorPresenter();
+            presenter = presenterProvider.get();
         }
 
         presenter.onAttach(this);

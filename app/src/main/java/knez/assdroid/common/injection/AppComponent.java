@@ -34,11 +34,6 @@ public interface AppComponent {
 
     void inject(App app);
 
-    Timber.Tree getLogger();
-    RefWatcher getRefWatcher();
-    EditorMVP.PresenterInterface getEditorPresenter();
-    TranslatorMVP.PresenterInterface getTranslatorPresenter();
     Context getContext(); // TODO: ko koristi ovo da predje na druge klase
-    @Named("theme") StringPreference getThemePreference();
 
 }

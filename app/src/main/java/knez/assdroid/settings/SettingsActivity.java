@@ -2,11 +2,11 @@ package knez.assdroid.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.AndroidInjection;
 import knez.assdroid.R;
 import knez.assdroid.common.mvp.CommonThemeableActivity;
 
@@ -18,6 +18,8 @@ public class SettingsActivity extends CommonThemeableActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
@@ -29,8 +31,6 @@ public class SettingsActivity extends CommonThemeableActivity {
                 .replace(R.id.settings_content, new SettingsFragment())
                 .commit();
     }
-
-    // TODO - when theme setting is changed, apply it to settings activity immediately
 
     @Override
     public void onBackPressed() {
