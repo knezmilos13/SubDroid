@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.squareup.leakcanary.RefWatcher;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.BindsInstance;
@@ -12,10 +11,6 @@ import dagger.Component;
 import dagger.android.AndroidInjectionModule;
 import knez.assdroid.App;
 import knez.assdroid.common.util.AppConfig;
-import knez.assdroid.editor.EditorMVP;
-import knez.assdroid.translator.TranslatorMVP;
-import knez.assdroid.util.preferences.StringPreference;
-import timber.log.Timber;
 
 @Singleton
 @Component(modules = {

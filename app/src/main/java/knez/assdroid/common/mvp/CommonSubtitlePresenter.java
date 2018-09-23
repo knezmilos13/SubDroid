@@ -69,7 +69,8 @@ public abstract class CommonSubtitlePresenter
     public void onSaveClicked() {
         SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
         if(currentSubtitleFile == null) {
-            getViewInterface().showErrorCantSaveMissingFile();
+            CommonSubtitleMVP.ViewInterface viewInterface = getViewInterface();
+            if(viewInterface != null) viewInterface.showErrorCantSaveMissingFile();
             return;
         }
 

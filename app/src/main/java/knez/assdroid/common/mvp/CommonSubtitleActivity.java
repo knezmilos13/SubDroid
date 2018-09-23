@@ -2,7 +2,6 @@ package knez.assdroid.common.mvp;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import dagger.android.AndroidInjection;
 import knez.assdroid.R;
 import knez.assdroid.help.KategorijeHelpaAktivnost;
 import knez.assdroid.settings.SettingsActivity;

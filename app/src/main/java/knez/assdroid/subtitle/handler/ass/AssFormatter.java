@@ -2,7 +2,6 @@ package knez.assdroid.subtitle.handler.ass;
 
 import android.support.annotation.NonNull;
 
-import org.threeten.bp.LocalTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.ArrayList;

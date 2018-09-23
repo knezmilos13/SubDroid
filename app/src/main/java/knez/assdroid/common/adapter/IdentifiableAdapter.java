@@ -88,12 +88,12 @@ public class IdentifiableAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return mappedViewTypesToPacks.get(viewType).getLayoutItem(context);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Identifiable currentEntity = allItems.get(position);
         getPackForClass(currentEntity.getClass()).showDataInLayoutItem(holder, currentEntity);
     }

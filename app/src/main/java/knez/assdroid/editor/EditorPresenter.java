@@ -65,7 +65,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull private ArrayList<SubtitleLineVso> searchResults = new ArrayList<>();
     private int activeSearchResultIndex = -1;
 
-    public EditorPresenter(
+    EditorPresenter(
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLineVsoFactory subtitleLineVsoFactory,
             @NonNull FileHandler fileHandler,
