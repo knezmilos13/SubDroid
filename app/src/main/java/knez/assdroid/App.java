@@ -21,77 +21,77 @@ import timber.log.Timber;
 
 public class App extends Application implements HasActivityInjector {
 
-	private static AppComponent appComponent;
+    private static AppComponent appComponent;
 
     @Inject protected DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
-	@Inject protected Timber.Tree logger;
+    @Inject protected Timber.Tree logger;
 
     @Override
     public AndroidInjector<Activity> activityInjector() {
         return dispatchingActivityInjector;
     }
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-		if (LeakCanary.isInAnalyzerProcess(this)) return;
+        if (LeakCanary.isInAnalyzerProcess(this)) return;
 
-		if(BuildConfig.DEBUG && BuildConfig.STRICT_MODE) enableStrictMode();
-
-
-		appComponent = buildDaggerComponent();
-		appComponent.inject(this);
-
-		AndroidThreeTen.init(this);
-
-		// this logger is configured in the following line, but you need a reference before that
-		setUpLoggingAndExceptionHandling();
-
-		logger.v("Application class initialized");
-	}
-
-	// Overridden in test app class (which is a subclass of this app class)
-	protected AppComponent buildDaggerComponent() {
-		return DaggerAppComponent
-				.builder()
-				.appInstance(this)
-				.refWatcherInstance(LeakCanary.install(this))
-				.build();
-	}
-
-	protected void setUpLoggingAndExceptionHandling() {
-		Fabric.with(this, new Crashlytics());
-
-		Crashlytics.setString("GIT SHA", BuildConfig.GIT_SHA);
-		Crashlytics.setLong("BUILD TIME", BuildConfig.GIT_TIMESTAMP);
-
-		Timber.plant(new CrashlyticsTree());
-	}
+        if(BuildConfig.DEBUG && BuildConfig.STRICT_MODE) enableStrictMode();
 
 
-	// ------------------------------------------------------------------------------ PUBLIC HELPERS
+        appComponent = buildDaggerComponent();
+        appComponent.inject(this);
 
-	public static AppComponent getAppComponent() { return appComponent; }
+        AndroidThreeTen.init(this);
+
+        // this logger is configured in the following line, but you need a reference before that
+        setUpLoggingAndExceptionHandling();
+
+        logger.v("Application class initialized");
+    }
+
+    // Overridden in test app class (which is a subclass of this app class)
+    protected AppComponent buildDaggerComponent() {
+        return DaggerAppComponent
+                .builder()
+                .appInstance(this)
+                .refWatcherInstance(LeakCanary.install(this))
+                .build();
+    }
+
+    protected void setUpLoggingAndExceptionHandling() {
+        Fabric.with(this, new Crashlytics());
+
+        Crashlytics.setString("GIT SHA", BuildConfig.GIT_SHA);
+        Crashlytics.setLong("BUILD TIME", BuildConfig.GIT_TIMESTAMP);
+
+        Timber.plant(new CrashlyticsTree());
+    }
 
 
-	// ------------------------------------------------------------------------------------ INTERNAL
+    // ------------------------------------------------------------------------------ PUBLIC HELPERS
 
-	private static void enableStrictMode() {
-		StrictMode.ThreadPolicy.Builder threadPolicyBuilder =
-				new StrictMode.ThreadPolicy.Builder()
-						.detectAll()
-						.penaltyFlashScreen()
-						.penaltyLog();
-		StrictMode.VmPolicy.Builder vmPolicyBuilder =
-				new StrictMode.VmPolicy.Builder()
-						.detectAll()
-						.penaltyLog();
+    public static AppComponent getAppComponent() { return appComponent; }
 
-		threadPolicyBuilder.penaltyFlashScreen();
 
-		StrictMode.setThreadPolicy(threadPolicyBuilder.build());
-		StrictMode.setVmPolicy(vmPolicyBuilder.build());
-	}
+    // ------------------------------------------------------------------------------------ INTERNAL
+
+    private static void enableStrictMode() {
+        StrictMode.ThreadPolicy.Builder threadPolicyBuilder =
+                new StrictMode.ThreadPolicy.Builder()
+                        .detectAll()
+                        .penaltyFlashScreen()
+                        .penaltyLog();
+        StrictMode.VmPolicy.Builder vmPolicyBuilder =
+                new StrictMode.VmPolicy.Builder()
+                        .detectAll()
+                        .penaltyLog();
+
+        threadPolicyBuilder.penaltyFlashScreen();
+
+        StrictMode.setThreadPolicy(threadPolicyBuilder.build());
+        StrictMode.setVmPolicy(vmPolicyBuilder.build());
+    }
 
 }
