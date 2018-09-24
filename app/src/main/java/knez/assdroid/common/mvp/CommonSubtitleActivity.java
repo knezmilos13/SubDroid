@@ -23,7 +23,7 @@ import knez.assdroid.util.gui.FadeAnimationHelper;
 import timber.log.Timber;
 
 public abstract class CommonSubtitleActivity extends CommonThemeableActivity
-        implements CommonSubtitleMvp2.ViewInterface {
+        implements CommonSubtitleMvp.ViewInterface {
 
     private static final int REQUEST_CODE_SETTINGS_ACTIVITY = 501;
     private static final int REQUEST_CODE_SAVE_SUBTITLE = 1235;
@@ -33,7 +33,7 @@ public abstract class CommonSubtitleActivity extends CommonThemeableActivity
 
     @Inject protected Timber.Tree logger;
 
-    protected abstract CommonSubtitleMvp2.PresenterInterface getPresenter();
+    protected abstract CommonSubtitleMvp.PresenterInterface getPresenter();
 
 
     // ------------------------------------------------------------------------ USER & SYSTEM EVENTS

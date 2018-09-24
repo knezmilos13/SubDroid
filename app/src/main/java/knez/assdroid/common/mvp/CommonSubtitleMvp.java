@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 
 import java.util.HashSet;
 
-public interface CommonSubtitleMvp2 {
+public interface CommonSubtitleMvp {
 
     interface ViewInterface {
         void showTitleUntitled(boolean currentSubtitleEdited);

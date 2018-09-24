@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import knez.assdroid.common.SharedPreferenceKey;
-import knez.assdroid.common.mvp.CommonSubtitleMvp2;
+import knez.assdroid.common.mvp.CommonSubtitleMvp;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 import knez.assdroid.editor.vso.SubtitleLineVso;
@@ -32,7 +32,7 @@ import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 public class EditorPresenter extends CommonSubtitlePresenter
-        implements EditorMvp2.PresenterInterface {
+        implements EditorMvp.PresenterInterface {
 
     @NonNull private final SubtitleLineVsoFactory subtitleLineVsoFactory;
     @NonNull private final ExecutorService singleThreadExecutor;
@@ -46,7 +46,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull private final BooleanPreference subLineShowActorStylePreference;
     @NonNull private final BooleanPreference simplifyTagsPreference;
 
-    private EditorMvp2.ViewInterface viewInterface;
+    private EditorMvp.ViewInterface viewInterface;
     private boolean presenterInitialized = false;
 
     @NonNull private final Object vsoSyncObject = new Object();
@@ -103,7 +103,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     // ---------------------------------------------------------------------------- SETUP & TEARDOWN
 
     @Override
-    public void onAttach(@NonNull EditorMvp2.ViewInterface viewInterface) {
+    public void onAttach(@NonNull EditorMvp.ViewInterface viewInterface) {
         this.viewInterface = viewInterface;
 
         // TODO and what if file was changed in the mean time?
@@ -311,7 +311,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     @Override @Nullable
-    public CommonSubtitleMvp2.ViewInterface getViewInterface() {
+    public CommonSubtitleMvp.ViewInterface getViewInterface() {
         return viewInterface;
     }
 

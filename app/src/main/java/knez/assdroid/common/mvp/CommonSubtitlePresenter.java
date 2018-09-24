@@ -13,7 +13,7 @@ import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.apache.FilenameUtils;
 
 public abstract class CommonSubtitlePresenter
-        implements CommonSubtitleMvp2.PresenterInterface, SubtitleController.Callback {
+        implements CommonSubtitleMvp.PresenterInterface, SubtitleController.Callback {
 
     @NonNull protected final SubtitleController subtitleController;
     @NonNull protected final FileHandler fileHandler;
@@ -24,7 +24,7 @@ public abstract class CommonSubtitlePresenter
         this.fileHandler = fileHandler;
     }
 
-    @Nullable public abstract CommonSubtitleMvp2.ViewInterface getViewInterface();
+    @Nullable public abstract CommonSubtitleMvp.ViewInterface getViewInterface();
 
 
     // ------------------------------------------------------------------------- PRESENTER INTERFACE
@@ -69,7 +69,7 @@ public abstract class CommonSubtitlePresenter
     public void onSaveClicked() {
         SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
         if(currentSubtitleFile == null) {
-            CommonSubtitleMvp2.ViewInterface viewInterface = getViewInterface();
+            CommonSubtitleMvp.ViewInterface viewInterface = getViewInterface();
             if(viewInterface != null) viewInterface.showErrorCantSaveMissingFile();
             return;
         }

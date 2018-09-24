@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-import knez.assdroid.common.mvp.CommonSubtitleMvp2;
+import knez.assdroid.common.mvp.CommonSubtitleMvp;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
 import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.subtitle.SubtitleController;
@@ -17,13 +17,13 @@ import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 public class TranslatorPresenter extends CommonSubtitlePresenter
-        implements TranslatorMvp2.PresenterInterface {
+        implements TranslatorMvp.PresenterInterface {
 
     @NonNull private final SubtitleLine.Builder subtitleLineBuilder;
     @NonNull private final Timber.Tree logger;
     @Nullable private final TagPrettifier tagPrettifier;
 
-    private TranslatorMvp2.ViewInterface viewInterface;
+    private TranslatorMvp.ViewInterface viewInterface;
     private boolean currentLineHadUncommittedChanges;
     @NonNull private final HashSet<Long> editedLineIds = new HashSet<>();
 
@@ -48,13 +48,13 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     // ---------------------------------------------------------------------------- SETUP & TEARDOWN
 
     @Override
-    public void onAttach(@NonNull TranslatorMvp2.ViewInterface viewInterface) {
+    public void onAttach(@NonNull TranslatorMvp.ViewInterface viewInterface) {
         onAttach(viewInterface, 1);
     }
 
     @Override
-    public void onAttach(@NonNull TranslatorMvp2.ViewInterface viewInterface,
-                         @NonNull TranslatorMvp2.InternalState internalState) {
+    public void onAttach(@NonNull TranslatorMvp.ViewInterface viewInterface,
+                         @NonNull TranslatorMvp.InternalState internalState) {
         this.viewInterface = viewInterface;
         this.currentLineHadUncommittedChanges = internalState.isCurrentLineHadUncommittedChanges();
 
@@ -89,8 +89,8 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
-    public void onAttach(@NonNull TranslatorMvp2.ViewInterface viewInterface, long lineId) {
-        onAttach(viewInterface, new TranslatorMvp2.InternalState(false, lineId, new HashSet<>()));
+    public void onAttach(@NonNull TranslatorMvp.ViewInterface viewInterface, long lineId) {
+        onAttach(viewInterface, new TranslatorMvp.InternalState(false, lineId, new HashSet<>()));
     }
 
     @Override
@@ -203,13 +203,13 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     }
 
     @Override @NonNull
-    public TranslatorMvp2.InternalState getInternalState() {
-        return new TranslatorMvp2.InternalState(
+    public TranslatorMvp.InternalState getInternalState() {
+        return new TranslatorMvp.InternalState(
                 currentLineHadUncommittedChanges, currentLine.getId(), editedLineIds);
     }
 
     @Override @Nullable
-    public CommonSubtitleMvp2.ViewInterface getViewInterface() {
+    public CommonSubtitleMvp.ViewInterface getViewInterface() {
         return viewInterface;
     }
 

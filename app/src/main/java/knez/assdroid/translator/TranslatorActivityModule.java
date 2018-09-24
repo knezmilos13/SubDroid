@@ -14,7 +14,7 @@ import timber.log.Timber;
 public class TranslatorActivityModule {
 
     @Provides
-    TranslatorMvp2.PresenterInterface provideTranslatorPresenter(
+    TranslatorMvp.PresenterInterface provideTranslatorPresenter(
             SubtitleController subtitleController,
             SubtitleLine.Builder subLineBuilder,
             Timber.Tree logger,
