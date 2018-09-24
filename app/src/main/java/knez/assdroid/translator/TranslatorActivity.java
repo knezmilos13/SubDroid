@@ -6,7 +6,7 @@ import butterknife.OnClick;
 import butterknife.OnEditorAction;
 import knez.assdroid.R;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
-import knez.assdroid.common.mvp.CommonSubtitleMVP;
+import knez.assdroid.common.mvp.CommonSubtitleMvp2;
 import knez.assdroid.util.gui.FadeAnimationHelper;
 
 import android.content.Intent;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
-import static knez.assdroid.translator.TranslatorMVP.*;
+import static knez.assdroid.translator.TranslatorMvp2.*;
 
 public class TranslatorActivity extends CommonSubtitleActivity implements ViewInterface {
 
@@ -84,7 +84,7 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
     }
 
     @Override
-    protected CommonSubtitleMVP.PresenterInterface getPresenter() {
+    protected CommonSubtitleMvp2.PresenterInterface getPresenter() {
         return presenter;
     }
 

@@ -19,7 +19,7 @@ import timber.log.Timber;
 public class EditorActivityModule {
 
     @Provides
-    EditorMVP.PresenterInterface getEditorPresenter(
+    EditorMvp2.PresenterInterface getEditorPresenter(
             SubtitleController subtitleController,
             SubtitleLineVsoFactory subtitleLineVsoFactory,
             FileHandler fileHandler,

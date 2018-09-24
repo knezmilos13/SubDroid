@@ -7,11 +7,11 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import knez.assdroid.common.mvp.CommonSubtitleMVP;
+import knez.assdroid.common.mvp.CommonSubtitleMvp2;
 
-public interface TranslatorMVP {
+public interface TranslatorMvp2 {
 
-    interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
+    interface ViewInterface extends CommonSubtitleMvp2.ViewInterface {
         void closeScreenNoSubtitle();
         void showSubtitleTexts(@NonNull String currentLineText, @Nullable String previousLineText,
                                @Nullable String nextLineText);
@@ -21,7 +21,7 @@ public interface TranslatorMVP {
         void showCurrentLineEdited(boolean currentLineEdited);
     }
 
-    interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
+    interface PresenterInterface extends CommonSubtitleMvp2.PresenterInterface {
         void onAttach(@NonNull ViewInterface viewInterface);
         void onAttach(@NonNull ViewInterface viewInterface, long lineId);
         void onAttach(@NonNull ViewInterface viewInterface, @NonNull InternalState internalState);

@@ -7,12 +7,12 @@ import android.support.v7.util.DiffUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import knez.assdroid.common.mvp.CommonSubtitleMVP;
+import knez.assdroid.common.mvp.CommonSubtitleMvp2;
 import knez.assdroid.editor.vso.SubtitleLineVso;
 
-public interface EditorMVP {
+public interface EditorMvp2 {
 
-    interface ViewInterface extends CommonSubtitleMVP.ViewInterface {
+    interface ViewInterface extends CommonSubtitleMvp2.ViewInterface {
         void showErrorLoadingSubtitleInvalidFormat(@NonNull String filename);
         void showErrorLoadingFailed(@NonNull String subtitleFilename);
 
@@ -44,8 +44,8 @@ public interface EditorMVP {
         int getFirstShownLineNumber();
     }
 
-    interface PresenterInterface extends CommonSubtitleMVP.PresenterInterface {
-        void onAttach(@NonNull EditorMVP.ViewInterface viewInterface);
+    interface PresenterInterface extends CommonSubtitleMvp2.PresenterInterface {
+        void onAttach(@NonNull EditorMvp2.ViewInterface viewInterface);
         void onDetach();
 
         void onSearchSubmitted(@NonNull String text);

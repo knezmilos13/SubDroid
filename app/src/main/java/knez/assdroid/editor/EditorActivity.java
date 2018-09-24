@@ -3,7 +3,7 @@ package knez.assdroid.editor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knez.assdroid.common.mvp.CommonSubtitleActivity;
-import knez.assdroid.common.mvp.CommonSubtitleMVP;
+import knez.assdroid.common.mvp.CommonSubtitleMvp2;
 import knez.assdroid.translator.TranslatorActivity;
 import knez.assdroid.R;
 import knez.assdroid.common.adapter.IdentifiableAdapter;
@@ -43,7 +43,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import static knez.assdroid.editor.EditorMVP.*;
+import static knez.assdroid.editor.EditorMvp2.*;
 
 public class EditorActivity extends CommonSubtitleActivity
         implements ViewInterface, SubtitleLineLayoutItem.Callback {
@@ -99,7 +99,7 @@ public class EditorActivity extends CommonSubtitleActivity
     }
 
     @Override
-    protected CommonSubtitleMVP.PresenterInterface getPresenter() {
+    protected CommonSubtitleMvp2.PresenterInterface getPresenter() {
         return presenter;
     }
 
