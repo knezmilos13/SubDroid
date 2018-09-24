@@ -16,7 +16,6 @@ import dagger.android.HasActivityInjector;
 import io.fabric.sdk.android.Fabric;
 import knez.assdroid.common.injection.AppComponent;
 import knez.assdroid.common.injection.DaggerAppComponent;
-import knez.assdroid.common.util.AppConfig;
 import knez.assdroid.util.logging.CrashlyticsTree;
 import timber.log.Timber;
 
@@ -57,7 +56,6 @@ public class App extends Application implements HasActivityInjector {
 		return DaggerAppComponent
 				.builder()
 				.appInstance(this)
-				.appConfigInstance(new AppConfig())
 				.refWatcherInstance(LeakCanary.install(this))
 				.build();
 	}

@@ -10,7 +10,6 @@ import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjectionModule;
 import knez.assdroid.App;
-import knez.assdroid.common.util.AppConfig;
 
 @Singleton
 @Component(modules = {
@@ -22,7 +21,6 @@ public interface AppComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance Builder appInstance(App app);
-        @BindsInstance Builder appConfigInstance(AppConfig appConfig);
         @BindsInstance Builder refWatcherInstance(RefWatcher refWatcher);
         AppComponent build();
     }
