@@ -30,8 +30,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.fonts.MaterialIcons;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
@@ -195,8 +195,10 @@ public class EditorActivity extends CommonSubtitleActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_editor, menu);
-        menu.getItem(0).setIcon(
-                new IconDrawable(this, MaterialIcons.md_search).color(Color.WHITE).sizeDp(24));
+        menu.getItem(0).setIcon(new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_search)
+                .color(Color.WHITE)
+                .sizeDp(20));
         return super.onCreateOptionsMenu(menu);
     }
 

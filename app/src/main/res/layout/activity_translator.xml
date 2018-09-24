@@ -10,8 +10,8 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?android:attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="?popup_theme"
         android:elevation="4dp" />
@@ -23,28 +23,29 @@
         android:baselineAligned="false"
         android:orientation="horizontal" >
 
-        <com.joanzapata.iconify.widget.IconButton
+        <com.mikepenz.iconics.view.IconicsButton
             android:id="@+id/translator_prev_button"
             style="@style/translator_main_image_button"
-            android:text="{md-chevron-left}"
-            tools:ignore="HardcodedText"/>
+            android:text="{gmd-chevron-left}"
+            tools:ignore="HardcodedText"
+            tools:text="&lt;"/>
 
-        <com.joanzapata.iconify.widget.IconButton
+        <com.mikepenz.iconics.view.IconicsButton
             android:id="@+id/translator_next_button"
             style="@style/translator_main_image_button"
-            android:text="{md-chevron-right}"
+            android:text="{gmd-chevron-right}"
             tools:ignore="HardcodedText"/>
 
-        <com.joanzapata.iconify.widget.IconButton
+        <com.mikepenz.iconics.view.IconicsButton
             android:id="@+id/translator_copy_button"
             style="@style/translator_main_image_button"
-            android:text="{md-content-copy}"
+            android:text="{gmd-content-copy}"
             tools:ignore="HardcodedText"/>
 
-        <com.joanzapata.iconify.widget.IconButton
+        <com.mikepenz.iconics.view.IconicsButton
             android:id="@+id/translator_commit_button"
             style="@style/translator_main_image_button"
-            android:text="{md-done}"
+            android:text="{gmd-done}"
             tools:ignore="HardcodedText"/>
 
         <Button
@@ -92,14 +93,16 @@
                     style="@style/translator_primary_subtitle_line"
                     tools:text="Current sentence, current sentence, current sentence..."/>
 
-                <ImageView
+                <com.mikepenz.iconics.view.IconicsImageView
                     android:id="@+id/translator_commit_indicator"
                     android:layout_width="@dimen/translator_commit_indicator_dimension"
                     android:layout_height="@dimen/translator_commit_indicator_dimension"
+                    android:layout_marginEnd="2dp"
                     android:layout_gravity="end|center"
                     android:scaleType="center"
                     android:visibility="gone"
-                    tools:background="@color/accent"
+                    app:iiv_color="@color/translator_commit_indicator"
+                    app:iiv_icon="gmd-edit"
                     tools:visibility="visible"/>
 
             </FrameLayout>

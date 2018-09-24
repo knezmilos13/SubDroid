@@ -13,11 +13,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.fonts.MaterialIcons;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,10 +25,6 @@ public class BgpSearchView extends FrameLayout {
 
     @BindView(R.id.bgp_search_view_text) protected EditText editText;
     @BindView(R.id.bgp_search_view_num_results) protected TextView numResultsView;
-
-    @BindView(R.id.bgp_search_view_prev_icon) protected ImageView prevIcon;
-    @BindView(R.id.bgp_search_view_next_icon) protected ImageView nextIcon;
-    @BindView(R.id.bgp_search_view_close_icon) protected ImageView closeIcon;
 
     private Listener listener;
     private String hint;
@@ -75,14 +67,6 @@ public class BgpSearchView extends FrameLayout {
     }
 
     private void setUpViews() {
-
-        prevIcon.setImageDrawable(new IconDrawable(getContext(), MaterialIcons.md_keyboard_arrow_up)
-                .colorRes(R.color.gray_4_medium_light).sizeDp(25));
-        nextIcon.setImageDrawable(new IconDrawable(getContext(), MaterialIcons.md_keyboard_arrow_down)
-                .colorRes(R.color.gray_4_medium_light).sizeDp(25));
-        closeIcon.setImageDrawable(new IconDrawable(getContext(), MaterialIcons.md_clear)
-                .colorRes(R.color.gray_4_medium_light).sizeDp(25));
-
         if(hint != null) editText.setHint(hint);
 
         editText.setSingleLine();

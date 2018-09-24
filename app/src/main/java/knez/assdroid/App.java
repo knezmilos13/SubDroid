@@ -6,9 +6,6 @@ import android.os.StrictMode;
 
 import com.crashlytics.android.Crashlytics;
 import com.jakewharton.threetenabp.AndroidThreeTen;
-import com.joanzapata.iconify.Iconify;
-import com.joanzapata.iconify.fonts.FontAwesomeModule;
-import com.joanzapata.iconify.fonts.MaterialModule;
 import com.squareup.leakcanary.LeakCanary;
 
 import javax.inject.Inject;
@@ -46,9 +43,6 @@ public class App extends Application implements HasActivityInjector {
 
 		appComponent = buildDaggerComponent();
 		appComponent.inject(this);
-
-		Iconify.with(new FontAwesomeModule())
-				.with(new MaterialModule());
 
 		AndroidThreeTen.init(this);
 

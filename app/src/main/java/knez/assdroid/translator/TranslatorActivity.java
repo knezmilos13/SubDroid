@@ -24,9 +24,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.fonts.MaterialIcons;
-
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -97,13 +94,6 @@ public class TranslatorActivity extends CommonSubtitleActivity implements ViewIn
         // hack - allows enter to work as ime action even though the field is multiline
         inputView.setHorizontallyScrolling(false);
         inputView.setMaxLines(200); // 200 is a random value not likely to be hit ever
-
-        commitIndicatorView.setImageDrawable(
-                new IconDrawable(this, MaterialIcons.md_edit)
-                        .sizePx(getResources().getDimensionPixelSize(
-                                R.dimen.translator_commit_indicator_dimension))
-                        .colorRes(R.color.translator_commit_indicator)
-        );
     }
 
     @Override

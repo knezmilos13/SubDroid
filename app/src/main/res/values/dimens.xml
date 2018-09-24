@@ -21,7 +21,7 @@
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TRANSLATOR ACTIVITY -->
 
-    <dimen name="translator_commit_indicator_dimension">20dp</dimen>
+    <dimen name="translator_commit_indicator_dimension">16dp</dimen>
     <dimen name="translator_main_button_dimension">60dp</dimen>
 
 </resources>
