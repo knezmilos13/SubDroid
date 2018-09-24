@@ -28,6 +28,8 @@ import knez.assdroid.util.Threader;
 import knez.assdroid.util.apache.FilenameUtils;
 import knez.assdroid.util.preferences.BooleanPreference;
 import knez.assdroid.util.preferences.IntPreference;
+import knez.assdroid.util.preferences.PersistedValue;
+import knez.assdroid.util.preferences.PersistedValueReader;
 import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
@@ -39,12 +41,12 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull private final Threader mainThreader;
     @NonNull private final Timber.Tree logger;
 
-    @NonNull private final StringPreference tagReplacementPreference;
-    @NonNull private final IntPreference subLineTextSizePreference;
-    @NonNull private final IntPreference subLineOtherSizePreference;
-    @NonNull private final BooleanPreference subLineShowTimingsPreference;
-    @NonNull private final BooleanPreference subLineShowActorStylePreference;
-    @NonNull private final BooleanPreference simplifyTagsPreference;
+    @NonNull private final PersistedValueReader<String> tagReplacementPreference;
+    @NonNull private final PersistedValueReader<Integer> subLineTextSizePreference;
+    @NonNull private final PersistedValueReader<Integer> subLineOtherSizePreference;
+    @NonNull private final PersistedValue<Boolean> subLineShowTimingsPreference;
+    @NonNull private final PersistedValue<Boolean> subLineShowActorStylePreference;
+    @NonNull private final PersistedValue<Boolean> simplifyTagsPreference;
 
     private EditorMvp.ViewInterface viewInterface;
     private boolean presenterInitialized = false;
@@ -72,12 +74,12 @@ public class EditorPresenter extends CommonSubtitlePresenter
             @NonNull ExecutorService singleThreadExecutor,
             @NonNull Threader mainThreader,
             @NonNull Timber.Tree logger,
-            @NonNull StringPreference tagReplacementPreference,
-            @NonNull IntPreference subLineTextSizePreference,
-            @NonNull IntPreference subLineOtherSizePreference,
-            @NonNull BooleanPreference subLineShowTimingsPreference,
-            @NonNull BooleanPreference subLineShowActorStylePreference,
-            @NonNull BooleanPreference simplifyTagsPreference) {
+            @NonNull PersistedValueReader<String> tagReplacementPreference,
+            @NonNull PersistedValueReader<Integer> subLineTextSizePreference,
+            @NonNull PersistedValueReader<Integer> subLineOtherSizePreference,
+            @NonNull PersistedValue<Boolean> subLineShowTimingsPreference,
+            @NonNull PersistedValue<Boolean> subLineShowActorStylePreference,
+            @NonNull PersistedValue<Boolean> simplifyTagsPreference) {
         super(subtitleController, fileHandler);
         this.subtitleLineVsoFactory = subtitleLineVsoFactory;
         this.singleThreadExecutor = singleThreadExecutor;

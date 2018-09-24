@@ -3,35 +3,38 @@ package knez.assdroid.util.preferences;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
-public final class BooleanPreference {
-    private final SharedPreferences sharedPreferences;
-    private final String key;
-    private final boolean defaultValue;
+public final class BooleanPreference implements PersistedValue<Boolean> {
 
-    public BooleanPreference(final @NonNull SharedPreferences sharedPreferences, final @NonNull String key) {
-        this(sharedPreferences, key, false);
-    }
+    @NonNull private SharedPreferences sharedPreferences;
+    @NonNull private String key;
+    @NonNull private Boolean defaultValue;
 
-    public BooleanPreference(final @NonNull SharedPreferences sharedPreferences, final @NonNull String key,
-                             final boolean defaultValue) {
+    public BooleanPreference(@NonNull SharedPreferences sharedPreferences,
+                             @NonNull String key,
+                             @NonNull Boolean defaultValue) {
         this.sharedPreferences = sharedPreferences;
         this.key = key;
         this.defaultValue = defaultValue;
     }
 
-    public boolean get() {
+    @Override @NonNull
+    public Boolean get() {
         return this.sharedPreferences.getBoolean(this.key, this.defaultValue);
     }
 
+    @Override
     public boolean isSet() {
         return this.sharedPreferences.contains(this.key);
     }
 
-    public void set(final boolean value) {
+    @Override
+    public void set(@NonNull Boolean value) {
         this.sharedPreferences.edit().putBoolean(this.key, value).apply();
     }
 
+    @Override
     public void delete() {
         this.sharedPreferences.edit().remove(this.key).apply();
     }
+
 }

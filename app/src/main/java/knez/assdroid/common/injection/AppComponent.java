@@ -14,7 +14,7 @@ import knez.assdroid.App;
 @Singleton
 @Component(modules = {
         AndroidInjectionModule.class, ActivityBuilderModule.class, AppContextModule.class,
-        SubtitleModule.class, ViewFactoryModule.class, DbModule.class, PreferencesModule.class
+        SubtitleModule.class, ViewFactoryModule.class, DbModule.class, PersistentValuesModule.class
 })
 public interface AppComponent {
 

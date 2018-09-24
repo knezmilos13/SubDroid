@@ -13,7 +13,7 @@ import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
 import knez.assdroid.util.FileHandler;
-import knez.assdroid.util.preferences.StringPreference;
+import knez.assdroid.util.preferences.PersistedValueReader;
 import timber.log.Timber;
 
 public class TranslatorPresenter extends CommonSubtitlePresenter
@@ -31,12 +31,12 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @Nullable private SubtitleLine previousLine;
     @Nullable private SubtitleLine nextLine;
 
-    public TranslatorPresenter(
+    TranslatorPresenter(
             @NonNull SubtitleController subtitleController,
             @NonNull SubtitleLine.Builder subtitleLineBuilder,
             @NonNull Timber.Tree logger,
             @NonNull FileHandler fileHandler,
-            @NonNull StringPreference tagReplacementPreference) {
+            @NonNull PersistedValueReader<String> tagReplacementPreference) {
         super(subtitleController, fileHandler);
         this.subtitleLineBuilder = subtitleLineBuilder;
         this.logger = logger;

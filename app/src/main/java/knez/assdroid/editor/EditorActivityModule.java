@@ -10,8 +10,9 @@ import knez.assdroid.editor.vso.SubtitleLineVsoFactory;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
-import knez.assdroid.util.preferences.BooleanPreference;
 import knez.assdroid.util.preferences.IntPreference;
+import knez.assdroid.util.preferences.PersistedValue;
+import knez.assdroid.util.preferences.PersistedValueReader;
 import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
@@ -26,12 +27,12 @@ public class EditorActivityModule {
             @Named("singleThreadExecutor") ExecutorService singleThreadExecutor,
             @Named("mainThreader") Threader mainThreader,
             Timber.Tree logger,
-            @Named("tagReplacement") StringPreference tagReplacementPreference,
-            @Named("subLineTextSize")IntPreference subLineTextSizePreference,
-            @Named("subLineOtherSize") IntPreference subLineOtherSizePreference,
-            @Named("subLineShowTimings") BooleanPreference subLineShowTimingsPreference,
-            @Named("subLineShowStyleActor") BooleanPreference subLineShowStyleActorPreference,
-            @Named("simplifyTags") BooleanPreference simplifyTagsPreference) {
+            @Named("tagReplacement") PersistedValue<String> tagReplacementPreference,
+            @Named("subLineTextSize")PersistedValue<Integer> subLineTextSizePreference,
+            @Named("subLineOtherSize") PersistedValue<Integer> subLineOtherSizePreference,
+            @Named("subLineShowTimings") PersistedValue<Boolean> subLineShowTimingsPreference,
+            @Named("subLineShowStyleActor") PersistedValue<Boolean> subLineShowStyleActorPreference,
+            @Named("simplifyTags") PersistedValue<Boolean> simplifyTagsPreference) {
         return new EditorPresenter(
                 subtitleController,
                 subtitleLineVsoFactory,
