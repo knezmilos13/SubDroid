@@ -42,6 +42,8 @@ public interface EditorMvp {
         void scrollToLine(@NonNull SubtitleLineVso subtitleLineVso);
 
         int getFirstShownLineNumber();
+
+        void showAboutScreen();
     }
 
     interface PresenterInterface extends CommonSubtitleMvp.PresenterInterface {
@@ -65,6 +67,8 @@ public interface EditorMvp {
         void onEndSearchRequested();
         void onPrevSearchResultRequested();
         void onNextSearchResultRequested();
+
+        void onAboutScreenRequested();
     }
 
 }

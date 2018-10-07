@@ -19,6 +19,9 @@
         <item name="highlight_color_bg">?android:textColor</item>
         <item name="highlight_color_special">@color/primary_subdued</item>
 
+        <!-- This was added specifically for about screen, to make the back arrow white. -->
+        <item name="android:textColorSecondary">@android:color/white</item>
+
         <!-- MaterialDrawer specific values -->
         <item name="material_drawer_background">@color/material_drawer_background</item>
         <item name="material_drawer_primary_text">@color/material_drawer_primary_text</item>

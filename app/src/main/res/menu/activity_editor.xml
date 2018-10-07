@@ -37,4 +37,9 @@
         android:orderInCategory="7"
         android:title="@string/common_help"/>
 
+    <item
+        android:id="@+id/menu_item_about"
+        android:orderInCategory="8"
+        android:title="@string/common_about"/>
+
 </menu>

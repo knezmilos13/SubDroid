@@ -30,6 +30,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikepenz.aboutlibraries.Libs;
+import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.Drawer;
@@ -228,9 +230,12 @@ public class EditorActivity extends CommonSubtitleActivity
 			case R.id.menu_item_create_subtitle:
 			    presenter.onNewSubtitleRequested();
 				break;
-			case R.id.menu_item_load_subtitle:
-				showFileOpenSelector();
-				break;
+            case R.id.menu_item_load_subtitle:
+                showFileOpenSelector();
+                break;
+            case R.id.menu_item_about:
+                presenter.onAboutScreenRequested();
+                break;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -407,6 +412,21 @@ public class EditorActivity extends CommonSubtitleActivity
         if(firstVisiblePosition == RecyclerView.NO_POSITION) return 0;
 
         return ((SubtitleLineVso) subtitleLinesAdapter.getItem(firstVisiblePosition)).getLineNumber();
+    }
+
+    @Override
+    public void showAboutScreen() {
+        new LibsBuilder()
+                .withAboutAppName(getString(R.string.app_name))
+                .withAboutIconShown(true)
+                .withAboutVersionShown(true)
+                .withAboutDescription(getString(R.string.app_description))
+                .withActivityTitle(getString(R.string.common_about_application))
+                .withAboutSpecial1(getString(R.string.common_privacy_policy))
+                .withAboutSpecial1Description(getString(R.string.privacy_policy_text))
+                .withActivityTheme(R.style.SubDroid_Theme_Light)
+                .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                .start(this);
     }
 
     @Override

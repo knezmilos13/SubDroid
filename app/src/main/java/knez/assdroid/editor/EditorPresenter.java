@@ -196,6 +196,11 @@ public class EditorPresenter extends CommonSubtitlePresenter
     }
 
     @Override
+    public void onAboutScreenRequested() {
+        if(viewInterface != null) viewInterface.showAboutScreen();
+    }
+
+    @Override
     public void onFileSelectedForLoad(@NonNull Uri uri) {
         String filename = fileHandler.getFileNameFromUri(uri);
         String subtitleExtension = FilenameUtils.getExtension(filename);
