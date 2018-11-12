@@ -1,6 +1,6 @@
 package knez.assdroid.subtitle.handler.ass;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import knez.assdroid.subtitle.handler.TagPrettifier;
 

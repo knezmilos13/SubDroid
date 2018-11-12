@@ -11,7 +11,7 @@ import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.SubtitleParser;
 import solid.collections.Pair;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import static knez.assdroid.subtitle.handler.ass.FormatConstants.*;
 

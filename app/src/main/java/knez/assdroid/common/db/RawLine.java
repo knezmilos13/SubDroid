@@ -1,6 +1,6 @@
 package knez.assdroid.common.db;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;

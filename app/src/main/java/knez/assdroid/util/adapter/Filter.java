@@ -1,6 +1,6 @@
 package knez.assdroid.util.adapter;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface Filter {
     boolean filter(@NonNull Object entity);

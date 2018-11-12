@@ -1,9 +1,9 @@
 package knez.assdroid.editor;
 
 import android.net.Uri;
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,11 +26,8 @@ import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
 import knez.assdroid.util.apache.FilenameUtils;
-import knez.assdroid.util.preferences.BooleanPreference;
-import knez.assdroid.util.preferences.IntPreference;
 import knez.assdroid.util.preferences.PersistedValue;
 import knez.assdroid.util.preferences.PersistedValueReader;
-import knez.assdroid.util.preferences.StringPreference;
 import timber.log.Timber;
 
 public class EditorPresenter extends CommonSubtitlePresenter

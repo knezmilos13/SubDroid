@@ -2,7 +2,7 @@ package knez.assdroid.subtitle.handler;
 
 import java.util.List;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import knez.assdroid.subtitle.data.ParsingError;
 import solid.collections.Pair;

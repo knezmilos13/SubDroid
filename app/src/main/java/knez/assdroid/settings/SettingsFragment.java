@@ -3,7 +3,7 @@ package knez.assdroid.settings;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.HashSet;
 

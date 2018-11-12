@@ -6,7 +6,7 @@ import android.content.UriPermission;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
