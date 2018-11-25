@@ -43,9 +43,10 @@ public abstract class CommonSubtitlePresenter
 
     @Override @Nullable
     public String getCurrentSubtitleName() {
-        SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
-        if(currentSubtitleFile == null) return null;
-        else return currentSubtitleFile.getName();
+//        SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
+//        if(currentSubtitleFile == null) return null;
+//        else return currentSubtitleFile.getName();
+        return null;
     }
 
     @Override
@@ -67,37 +68,37 @@ public abstract class CommonSubtitlePresenter
 
     @Override
     public void onSaveClicked() {
-        SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
-        if(currentSubtitleFile == null) {
-            CommonSubtitleMvp.ViewInterface viewInterface = getViewInterface();
-            if(viewInterface != null) viewInterface.showErrorCantSaveMissingFile();
-            return;
-        }
-
-        // No name or extension? Must be a newly created file. Ask user to choose a location (save as)
-        if(currentSubtitleFile.getName() == null || currentSubtitleFile.getExtension() == null
-                || currentSubtitleFile.getUriPath() == null) {
-            if(getViewInterface() != null) getViewInterface().showFileSaveSelector();
-            return;
-        }
-
-        if(!fileHandler.hasPermissionsToOpenUri(currentSubtitleFile.getUriPath())) {
-            if(getViewInterface() != null) getViewInterface().showFileSaveSelector();
-            return;
-        }
-
-        if(!subtitleController.canWriteSubtitle(currentSubtitleFile.getExtension())) {
-            if(getViewInterface() != null)
-                getViewInterface().showErrorWritingSubtitleInvalidFormat(
-                        currentSubtitleFile.getName() + "." + currentSubtitleFile.getExtension());
-            return;
-        }
-
-        // This mostly just refreshes the permission (which you got when loading file)
-        fileHandler.takePermissionForUri(currentSubtitleFile.getUriPath());
-
-        if(getViewInterface() != null) getViewInterface().showProgressSavingFile();
-        subtitleController.writeSubtitle(currentSubtitleFile.getUriPath());
+//        SubtitleFile currentSubtitleFile = subtitleController.getCurrentSubtitleFile();
+//        if(currentSubtitleFile == null) {
+//            CommonSubtitleMvp.ViewInterface viewInterface = getViewInterface();
+//            if(viewInterface != null) viewInterface.showErrorCantSaveMissingFile();
+//            return;
+//        }
+//
+//        // No name or extension? Must be a newly created file. Ask user to choose a location (save as)
+//        if(currentSubtitleFile.getName() == null || currentSubtitleFile.getExtension() == null
+//                || currentSubtitleFile.getUriPath() == null) {
+//            if(getViewInterface() != null) getViewInterface().showFileSaveSelector();
+//            return;
+//        }
+//
+//        if(!fileHandler.hasPermissionsToOpenUri(currentSubtitleFile.getUriPath())) {
+//            if(getViewInterface() != null) getViewInterface().showFileSaveSelector();
+//            return;
+//        }
+//
+//        if(!subtitleController.canWriteSubtitle(currentSubtitleFile.getExtension())) {
+//            if(getViewInterface() != null)
+//                getViewInterface().showErrorWritingSubtitleInvalidFormat(
+//                        currentSubtitleFile.getName() + "." + currentSubtitleFile.getExtension());
+//            return;
+//        }
+//
+//        // This mostly just refreshes the permission (which you got when loading file)
+//        fileHandler.takePermissionForUri(currentSubtitleFile.getUriPath());
+//
+//        if(getViewInterface() != null) getViewInterface().showProgressSavingFile();
+//        subtitleController.writeSubtitle(currentSubtitleFile.getUriPath());
     }
 
     @Override

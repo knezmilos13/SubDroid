@@ -61,31 +61,29 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
         this.editedLineIds.clear();
         this.editedLineIds.addAll(internalState.getEditedLineIds());
 
-        SubtitleFile subtitleFile = subtitleController.getCurrentSubtitleFile();
-        if(subtitleFile == null) {
-            logger.e("No subtitle file loaded");
-            viewInterface.closeScreenNoSubtitle();
-            return;
-        }
-
-        showSubtitleTitle(subtitleFile);
-
-        SubtitleLine tempCurrentLine = subtitleController.getLineForId(internalState.getCurrentLineId());
-        if(tempCurrentLine == null) {
-            logger.e("Translator activity started, but no lines available!");
-            viewInterface.closeScreenNoSubtitle();
-            return;
-        }
-
-        subtitleController.attachListener(this);
-
-        currentLine = tempCurrentLine;
-        previousLine = subtitleController.getLineForNumber(currentLine.getLineNumber() - 1);
-        nextLine = subtitleController.getLineForNumber(currentLine.getLineNumber() + 1);
-
-        showActiveSubtitleLines();
-        viewInterface.resetInputField(currentLine.getText());
-        viewInterface.showCurrentLineEdited(currentLineHadUncommittedChanges);
+//        SubtitleFile subtitleFile = subtitleController.getCurrentSubtitleFile();
+//        if(subtitleFile == null) {
+//            logger.e("No subtitle file loaded");
+//            viewInterface.closeScreenNoSubtitle();
+//            return;
+//        }
+//
+//        showSubtitleTitle(subtitleFile);
+//
+//        SubtitleLine tempCurrentLine = subtitleController.getLineForId(internalState.getCurrentLineId());
+//        if(tempCurrentLine == null) {
+//            logger.e("Translator activity started, but no lines available!");
+//            viewInterface.closeScreenNoSubtitle();
+//            return;
+//        }
+//
+//        currentLine = tempCurrentLine;
+//        previousLine = subtitleController.getLineForNumber(currentLine.getLineNumber() - 1);
+//        nextLine = subtitleController.getLineForNumber(currentLine.getLineNumber() + 1);
+//
+//        showActiveSubtitleLines();
+//        viewInterface.resetInputField(currentLine.getText());
+//        viewInterface.showCurrentLineEdited(currentLineHadUncommittedChanges);
     }
 
     @Override
@@ -96,7 +94,6 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
     @Override
     public void onDetach() {
         viewInterface = null;
-        subtitleController.detachListener(this);
     }
 
 
@@ -136,7 +133,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onCommitRequested() {
-        if(viewInterface == null || subtitleController.isWritingFile()) return;
+        if(viewInterface == null /*|| subtitleController.isWritingFile()*/) return;
 
         String translationText = viewInterface.getTranslationText().trim();
         if(translationText.equals("")) translationText = currentLine.getText();
@@ -152,7 +149,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
         currentLine = updatedLine;
 
-        showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
+//        showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
         showActiveSubtitleLines();
 
         currentLineHadUncommittedChanges = false;
@@ -161,7 +158,7 @@ public class TranslatorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onCommitAndNextRequested() {
-        if(subtitleController.isWritingFile()) return;
+//        if(subtitleController.isWritingFile()) return;
         onCommitRequested();
         onNextLineRequested();
     }

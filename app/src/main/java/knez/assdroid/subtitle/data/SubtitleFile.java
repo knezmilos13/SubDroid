@@ -8,30 +8,41 @@ import knez.assdroid.subtitle.handler.SubtitleContent;
 
 public class SubtitleFile {
 
-    private boolean edited;
+    private final boolean edited;
     @Nullable private final Uri uriPath;
-    @Nullable private String name;
-    @Nullable private String extension;
+    @Nullable private final String name;
+    @Nullable private final String extension;
     @NonNull private final SubtitleContent subtitleContent;
+    private final boolean headerLoaded;
+    private final boolean contentLoaded;
+
+    public SubtitleFile() {
+        this(false, null, null, null, null, false, false);
+    }
 
     public SubtitleFile(boolean edited,
                         @Nullable final Uri uriPath,
                         @Nullable final String name,
                         @Nullable final String extension,
-                        @NonNull SubtitleContent subtitleContent) {
+                        @Nullable SubtitleContent subtitleContent,
+                        boolean headerLoaded,
+                        boolean contentLoaded) {
         this.edited = edited;
         this.uriPath = uriPath;
         this.name = name;
         this.extension = extension;
         this.subtitleContent = subtitleContent;
+        this.headerLoaded = headerLoaded;
+        this.contentLoaded = contentLoaded;
     }
 
     public boolean isEdited() { return edited; }
-    public void setEdited(boolean edited) { this.edited = edited; }
+    public boolean isContentLoaded() { return contentLoaded; }
+    public boolean isHeaderLoaded() { return headerLoaded; }
 
     @Nullable public String getName() { return name; }
     @Nullable public String getExtension() { return extension; }
     @Nullable public Uri getUriPath() { return uriPath; }
-    @NonNull public SubtitleContent getSubtitleContent() { return subtitleContent; }
+    @Nullable public SubtitleContent getSubtitleContent() { return subtitleContent; }
 
 }

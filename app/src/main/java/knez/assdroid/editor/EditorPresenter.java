@@ -1,6 +1,9 @@
 package knez.assdroid.editor;
 
 import android.net.Uri;
+
+import org.jetbrains.annotations.NotNull;
+
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +16,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Predicate;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import knez.assdroid.common.SharedPreferenceKey;
 import knez.assdroid.common.mvp.CommonSubtitleMvp;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
@@ -22,6 +31,7 @@ import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.ParsingError;
 import knez.assdroid.subtitle.data.SubtitleFile;
 import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.subtitle.handler.SubtitleContent;
 import knez.assdroid.subtitle.handler.TagPrettifier;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
@@ -29,6 +39,8 @@ import knez.assdroid.util.apache.FilenameUtils;
 import knez.assdroid.util.preferences.PersistedValue;
 import knez.assdroid.util.preferences.PersistedValueReader;
 import timber.log.Timber;
+
+import static knez.assdroid.subtitle.SubtitleController.*;
 
 public class EditorPresenter extends CommonSubtitlePresenter
         implements EditorMvp.PresenterInterface {
@@ -105,49 +117,52 @@ public class EditorPresenter extends CommonSubtitlePresenter
     public void onAttach(@NonNull EditorMvp.ViewInterface viewInterface) {
         this.viewInterface = viewInterface;
 
-        // TODO and what if file was changed in the mean time?
-        subtitleController.attachListener(this);
+        Observable<SubtitleEvent> subtitleObservable = subtitleController.getSubtitleObservable();
+
+        subtitleObservable
+                .filter(subtitleEvent ->
+                        subtitleEvent.subtitleEventType.equals(SubtitleEventType.INITIAL_STATE) ||
+                                subtitleEvent.subtitleEventType.equals(SubtitleEventType.HEADER_CHANGED))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(headerObserver);
+
+        subtitleObservable
+                .filter(subtitleEvent ->
+                        subtitleEvent.subtitleEventType.equals(SubtitleEventType.INITIAL_STATE) ||
+                                subtitleEvent.subtitleEventType.equals(SubtitleEventType.CONTENT_LOADED))
+                .observeOn(Schedulers.computation())
+                .subscribe(contentObserver);
+
+        // TODO disposable?
+
 
         // if reattaching to the same presenter (e.g. after orientation change)
-        if(presenterInitialized) {
-            showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
-            viewInterface.showSubtitleLines(new ArrayList<>(subtitleLineVsos));
-
-            if(currentSearchQuery != null) {
-                viewInterface.showSearchSectionWithQuery(currentSearchQuery);
-                updateActiveSearchResult(activeSearchResultIndex, true);
-            }
-
-            if(subtitleController.isLoadingFile()) viewInterface.showProgressLoadingFile();
-            else if(subtitleController.isWritingFile()) viewInterface.showProgressSavingFile();
-
-            return;
-        }
+//        if(presenterInitialized) { // TODO
+//            showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
+//            viewInterface.showSubtitleLines(new ArrayList<>(subtitleLineVsos));
+//
+//            if(currentSearchQuery != null) {
+//                viewInterface.showSearchSectionWithQuery(currentSearchQuery);
+//                updateActiveSearchResult(activeSearchResultIndex, true);
+//            }
+//
+//            if(subtitleController.isLoadingFile()) viewInterface.showProgressLoadingFile();
+//            else if(subtitleController.isWritingFile()) viewInterface.showProgressSavingFile();
+//
+//            return;
+//        }
 
         presenterInitialized = true;
 
+        // TODO ovo neki observable kraci na relaciji view-prezenter? Ili svaki pref. da je observable?
         viewInterface.showCurrentQuickSettings(
                 subLineShowTimingsPreference.get(),
                 subLineShowActorStylePreference.get(),
                 simplifyTagsPreference.get());
-
-        if(subtitleController.getCurrentSubtitleFile() != null) {
-            showSubtitleTitle(subtitleController.getCurrentSubtitleFile());
-            asyncCreateAllVsos(
-                    subtitleController.getCurrentSubtitleFile().getSubtitleContent().getSubtitleLines());
-        }
-        else if(subtitleController.hasStoredSubtitle()) {
-            subtitleController.reloadCurrentSubtitleFile();
-        }
-        else {
-            onNewSubtitleRequested();
-        }
-
     }
 
     @Override
     public void onDetach() {
-        subtitleController.detachListener(this);
         viewInterface = null;
     }
 
@@ -216,39 +231,43 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onSubtitleLineClicked(long id) {
-        if(viewInterface == null || subtitleController.isLoadingFile()) return;
-        viewInterface.showTranslatorScreen(id);
+//        if(viewInterface == null || subtitleController.isLoadingFile()) return;
+//        viewInterface.showTranslatorScreen(id);
     }
 
     @Override
     public void onSubtitleEditedExternally(@NonNull ArrayList<Long> editedLineIds) {
-        showSubtitleTitle(subtitleController.getCurrentSubtitleFile()); // to update the "*"
-
-        // TODO: preuzmi sve
-        List<SubtitleLine> editedLines = new ArrayList<>();
-        for(Long id : editedLineIds) {
-            SubtitleLine line = subtitleController.getLineForId(id);
-            if(line == null) continue; // defensive wtf // todo loguj
-            editedLines.add(line);
-        }
-
-        clearActiveSearchResult();
-
-        asyncRecreateSomeVsos(editedLines);
-        asyncUpdateSearchCounter(false);
+//        showSubtitleTitle(subtitleController.getCurrentSubtitleFile()); // to update the "*"
+//
+//        // TODO: preuzmi sve
+//        List<SubtitleLine> editedLines = new ArrayList<>();
+//        for(Long id : editedLineIds) {
+//            SubtitleLine line = subtitleController.getLineForId(id);
+//            if(line == null) continue; // defensive wtf // todo loguj
+//            editedLines.add(line);
+//        }
+//
+//        clearActiveSearchResult();
+//
+//        asyncRecreateSomeVsos(editedLines);
+//        asyncUpdateSearchCounter(false);
     }
 
     @Override
     public void onNewSubtitleRequested() {
-        subtitleController.createNewSubtitleFile();
-        SubtitleFile newlyCreatedSubtitleFile = subtitleController.getCurrentSubtitleFile();
-        showSubtitleTitle(newlyCreatedSubtitleFile);
-        subtitleLineVsos.clear();
-
-        onEndSearchRequested();
-
-        if(viewInterface == null) return;
-        viewInterface.showSubtitleLines(new ArrayList<>(subtitleLineVsos));
+        // TODO ja da javim repou da ocu novi subtitle
+        // on da meni javi da loaduje
+        // i da javi kad ucita
+        // i ja onda ocistim i search i sve
+//        subtitleController.createNewSubtitleFile();
+//        SubtitleFile newlyCreatedSubtitleFile = subtitleController.getCurrentSubtitleFile();
+//        showSubtitleTitle(newlyCreatedSubtitleFile);
+//        subtitleLineVsos.clear();
+//
+//        onEndSearchRequested();
+//
+//        if(viewInterface == null) return;
+//        viewInterface.showSubtitleLines(new ArrayList<>(subtitleLineVsos));
     }
 
     @Override
@@ -271,24 +290,92 @@ public class EditorPresenter extends CommonSubtitlePresenter
         asyncChangeTagReplacement();
     }
 
+    @Override
+    public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
+        super.onSettingsChanged(changedSettings);
+
+        if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP)
+                || changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_OTHER_SIZE_DP)) {
+            updateSubtitleLineSharedSettings();
+        }
+
+        if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)
+                && simplifyTagsPreference.get()) {
+            // ^ don't recreate tag replacements if tags are not simplified
+            asyncChangeTagReplacement();
+        }
+    }
+
+    @Override @Nullable
+    public CommonSubtitleMvp.ViewInterface getViewInterface() {
+        return viewInterface;
+    }
+
+
 
     // ------------------------------------------------------------------------------- REPO CALLBACK
 
-    @Override
+    @NotNull
+    private final DisposableObserver<SubtitleEvent> headerObserver =
+            new DisposableObserver<SubtitleEvent>() {
+                @Override
+                public void onNext(SubtitleEvent subtitleEvent) {
+                    showSubtitleTitle(subtitleEvent.subtitleFile);
+                }
+
+                // TODO: gde ces da gasis search?
+
+                @Override
+                public void onError(Throwable e) {
+                    // TODO sta ako se ovo desi? Ne zelim ovo ikad... Mada mogu uvek da zovem opet da se subscribujem ili ono auto ima nesto
+                }
+
+                @Override
+                public void onComplete() {
+                    // TODO ne zelim ovo ikad, jel ima neka varijanta bez ovoga
+                }
+            };
+
+    @NotNull
+    private final DisposableObserver<SubtitleEvent> contentObserver =
+            new DisposableObserver<SubtitleEvent>() {
+                @Override
+                public void onNext(SubtitleEvent subtitleEvent) {
+                    SubtitleContent content = subtitleEvent.subtitleFile.getSubtitleContent();
+                    List<SubtitleLine> lines =
+                            content == null ? new ArrayList<>() : content.getSubtitleLines();
+                    asyncCreateAllVsos(lines);
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    // TODO
+                }
+
+                @Override
+                public void onComplete() {
+                    // TODO
+                }
+            };
+
+
+
+
+    @Override @Deprecated
     public void onInvalidSubtitleFormatForLoading(@NonNull String subtitleFilename) {
         if(viewInterface == null) return;
         viewInterface.showErrorLoadingSubtitleInvalidFormat(subtitleFilename);
         viewInterface.hideProgress();
     }
 
-    @Override
+    @Override @Deprecated
     public void onFileReadingFailed(@NonNull String subtitleFilename) {
         if(viewInterface == null) return;
         viewInterface.hideProgress();
         viewInterface.showErrorLoadingFailed(subtitleFilename);
     }
 
-    @Override
+    @Override @Deprecated
     public void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
                                      @NonNull List<ParsingError> parsingErrors) {
         // TODO: utvrdi da li su neke fatalne greske i prikazi nekakav dijalog
@@ -308,31 +395,10 @@ public class EditorPresenter extends CommonSubtitlePresenter
         asyncCreateAllVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 
-    @Override
+    @Override @Deprecated
     public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {
         showSubtitleTitle(subtitleFile);
         asyncCreateAllVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
-    }
-
-    @Override @Nullable
-    public CommonSubtitleMvp.ViewInterface getViewInterface() {
-        return viewInterface;
-    }
-
-    @Override
-    public void onSettingsChanged(@NonNull HashSet<String> changedSettings) {
-        super.onSettingsChanged(changedSettings);
-
-        if(changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_TEXT_SIZE_DP)
-                || changedSettings.contains(SharedPreferenceKey.SUBTITLE_LINE_OTHER_SIZE_DP)) {
-            updateSubtitleLineSharedSettings();
-        }
-
-        if(changedSettings.contains(SharedPreferenceKey.TAG_REPLACEMENT)
-                && simplifyTagsPreference.get()) {
-            // ^ don't recreate tag replacements if tags are not simplified
-            asyncChangeTagReplacement();
-        }
     }
 
 
@@ -514,7 +580,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
         // whatever other task is in progress, just execute this one. It will convert current vsos
         // whatever they may be after the current task completes (since a single thread is used)
-
+/*
         vsosTagReplacementChangeFuture = singleThreadExecutor.submit(() -> {
             synchronized (vsoSyncObject) {
 
@@ -540,7 +606,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
                 mainThreader.justExecute(() -> viewInterface.showSubtitleLines(subtitleLineVsos));
             }
-        });
+        });*/
     }
 
 }

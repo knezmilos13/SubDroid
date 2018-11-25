@@ -5,8 +5,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Scheduler;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import knez.assdroid.common.AbstractRepo;
 import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.db.SubtitleContentDao;
@@ -32,6 +40,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.annotation.WorkerThread;
 
+import static knez.assdroid.subtitle.SubtitleController.SubtitleEvent.*;
+
 public class SubtitleController extends AbstractRepo {
 
     /** Set only initially in order to know if there is a file in storage or not */
@@ -54,12 +64,13 @@ public class SubtitleController extends AbstractRepo {
     @NonNull private final Threader mainThreader;
     @NonNull private final Timber.Tree logger;
 
-    @NonNull private final List<Callback> callbacks = Collections.synchronizedList(new ArrayList<>());
-    @Nullable private SubtitleFile currentSubtitleFile;
+    @NonNull private SubtitleFile currentSubtitleFile;
+    private boolean startedInitialization = false;
     private boolean isLoadingFile;
     private boolean isWritingFile;
 
-    // TODO sinhronizovan pristup subtajtl fajlu... preko nekog objekta drugog posto ovja moze biti null
+    @NonNull private final PublishSubject<SubtitleEvent> subtitleEventSubject;
+    private Subject<Observable<SubtitleEvent>> funnel;
 
     public SubtitleController(@NonNull SubtitleHandlerRepository subtitleHandlerRepository,
                               @NonNull FileHandler fileHandler,
@@ -75,30 +86,73 @@ public class SubtitleController extends AbstractRepo {
         this.executorService = executorService;
         this.mainThreader = mainThreader;
         this.logger = logger;
+        currentSubtitleFile = new SubtitleFile();
+
+        // TODO realno ne bi ni trebao da drzis referencu na subtitleEventSubject, samo na njegov funnel
+        // ali dokle god mozda zelis rucno da zoves onNext na njemu treba ti, dok preko funnela ces da povezes sa observable
+        funnel = PublishSubject.<Observable<SubtitleEvent>>create().toSerialized();
+
+        subtitleEventSubject = PublishSubject.create();
+        Observable.merge(funnel).replay().autoConnect()
+                .subscribe(subtitleEventSubject);
     }
 
-    public void attachListener(Callback callback) {
-        synchronized (callbacks) {
-            if (callbacks.contains(callback)) return;
-            callbacks.add(callback);
+    @NonNull
+    public Observable<SubtitleEvent> getSubtitleObservable() {
+        if(!startedInitialization) { // todo sync ovde?
+            startedInitialization = true;
+            initializeSubtitle();
         }
+
+        return Observable
+                // TODO ovo just ne moze ovako, treba mi nesto sa odlozenim izvrsenje da bi dobio stanje kakvo jeste onda kad se zakacis
+                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.INITIAL_STATE))
+                .concatWith(subtitleEventSubject)
+                .subscribeOn(Schedulers.io());
     }
 
-    @Nullable
-    public SubtitleFile getCurrentSubtitleFile() {
-        return currentSubtitleFile;
+    private void initializeSubtitle() {
+        // TODO sinhronizuj ili uzmi kopiraj referencu da te neko ne zajebe
+
+        if(!hasStoredSubtitle()) {
+            // TODO formatiranje
+            funnel.onNext(
+                    Observable.fromCallable(() -> {
+                        // TODO: sync na fajl, takodje cancel drugo ucitavanje ako postoji?
+                        currentSubtitleFile = new SubtitleFile(false, null, null, null,
+                        new SubtitleContent(new ArrayList<>(), new HashMap<>()), true, true);
+                        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+                        subtitleContentDao.clearSubtitle();
+                        return currentSubtitleFile;
+                    }).flatMap((Function<SubtitleFile, ObservableSource<SubtitleEvent>>) subtitleFile ->
+                            Observable.just(
+                                    new SubtitleEvent(currentSubtitleFile, SubtitleEventType.HEADER_CHANGED),
+                                    new SubtitleEvent(currentSubtitleFile, SubtitleEventType.CONTENT_LOADED)))
+                    .subscribeOn(Schedulers.io())
+            );
+
+            return;
+        }
+
+        // TODO: ovde kao iznad samo za ucitavanje postojeceg
+        Observable.fromCallable(new Callable<SubtitleFile>() {
+            @Override
+            public SubtitleFile call() throws Exception {
+                _reloadCurrentSubtitleFile();
+                return currentSubtitleFile; // TODO neka ova metoda iznad vraca to
+            }
+        });//.subscribe(subtitleEventSubject);
+
+        // https://stackoverflow.com/questions/49110145/rxjava-add-items-from-different-observables-to-subject
+
+//        reloadCurrentSubtitleFile();
     }
 
-    public boolean hasStoredSubtitle() {
+
+
+    private boolean hasStoredSubtitle() {
         return storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
     }
-
-    public void detachListener(Callback callback) {
-        callbacks.remove(callback);
-    }
-
-    public boolean isLoadingFile() { return isLoadingFile; }
-    public boolean isWritingFile() { return isWritingFile; }
 
     public boolean canLoadExtension(@NonNull String subtitleExtension) {
         return subtitleHandlerRepository.canOpenSubtitleExtension(subtitleExtension);
@@ -127,20 +181,13 @@ public class SubtitleController extends AbstractRepo {
         executorService.execute(() -> _parseSubtitle(subtitlePath));
     }
 
-    public void reloadCurrentSubtitleFile() {
+    private void reloadCurrentSubtitleFile() {
         executorService.execute(this::_reloadCurrentSubtitleFile);
     }
 
     public void writeSubtitle(@NonNull Uri uri) {
         isWritingFile = true;
         executorService.execute(() -> _writeSubtitle(uri));
-    }
-
-    public void createNewSubtitleFile() {
-        currentSubtitleFile = new SubtitleFile(false, null, null, null,
-                new SubtitleContent(new ArrayList<>(), new HashMap<>()));
-        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
-        subtitleContentDao.clearSubtitle();
     }
 
     @Nullable
@@ -179,7 +226,7 @@ public class SubtitleController extends AbstractRepo {
 
         if(!currentSubtitleFile.isEdited()) {
             storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_EDITED, true);
-            currentSubtitleFile.setEdited(true);
+//            currentSubtitleFile.setEdited(true);
         }
 
         // TODO ako se ne poklapaju i ID i line number stare i izmenjene linije, imas problem
@@ -197,8 +244,8 @@ public class SubtitleController extends AbstractRepo {
         SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
         if(subtitleParser == null) {
             isLoadingFile = false;
-            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForLoading(subtitleFilename),
-                    mainThreader);
+//            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForLoading(subtitleFilename),
+//                    mainThreader);
             return;
         }
 
@@ -208,8 +255,8 @@ public class SubtitleController extends AbstractRepo {
         } catch (IOException e) {
             isLoadingFile = false;
             logger.e(e);
-            fireCallbacks(callbacks, callback -> callback.onFileReadingFailed(subtitleFilename),
-                    mainThreader);
+//            fireCallbacks(callbacks, callback -> callback.onFileReadingFailed(subtitleFilename),
+//                    mainThreader);
             return;
         }
 
@@ -221,7 +268,7 @@ public class SubtitleController extends AbstractRepo {
         String subtitleName = FilenameUtils.getName(subtitleFilename);
 
         currentSubtitleFile = new SubtitleFile(
-                false, subtitlePath, subtitleName, subtitleExtension, result.first);
+                false, subtitlePath, subtitleName, subtitleExtension, result.first, true, true);
 
         subtitleContentDao.storeSubtitleContent(subtitleContent);
 
@@ -229,9 +276,9 @@ public class SubtitleController extends AbstractRepo {
         storeSubtitleFileValues(currentSubtitleFile);
 
         isLoadingFile = false;
-        fireCallbacks(callbacks,
-				callback -> callback.onSubtitleFileParsed(currentSubtitleFile, parsingErrors),
-				mainThreader);
+//        fireCallbacks(callbacks,
+//				callback -> callback.onSubtitleFileParsed(currentSubtitleFile, parsingErrors),
+//				mainThreader);
     }
 
     @WorkerThread
@@ -252,11 +299,11 @@ public class SubtitleController extends AbstractRepo {
 
         SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
         currentSubtitleFile = new SubtitleFile(
-                currentSubtitleEdited, uriPath, name, extension, subtitleContent);
+                currentSubtitleEdited, uriPath, name, extension, subtitleContent, true, true);
 
-        fireCallbacks(callbacks,
-                callback -> callback.onSubtitleFileReloaded(currentSubtitleFile),
-                mainThreader);
+//        fireCallbacks(callbacks,
+//                callback -> callback.onSubtitleFileReloaded(currentSubtitleFile),
+//                mainThreader);
     }
 
     @WorkerThread
@@ -279,8 +326,8 @@ public class SubtitleController extends AbstractRepo {
 
         if(subtitleFormatter == null) {
             isWritingFile = false;
-            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForWriting(destFilename),
-                    mainThreader); // TODO ovo invalidSubtitleFormat ti je isto i za read i write, aj nekako to razdvoj malo
+//            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForWriting(destFilename),
+//                    mainThreader); // TODO ovo invalidSubtitleFormat ti je isto i za read i write, aj nekako to razdvoj malo
             return;
         }
 
@@ -294,20 +341,20 @@ public class SubtitleController extends AbstractRepo {
         } catch (IOException e) {
             isWritingFile = false;
             logger.e(e);
-            fireCallbacks(callbacks, callback -> callback.onFileWritingFailed(destFilename),
-                    mainThreader);
+//            fireCallbacks(callbacks, callback -> callback.onFileWritingFailed(destFilename),
+//                    mainThreader);
             return;
         }
 
         String subtitleName = FilenameUtils.getName(destFilename);
         currentSubtitleFile = new SubtitleFile(false, destPath, subtitleName, destExtension,
-                currentSubtitleFile.getSubtitleContent());
+                currentSubtitleFile.getSubtitleContent(), true, true);
 
         storeSubtitleFileValues(currentSubtitleFile);
 
         isWritingFile = false;
-        fireCallbacks(callbacks,
-                callback -> callback.onSubtitleFileSaved(currentSubtitleFile), mainThreader);
+//        fireCallbacks(callbacks,
+//                callback -> callback.onSubtitleFileSaved(currentSubtitleFile), mainThreader);
     }
 
     private void storeSubtitleFileValues(@NonNull SubtitleFile subtitleFile) {
@@ -321,8 +368,24 @@ public class SubtitleController extends AbstractRepo {
 
     // ------------------------------------------------------------------------------------- CLASSES
 
+    public enum SubtitleEventType {
+        INITIAL_STATE, HEADER_CHANGED, CONTENT_LOADED
+    }
+
+    public static class SubtitleEvent {
+
+        public final SubtitleFile subtitleFile; // todo dal je nullable?
+        @NonNull public final SubtitleEventType subtitleEventType;
+
+        public SubtitleEvent(SubtitleFile subtitleFile, SubtitleEventType subtitleEventType) {
+            this.subtitleFile = subtitleFile;
+            this.subtitleEventType = subtitleEventType;
+        }
+    }
+
     @UiThread
     public interface Callback {
+        // TODO kako ces da javljas ove errore?
         default void onInvalidSubtitleFormatForWriting(@NonNull String subtitleFilename) { }
         default void onInvalidSubtitleFormatForLoading(@NonNull String subtitleFilename) { }
         default void onFileReadingFailed(@NonNull String subtitleFilename) { }
