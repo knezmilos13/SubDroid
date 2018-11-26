@@ -17,11 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 import knez.assdroid.common.SharedPreferenceKey;
 import knez.assdroid.common.mvp.CommonSubtitleMvp;
 import knez.assdroid.common.mvp.CommonSubtitlePresenter;
@@ -57,7 +54,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
     @NonNull private final PersistedValue<Boolean> subLineShowActorStylePreference;
     @NonNull private final PersistedValue<Boolean> simplifyTagsPreference;
 
-    private EditorMvp.ViewInterface viewInterface;
+    @Nullable private EditorMvp.ViewInterface viewInterface;
     private boolean presenterInitialized = false;
 
     @NonNull private final Object vsoSyncObject = new Object();
@@ -120,18 +117,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
         Observable<SubtitleEvent> subtitleObservable = subtitleController.getSubtitleObservable();
 
         subtitleObservable
-                .filter(subtitleEvent ->
-                        subtitleEvent.subtitleEventType.equals(SubtitleEventType.INITIAL_STATE) ||
-                                subtitleEvent.subtitleEventType.equals(SubtitleEventType.HEADER_CHANGED))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(headerObserver);
-
-        subtitleObservable
-                .filter(subtitleEvent ->
-                        subtitleEvent.subtitleEventType.equals(SubtitleEventType.INITIAL_STATE) ||
-                                subtitleEvent.subtitleEventType.equals(SubtitleEventType.CONTENT_LOADED))
-                .observeOn(Schedulers.computation())
-                .subscribe(contentObserver);
+                .subscribe(subtitleEventObserver);
 
         // TODO disposable?
 
@@ -255,19 +242,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
     @Override
     public void onNewSubtitleRequested() {
-        // TODO ja da javim repou da ocu novi subtitle
-        // on da meni javi da loaduje
-        // i da javi kad ucita
-        // i ja onda ocistim i search i sve
-//        subtitleController.createNewSubtitleFile();
-//        SubtitleFile newlyCreatedSubtitleFile = subtitleController.getCurrentSubtitleFile();
-//        showSubtitleTitle(newlyCreatedSubtitleFile);
-//        subtitleLineVsos.clear();
-//
-//        onEndSearchRequested();
-//
-//        if(viewInterface == null) return;
-//        viewInterface.showSubtitleLines(new ArrayList<>(subtitleLineVsos));
+        subtitleController.createNewSubtitle();
     }
 
     @Override
@@ -316,14 +291,29 @@ public class EditorPresenter extends CommonSubtitlePresenter
     // ------------------------------------------------------------------------------- REPO CALLBACK
 
     @NotNull
-    private final DisposableObserver<SubtitleEvent> headerObserver =
+    private final DisposableObserver<SubtitleEvent> subtitleEventObserver =
             new DisposableObserver<SubtitleEvent>() {
                 @Override
                 public void onNext(SubtitleEvent subtitleEvent) {
-                    showSubtitleTitle(subtitleEvent.subtitleFile);
-                }
+                    if(subtitleEvent.subtitleEventType.equals(SubtitleEventType.LOADING)) {
+                        if(viewInterface != null) viewInterface.showProgressLoadingFile();
+                        return;
+                    }
 
-                // TODO: gde ces da gasis search?
+                    if(subtitleEvent.subtitleEventType.equals(SubtitleEventType.FULL_LOAD)) {
+                        clearActiveSearchResult();
+
+                        showSubtitleTitle(subtitleEvent.subtitleFile);
+
+                        SubtitleContent content = subtitleEvent.subtitleFile.getSubtitleContent();
+                        List<SubtitleLine> lines =
+                                content == null ? new ArrayList<>() : content.getSubtitleLines();
+                        asyncCreateAllVsos(lines);
+
+                        if(viewInterface != null) viewInterface.hideProgress();
+                        return;
+                    }
+                }
 
                 @Override
                 public void onError(Throwable e) {
@@ -335,30 +325,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
                     // TODO ne zelim ovo ikad, jel ima neka varijanta bez ovoga
                 }
             };
-
-    @NotNull
-    private final DisposableObserver<SubtitleEvent> contentObserver =
-            new DisposableObserver<SubtitleEvent>() {
-                @Override
-                public void onNext(SubtitleEvent subtitleEvent) {
-                    SubtitleContent content = subtitleEvent.subtitleFile.getSubtitleContent();
-                    List<SubtitleLine> lines =
-                            content == null ? new ArrayList<>() : content.getSubtitleLines();
-                    asyncCreateAllVsos(lines);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    // TODO
-                }
-
-                @Override
-                public void onComplete() {
-                    // TODO
-                }
-            };
-
-
 
 
     @Override @Deprecated

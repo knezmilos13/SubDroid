@@ -2,7 +2,6 @@ package knez.assdroid.subtitle;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -10,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Scheduler;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -39,8 +37,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.annotation.WorkerThread;
-
-import static knez.assdroid.subtitle.SubtitleController.SubtitleEvent.*;
 
 public class SubtitleController extends AbstractRepo {
 
@@ -106,31 +102,14 @@ public class SubtitleController extends AbstractRepo {
 
         return Observable
                 // TODO ovo just ne moze ovako, treba mi nesto sa odlozenim izvrsenje da bi dobio stanje kakvo jeste onda kad se zakacis
-                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.INITIAL_STATE))
+                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.FULL_LOAD))
                 .concatWith(subtitleEventSubject)
                 .subscribeOn(Schedulers.io());
     }
 
     private void initializeSubtitle() {
-        // TODO sinhronizuj ili uzmi kopiraj referencu da te neko ne zajebe
-
         if(!hasStoredSubtitle()) {
-            // TODO formatiranje
-            funnel.onNext(
-                    Observable.fromCallable(() -> {
-                        // TODO: sync na fajl, takodje cancel drugo ucitavanje ako postoji?
-                        currentSubtitleFile = new SubtitleFile(false, null, null, null,
-                        new SubtitleContent(new ArrayList<>(), new HashMap<>()), true, true);
-                        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
-                        subtitleContentDao.clearSubtitle();
-                        return currentSubtitleFile;
-                    }).flatMap((Function<SubtitleFile, ObservableSource<SubtitleEvent>>) subtitleFile ->
-                            Observable.just(
-                                    new SubtitleEvent(currentSubtitleFile, SubtitleEventType.HEADER_CHANGED),
-                                    new SubtitleEvent(currentSubtitleFile, SubtitleEventType.CONTENT_LOADED)))
-                    .subscribeOn(Schedulers.io())
-            );
-
+            createNewSubtitle();
             return;
         }
 
@@ -141,11 +120,8 @@ public class SubtitleController extends AbstractRepo {
                 _reloadCurrentSubtitleFile();
                 return currentSubtitleFile; // TODO neka ova metoda iznad vraca to
             }
-        });//.subscribe(subtitleEventSubject);
+        });
 
-        // https://stackoverflow.com/questions/49110145/rxjava-add-items-from-different-observables-to-subject
-
-//        reloadCurrentSubtitleFile();
     }
 
 
@@ -235,6 +211,27 @@ public class SubtitleController extends AbstractRepo {
 
 
     // ------------------------------------------------------------------------------------ INTERNAL
+
+    public void createNewSubtitle() {
+        // TODO ovo realno ne valja, sta ako mi uleti neko drugi i ugasi loading? ili pokrene duplo?
+        // mozda da je ovo odvojen observable? Ili da ima otkazivanja observablea?
+        funnel.onNext(Observable.just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING)));
+
+        Observable<SubtitleEvent> subCreatorObservable = Observable.fromCallable(() -> {
+            Thread.sleep(5000); // TODO temp
+            // TODO: sync na fajl, takodje cancel drugo ucitavanje ako postoji?
+            currentSubtitleFile = new SubtitleFile(false, null, null, null,
+                    new SubtitleContent(new ArrayList<>(), new HashMap<>()), true, true);
+            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+            subtitleContentDao.clearSubtitle();
+            return currentSubtitleFile;
+        }).flatMap((Function<SubtitleFile, ObservableSource<SubtitleEvent>>) subtitleFile ->
+                Observable.just(
+                        new SubtitleEvent(currentSubtitleFile, SubtitleEventType.FULL_LOAD)))
+                .subscribeOn(Schedulers.io());
+
+        funnel.onNext(subCreatorObservable);
+    }
 
     @WorkerThread
     private void _parseSubtitle(@NonNull Uri subtitlePath) {
@@ -369,7 +366,8 @@ public class SubtitleController extends AbstractRepo {
     // ------------------------------------------------------------------------------------- CLASSES
 
     public enum SubtitleEventType {
-        INITIAL_STATE, HEADER_CHANGED, CONTENT_LOADED
+        /** The subtitle file has been loaded/reloaded and all of the data has changed. */
+        FULL_LOAD, LOADING
     }
 
     public static class SubtitleEvent {
