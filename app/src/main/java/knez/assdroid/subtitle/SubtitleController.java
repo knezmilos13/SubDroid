@@ -52,6 +52,8 @@ public class SubtitleController extends AbstractRepo {
     private static final String STORAGE_KEY_SUBTITLE_EDITED =
             SubtitleController.class.getCanonicalName() + ".subtitle_edited";
 
+    enum SubtitleAction { NEW_SUBTITLE, LOAD_SUBTITLE }
+
     @NonNull private final SubtitleHandlerRepository subtitleHandlerRepository;
     @NonNull private final FileHandler fileHandler;
     @NonNull private final SubtitleContentDao subtitleContentDao;
@@ -215,11 +217,29 @@ public class SubtitleController extends AbstractRepo {
     public void createNewSubtitle() {
         // TODO ovo realno ne valja, sta ako mi uleti neko drugi i ugasi loading? ili pokrene duplo?
         // mozda da je ovo odvojen observable? Ili da ima otkazivanja observablea?
+        // Mozda bi switchMap mogao da se koristi? Posto on radi neko satro otkazivanje?
+        // tipa da izmedju observablea i funnela ima switch map tako da svaki novi task
+        // mzoe da svicuje stari. A da se subtajtl fajl snima tek nakon switch mapa tako da jednom
+        // kad svicujes, onaj stari task i da se odradi ne utice na stanje
+
+        // Npr: observable koji generise INTENT, ACTION ili tako nesto
+        // i onda na njega zakacis switch map koji svicuje drugi observable na osnovu toga
+            // (taj drugi dobija npr pozivom getCreateNewObservable, sto vraca ovaj kod ispod)
+        // i onda na to zakacis funnel (koji ti i ne treba ovakav kakav je jer ces stalno da svicujes)
+        // u funnelu imas snimac trenutnog stanja tek sinhronizovan
+
+        // Ili Schedulers.single() pa da su svi poslovi na istom threadu todo
+        // Sto je sasvim ok, ako ne mozes da cancelujes a bar da obezbedis redosled izvrsavanja pa nek cekaju
+            // a u kombinaciji sa switchom i ne moraju da cekaju... tj. moraju, cak i da swicujes, ako su
+            // i svicovani i novi na istom threadu, dzabe, cekaces onaj da se zavrsi, zar ne?
+
         funnel.onNext(Observable.just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING)));
 
         Observable<SubtitleEvent> subCreatorObservable = Observable.fromCallable(() -> {
             Thread.sleep(5000); // TODO temp
             // TODO: sync na fajl, takodje cancel drugo ucitavanje ako postoji?
+            // umesto sync, da uzmes lokalnu kopiju u tom trenutku
+            // mada svejedno radis sa storage helperom, znaci moze da te zajebe preplitanje
             currentSubtitleFile = new SubtitleFile(false, null, null, null,
                     new SubtitleContent(new ArrayList<>(), new HashMap<>()), true, true);
             storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
