@@ -119,6 +119,13 @@ public class EditorPresenter extends CommonSubtitlePresenter
         subtitleObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subtitleEventObserver);
+//        try {
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        // TODO if reattach, ne moras da trazis load, al' ako nije, trazi onda.
+        subtitleController.initializeSubtitle();
 
         // TODO disposable?
 
@@ -295,6 +302,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
             new DisposableObserver<SubtitleEvent>() {
                 @Override
                 public void onNext(SubtitleEvent subtitleEvent) {
+                    Timber.e("WTF - Dobio konacni event: %s", subtitleEvent.subtitleEventType.name());
+
                     if(subtitleEvent.subtitleEventType.equals(SubtitleEventType.LOADING)) {
                         if(viewInterface != null) viewInterface.showProgressLoadingFile();
                         return;
@@ -313,6 +322,12 @@ public class EditorPresenter extends CommonSubtitlePresenter
                         if(viewInterface != null) viewInterface.hideProgress();
                         return;
                     }
+                }
+
+                @Override
+                protected void onStart() {
+                    Timber.e("WTF - POZVAN ON START");
+                    super.onStart();
                 }
 
                 @Override

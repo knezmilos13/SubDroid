@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
 import io.reactivex.Observable;
@@ -52,7 +51,7 @@ public class SubtitleController extends AbstractRepo {
     private static final String STORAGE_KEY_SUBTITLE_EDITED =
             SubtitleController.class.getCanonicalName() + ".subtitle_edited";
 
-    enum SubtitleAction { NEW_SUBTITLE, LOAD_SUBTITLE }
+    enum SubtitleAction { NEW_SUBTITLE, RELOAD_SUBTITLE}
 
     @NonNull private final SubtitleHandlerRepository subtitleHandlerRepository;
     @NonNull private final FileHandler fileHandler;
@@ -63,12 +62,13 @@ public class SubtitleController extends AbstractRepo {
     @NonNull private final Timber.Tree logger;
 
     @NonNull private SubtitleFile currentSubtitleFile;
+    @NonNull private final Object currentSubtitleFileLock = new Object();
     private boolean startedInitialization = false;
-    private boolean isLoadingFile;
-    private boolean isWritingFile;
 
-    @NonNull private final PublishSubject<SubtitleEvent> subtitleEventSubject;
-    private Subject<Observable<SubtitleEvent>> funnel;
+    private Subject<SubtitleAction> subtitleFileActionInput;
+    private Observable<SubtitleEvent> subtitleEventObservable;
+
+    // TODO: subjectov on next mozda treba da ima serialized zbog razlicitih threadova
 
     public SubtitleController(@NonNull SubtitleHandlerRepository subtitleHandlerRepository,
                               @NonNull FileHandler fileHandler,
@@ -84,47 +84,54 @@ public class SubtitleController extends AbstractRepo {
         this.executorService = executorService;
         this.mainThreader = mainThreader;
         this.logger = logger;
+
         currentSubtitleFile = new SubtitleFile();
+    }
 
-        // TODO realno ne bi ni trebao da drzis referencu na subtitleEventSubject, samo na njegov funnel
-        // ali dokle god mozda zelis rucno da zoves onNext na njemu treba ti, dok preko funnela ces da povezes sa observable
-        funnel = PublishSubject.<Observable<SubtitleEvent>>create().toSerialized();
+    private void buildCoreObservables() {
+        subtitleFileActionInput = PublishSubject.<SubtitleAction>create().toSerialized();
 
-        subtitleEventSubject = PublishSubject.create();
-        Observable.merge(funnel).replay().autoConnect()
-                .subscribe(subtitleEventSubject);
+        subtitleEventObservable = subtitleFileActionInput
+                .switchMap((Function<SubtitleAction, ObservableSource<SubtitleEvent>>) subtitleAction -> {
+                    if (subtitleAction.equals(SubtitleAction.NEW_SUBTITLE))
+                        return createNewSubtitleAction();
+                    else
+                        return reloadSubtitleAction();
+                    }).doOnNext(newSubtitleFile -> {
+                        synchronized (currentSubtitleFileLock) {
+                            currentSubtitleFile = newSubtitleFile.subtitleFile;
+                        }
+                    });
     }
 
     @NonNull
     public Observable<SubtitleEvent> getSubtitleObservable() {
-        if(!startedInitialization) { // todo sync ovde?
-            startedInitialization = true;
-            initializeSubtitle();
-        }
+        if(subtitleEventObservable == null) buildCoreObservables();
 
         return Observable
-                // TODO ovo just ne moze ovako, treba mi nesto sa odlozenim izvrsenje da bi dobio stanje kakvo jeste onda kad se zakacis
-                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.FULL_LOAD))
-                .concatWith(subtitleEventSubject)
-                .subscribeOn(Schedulers.io());
+                // TODO ovo just ne moze ovako, treba mi nesto sa odlozenim izvrsenje da bi dobio
+                // stanje kakvo jeste onda kad se zakacis + da bude sinhronizovan pristup
+                // jos kad bi mogao neki state observable il nesto
+                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
+                .concatWith(subtitleEventObservable);
     }
 
-    private void initializeSubtitle() {
-        if(!hasStoredSubtitle()) {
-            createNewSubtitle();
-            return;
+    public void createNewSubtitle() {
+        subtitleFileActionInput.onNext(SubtitleAction.NEW_SUBTITLE);
+    }
+
+    // TODO: treba da pratis dal' vec imas inicijalizovan subtitle ili da dozvolis subtitle null i tako vratis inicijalno
+    // pa onda prezenter nek bude u fazonu cek ocu da ucitas. Tako da ovaj kod ispod nije bas to to, samo copy/paste je
+    public void initializeSubtitle() {
+        if(!startedInitialization) { // todo sync ovde?
+            startedInitialization = true;
+            if(!hasStoredSubtitle()) createNewSubtitle();
+            else subtitleFileActionInput.onNext(SubtitleAction.RELOAD_SUBTITLE);
         }
-
-        // TODO: ovde kao iznad samo za ucitavanje postojeceg
-        Observable.fromCallable(new Callable<SubtitleFile>() {
-            @Override
-            public SubtitleFile call() throws Exception {
-                _reloadCurrentSubtitleFile();
-                return currentSubtitleFile; // TODO neka ova metoda iznad vraca to
-            }
-        });
-
     }
+
+
+
 
 
 
@@ -155,16 +162,12 @@ public class SubtitleController extends AbstractRepo {
     }
 
     public void parseSubtitle(@NonNull Uri subtitlePath) {
-        isLoadingFile = true;
+//        isLoadingFile = true;
         executorService.execute(() -> _parseSubtitle(subtitlePath));
     }
 
-    private void reloadCurrentSubtitleFile() {
-        executorService.execute(this::_reloadCurrentSubtitleFile);
-    }
-
     public void writeSubtitle(@NonNull Uri uri) {
-        isWritingFile = true;
+//        isWritingFile = true;
         executorService.execute(() -> _writeSubtitle(uri));
     }
 
@@ -214,44 +217,77 @@ public class SubtitleController extends AbstractRepo {
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
-    public void createNewSubtitle() {
-        // TODO ovo realno ne valja, sta ako mi uleti neko drugi i ugasi loading? ili pokrene duplo?
-        // mozda da je ovo odvojen observable? Ili da ima otkazivanja observablea?
-        // Mozda bi switchMap mogao da se koristi? Posto on radi neko satro otkazivanje?
-        // tipa da izmedju observablea i funnela ima switch map tako da svaki novi task
-        // mzoe da svicuje stari. A da se subtajtl fajl snima tek nakon switch mapa tako da jednom
-        // kad svicujes, onaj stari task i da se odradi ne utice na stanje
+    // TODO ovo realno ne valja, sta ako mi uleti neko drugi i ugasi loading? ili pokrene duplo?
+    // mozda da je ovo odvojen observable? Ili da ima otkazivanja observablea?
+    // Mozda bi switchMap mogao da se koristi? Posto on radi neko satro otkazivanje?
+    // tipa da izmedju observablea i funnela ima switch map tako da svaki novi task
+    // mzoe da svicuje stari. A da se subtajtl fajl snima tek nakon switch mapa tako da jednom
+    // kad svicujes, onaj stari task i da se odradi ne utice na stanje
 
-        // Npr: observable koji generise INTENT, ACTION ili tako nesto
-        // i onda na njega zakacis switch map koji svicuje drugi observable na osnovu toga
-            // (taj drugi dobija npr pozivom getCreateNewObservable, sto vraca ovaj kod ispod)
-        // i onda na to zakacis funnel (koji ti i ne treba ovakav kakav je jer ces stalno da svicujes)
-        // u funnelu imas snimac trenutnog stanja tek sinhronizovan
+    // Npr: observable koji generise INTENT, ACTION ili tako nesto
+    // i onda na njega zakacis switch map koji svicuje drugi observable na osnovu toga
+    // (taj drugi dobija npr pozivom getCreateNewObservable, sto vraca ovaj kod ispod)
+    // i onda na to zakacis funnel (koji ti i ne treba ovakav kakav je jer ces stalno da svicujes)
+    // u funnelu imas snimac trenutnog stanja tek sinhronizovan
 
-        // Ili Schedulers.single() pa da su svi poslovi na istom threadu todo
-        // Sto je sasvim ok, ako ne mozes da cancelujes a bar da obezbedis redosled izvrsavanja pa nek cekaju
-            // a u kombinaciji sa switchom i ne moraju da cekaju... tj. moraju, cak i da swicujes, ako su
-            // i svicovani i novi na istom threadu, dzabe, cekaces onaj da se zavrsi, zar ne?
+    // Ili Schedulers.single() pa da su svi poslovi na istom threadu todo
+    // Sto je sasvim ok, ako ne mozes da cancelujes a bar da obezbedis redosled izvrsavanja pa nek cekaju
+    // a u kombinaciji sa switchom i ne moraju da cekaju... tj. moraju, cak i da swicujes, ako su
+    // i svicovani i novi na istom threadu, dzabe, cekaces onaj da se zavrsi, zar ne?
 
-        funnel.onNext(Observable.just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING)));
-
-        Observable<SubtitleEvent> subCreatorObservable = Observable.fromCallable(() -> {
+    @NonNull
+    private Observable<SubtitleEvent> createNewSubtitleAction() {
+        Observable<SubtitleEvent> work = Observable.fromCallable(() -> {
             Thread.sleep(5000); // TODO temp
-            // TODO: sync na fajl, takodje cancel drugo ucitavanje ako postoji?
-            // umesto sync, da uzmes lokalnu kopiju u tom trenutku
-            // mada svejedno radis sa storage helperom, znaci moze da te zajebe preplitanje
-            currentSubtitleFile = new SubtitleFile(false, null, null, null,
+            SubtitleFile subtitleFile = new SubtitleFile(false, null, null, null,
                     new SubtitleContent(new ArrayList<>(), new HashMap<>()), true, true);
-            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true); // TODO pristupas spolja stvarima?
             subtitleContentDao.clearSubtitle();
-            return currentSubtitleFile;
-        }).flatMap((Function<SubtitleFile, ObservableSource<SubtitleEvent>>) subtitleFile ->
-                Observable.just(
-                        new SubtitleEvent(currentSubtitleFile, SubtitleEventType.FULL_LOAD)))
-                .subscribeOn(Schedulers.io());
+            return subtitleFile;
+        }).map(subtitleFile -> new SubtitleEvent(subtitleFile, SubtitleEventType.FULL_LOAD));
 
-        funnel.onNext(subCreatorObservable);
+        return Observable
+                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
+                .mergeWith(work)
+                .subscribeOn(Schedulers.io());
     }
+
+    @NonNull
+    private ObservableSource<SubtitleEvent> reloadSubtitleAction() {
+        Observable<SubtitleEvent> work = Observable.fromCallable(() -> {
+            Thread.sleep(5000); // TODO temp
+
+            boolean subtitleStored = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
+            if(!subtitleStored) { // Shouldn't happen - always ask controller if subtitle is stored first
+                logger.w("Performing reload subtitle file but no file stored! Creating a new file.");
+
+                storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+                subtitleContentDao.clearSubtitle(); // just in case
+            }
+
+            String name = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
+            String extension = storageHelper.getString(STORAGE_KEY_SUBTITLE_EXTENSION, null);
+            String uriString = storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null);
+            Uri uriPath = uriString == null? null : Uri.parse(uriString);
+            boolean currentSubtitleEdited = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
+
+            SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
+            return new SubtitleFile(
+                    currentSubtitleEdited, uriPath, name, extension, subtitleContent, true, true);
+
+        }).map(subtitleFile -> new SubtitleEvent(currentSubtitleFile, SubtitleEventType.FULL_LOAD));
+
+        return Observable
+                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
+                .mergeWith(work)
+                .subscribeOn(Schedulers.io());
+    }
+
+
+
+
+
+
 
     @WorkerThread
     private void _parseSubtitle(@NonNull Uri subtitlePath) {
@@ -260,7 +296,7 @@ public class SubtitleController extends AbstractRepo {
 
         SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
         if(subtitleParser == null) {
-            isLoadingFile = false;
+//            isLoadingFile = false;
 //            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForLoading(subtitleFilename),
 //                    mainThreader);
             return;
@@ -270,7 +306,7 @@ public class SubtitleController extends AbstractRepo {
         try {
             fileContent = fileHandler.readFileContent(subtitlePath);
         } catch (IOException e) {
-            isLoadingFile = false;
+//            isLoadingFile = false;
             logger.e(e);
 //            fireCallbacks(callbacks, callback -> callback.onFileReadingFailed(subtitleFilename),
 //                    mainThreader);
@@ -292,41 +328,16 @@ public class SubtitleController extends AbstractRepo {
         storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
         storeSubtitleFileValues(currentSubtitleFile);
 
-        isLoadingFile = false;
+//        isLoadingFile = false;
 //        fireCallbacks(callbacks,
 //				callback -> callback.onSubtitleFileParsed(currentSubtitleFile, parsingErrors),
 //				mainThreader);
     }
 
     @WorkerThread
-    private void _reloadCurrentSubtitleFile() {
-        boolean subtitleStored = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
-        if(!subtitleStored) { // Shouldn't happen - always ask controller if subtitle is stored first
-            logger.w("Performing reload subtitle file but no file stored! Creating a new file.");
-
-            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
-            subtitleContentDao.clearSubtitle(); // just in case
-        }
-
-        String name = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
-        String extension = storageHelper.getString(STORAGE_KEY_SUBTITLE_EXTENSION, null);
-        String uriString = storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null);
-        Uri uriPath = uriString == null? null : Uri.parse(uriString);
-        boolean currentSubtitleEdited = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
-
-        SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
-        currentSubtitleFile = new SubtitleFile(
-                currentSubtitleEdited, uriPath, name, extension, subtitleContent, true, true);
-
-//        fireCallbacks(callbacks,
-//                callback -> callback.onSubtitleFileReloaded(currentSubtitleFile),
-//                mainThreader);
-    }
-
-    @WorkerThread
     private void _writeSubtitle(@NonNull Uri destPath) {
         if(currentSubtitleFile == null) {
-            isWritingFile = false;
+//            isWritingFile = false;
             return;
             // TODO nije realisticno ali eto bas ako se desi neki fuckup
         }
@@ -342,7 +353,7 @@ public class SubtitleController extends AbstractRepo {
                 subtitleHandlerRepository.getFormatterForSubtitleFormat(destExtension);
 
         if(subtitleFormatter == null) {
-            isWritingFile = false;
+//            isWritingFile = false;
 //            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForWriting(destFilename),
 //                    mainThreader); // TODO ovo invalidSubtitleFormat ti je isto i za read i write, aj nekako to razdvoj malo
             return;
@@ -356,7 +367,7 @@ public class SubtitleController extends AbstractRepo {
         try {
             fileHandler.writeFileContent(destPath, serializedSubtitle);
         } catch (IOException e) {
-            isWritingFile = false;
+//            isWritingFile = false;
             logger.e(e);
 //            fireCallbacks(callbacks, callback -> callback.onFileWritingFailed(destFilename),
 //                    mainThreader);
@@ -369,7 +380,7 @@ public class SubtitleController extends AbstractRepo {
 
         storeSubtitleFileValues(currentSubtitleFile);
 
-        isWritingFile = false;
+//        isWritingFile = false;
 //        fireCallbacks(callbacks,
 //                callback -> callback.onSubtitleFileSaved(currentSubtitleFile), mainThreader);
     }
