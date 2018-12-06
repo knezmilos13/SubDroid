@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
+import io.reactivex.observables.ConnectableObservable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
@@ -61,14 +62,11 @@ public class SubtitleController extends AbstractRepo {
     @NonNull private final Threader mainThreader;
     @NonNull private final Timber.Tree logger;
 
-    @NonNull private SubtitleFile currentSubtitleFile;
+    @NonNull private SubtitleFile currentSubtitleFile; // TODO da li ovo moze da se zameni observableom? Da nema pristupa ovako?
     @NonNull private final Object currentSubtitleFileLock = new Object();
-    private boolean startedInitialization = false;
 
     private Subject<SubtitleAction> subtitleFileActionInput;
-    private Observable<SubtitleEvent> subtitleEventObservable;
-
-    // TODO: subjectov on next mozda treba da ima serialized zbog razlicitih threadova
+    private ConnectableObservable<SubtitleEvent> subtitleEventObservable;
 
     public SubtitleController(@NonNull SubtitleHandlerRepository subtitleHandlerRepository,
                               @NonNull FileHandler fileHandler,
@@ -88,7 +86,17 @@ public class SubtitleController extends AbstractRepo {
         currentSubtitleFile = new SubtitleFile();
     }
 
-    private void buildCoreObservables() {
+
+    // ------------------------------------------------------------------ GLOBAL SUBTITLE FILE STATE
+
+    @NonNull
+    public Observable<SubtitleEvent> getSubtitleObservable() {
+        // TODO synchronized
+        if(subtitleEventObservable == null) initializeSubtitleFileObservables();
+        return subtitleEventObservable;
+    }
+
+    private void initializeSubtitleFileObservables() {
         subtitleFileActionInput = PublishSubject.<SubtitleAction>create().toSerialized();
 
         subtitleEventObservable = subtitleFileActionInput
@@ -97,47 +105,31 @@ public class SubtitleController extends AbstractRepo {
                         return createNewSubtitleAction();
                     else
                         return reloadSubtitleAction();
-                    }).doOnNext(newSubtitleFile -> {
-                        synchronized (currentSubtitleFileLock) {
-                            currentSubtitleFile = newSubtitleFile.subtitleFile;
-                        }
-                    });
-    }
+                    })
+                .concatWith(Observable.just(
+                        new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING)))
+                .replay(1);
 
-    @NonNull
-    public Observable<SubtitleEvent> getSubtitleObservable() {
-        if(subtitleEventObservable == null) buildCoreObservables();
+        subtitleEventObservable.connect();
 
-        return Observable
-                // TODO ovo just ne moze ovako, treba mi nesto sa odlozenim izvrsenje da bi dobio
-                // stanje kakvo jeste onda kad se zakacis + da bude sinhronizovan pristup
-                // jos kad bi mogao neki state observable il nesto
-                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
-                .concatWith(subtitleEventObservable);
+        subtitleFileActionInput.onNext(hasStoredSubtitle()?
+                SubtitleAction.RELOAD_SUBTITLE : SubtitleAction.NEW_SUBTITLE);
     }
 
     public void createNewSubtitle() {
         subtitleFileActionInput.onNext(SubtitleAction.NEW_SUBTITLE);
     }
 
-    // TODO: treba da pratis dal' vec imas inicijalizovan subtitle ili da dozvolis subtitle null i tako vratis inicijalno
-    // pa onda prezenter nek bude u fazonu cek ocu da ucitas. Tako da ovaj kod ispod nije bas to to, samo copy/paste je
-    public void initializeSubtitle() {
-        if(!startedInitialization) { // todo sync ovde?
-            startedInitialization = true;
-            if(!hasStoredSubtitle()) createNewSubtitle();
-            else subtitleFileActionInput.onNext(SubtitleAction.RELOAD_SUBTITLE);
-        }
-    }
-
-
-
-
-
-
     private boolean hasStoredSubtitle() {
         return storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
     }
+
+
+
+
+
+
+
 
     public boolean canLoadExtension(@NonNull String subtitleExtension) {
         return subtitleHandlerRepository.canOpenSubtitleExtension(subtitleExtension);

@@ -119,13 +119,8 @@ public class EditorPresenter extends CommonSubtitlePresenter
         subtitleObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subtitleEventObserver);
-//        try {
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+
         // TODO if reattach, ne moras da trazis load, al' ako nije, trazi onda.
-        subtitleController.initializeSubtitle();
 
         // TODO disposable?
 
