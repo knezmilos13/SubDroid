@@ -1,5 +1,6 @@
 package knez.assdroid.common.injection;
 
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import javax.inject.Named;
@@ -11,12 +12,11 @@ import knez.assdroid.common.StorageHelper;
 import knez.assdroid.common.db.SubtitleContentDao;
 import knez.assdroid.subtitle.SubtitleController;
 import knez.assdroid.subtitle.data.SubtitleLine;
+import knez.assdroid.subtitle.handler.SubtitleFormatter;
 import knez.assdroid.subtitle.handler.SubtitleHandlerRepository;
-import knez.assdroid.subtitle.handler.ass.AssFormatter;
-import knez.assdroid.subtitle.handler.ass.AssParser;
+import knez.assdroid.subtitle.handler.SubtitleParser;
 import knez.assdroid.util.FileHandler;
 import knez.assdroid.util.Threader;
-import solid.collections.SolidList;
 import timber.log.Timber;
 
 @Module(includes = SubtitleAssModule.class)
@@ -37,11 +37,9 @@ class SubtitleModule {
 
     @Provides @Singleton
     SubtitleHandlerRepository getSubtitleHandlerRepository(
-            AssParser assParser, AssFormatter assFormatter) {
-        return new SubtitleHandlerRepository(
-                SolidList.list(assParser),
-                SolidList.list(assFormatter)
-        );
+            Set<SubtitleParser> subtitleParsers,
+            Set<SubtitleFormatter> subtitleFormatters) {
+        return new SubtitleHandlerRepository(subtitleParsers, subtitleFormatters);
     }
 
     @Provides

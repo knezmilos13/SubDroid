@@ -4,6 +4,9 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import dagger.multibindings.IntoSet;
+import knez.assdroid.subtitle.handler.SubtitleFormatter;
+import knez.assdroid.subtitle.handler.SubtitleParser;
 import knez.assdroid.subtitle.handler.ass.AssFormatter;
 import knez.assdroid.subtitle.handler.ass.AssParser;
 import knez.assdroid.subtitle.handler.ass.TextSectionParser;
@@ -11,8 +14,8 @@ import knez.assdroid.subtitle.handler.ass.TextSectionParser;
 @Module
 class SubtitleAssModule {
 
-    @Provides @Singleton
-    AssParser getAssParser(TextSectionParser textSectionParser) {
+    @Provides @Singleton @IntoSet
+    SubtitleParser getAssParser(TextSectionParser textSectionParser) {
         return new AssParser(textSectionParser);
     }
 
@@ -21,8 +24,8 @@ class SubtitleAssModule {
         return new TextSectionParser();
     }
 
-    @Provides @Singleton
-    AssFormatter getAssFormatter() {
+    @Provides @Singleton @IntoSet
+    SubtitleFormatter getAssFormatter() {
         return new AssFormatter();
     }
 
