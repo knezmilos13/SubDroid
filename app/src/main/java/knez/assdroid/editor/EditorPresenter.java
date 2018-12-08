@@ -498,6 +498,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
                 if(Thread.interrupted()) return;
 
+                subtitleLineVsos.clear();
                 subtitleLineVsos.addAll(vsos);
 
                 if(viewInterface == null) return;
