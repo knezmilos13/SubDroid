@@ -102,9 +102,9 @@ public class SubtitleController extends AbstractRepo {
         subtitleEventObservable = subtitleFileActionInput
                 .switchMap((Function<SubtitleAction, ObservableSource<SubtitleEvent>>) subtitleAction -> {
                     if (subtitleAction.equals(SubtitleAction.NEW_SUBTITLE))
-                        return createNewSubtitleAction();
+                        return createNewSubtitleEventObservable();
                     else
-                        return reloadSubtitleAction();
+                        return reloadSubtitleEventObservable();
                     })
                 .concatWith(Observable.just(
                         new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING)))
@@ -123,6 +123,66 @@ public class SubtitleController extends AbstractRepo {
     private boolean hasStoredSubtitle() {
         return storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
     }
+
+    @NonNull
+    private Observable<SubtitleEvent> createNewSubtitleEventObservable() {
+        return fullLoadObservable(createNewSubtitleObservable());
+    }
+
+    @NonNull
+    private Observable<SubtitleFile> createNewSubtitleObservable() {
+        return Observable.fromCallable(() -> {
+            Thread.sleep(5000); // TODO temp
+            SubtitleFile subtitleFile = new SubtitleFile(false, null, null, null,
+                    new SubtitleContent(new ArrayList<>(), new HashMap<>()), true, true);
+            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true); // TODO pristupas spolja stvarima?
+            subtitleContentDao.clearSubtitle();
+            return subtitleFile;
+        });
+    }
+
+    @NonNull
+    private ObservableSource<SubtitleEvent> reloadSubtitleEventObservable() {
+        return fullLoadObservable(reloadSubtitleObservable());
+    }
+
+    @NonNull
+    private Observable<SubtitleFile> reloadSubtitleObservable() {
+        return Observable.fromCallable(() -> {
+            Thread.sleep(5000); // TODO temp
+
+            boolean subtitleStored = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
+            if(!subtitleStored) { // Shouldn't happen - always ask controller if subtitle is stored first
+                logger.w("Performing reload subtitle file but no file stored! Creating a new file.");
+
+                storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+                subtitleContentDao.clearSubtitle(); // just in case
+            }
+
+            String name = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
+            String extension = storageHelper.getString(STORAGE_KEY_SUBTITLE_EXTENSION, null);
+            String uriString = storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null);
+            Uri uriPath = uriString == null? null : Uri.parse(uriString);
+            boolean currentSubtitleEdited = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
+
+            SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
+            return new SubtitleFile(
+                    currentSubtitleEdited, uriPath, name, extension, subtitleContent, true, true);
+        });
+    }
+
+    @NonNull
+    private Observable<SubtitleEvent> fullLoadObservable(Observable<SubtitleFile> worker) {
+        Observable<SubtitleEvent> workerWithSubtitleEvent = worker.map(
+                subtitleFile -> new SubtitleEvent(subtitleFile, SubtitleEventType.FULL_LOAD));
+
+        return Observable
+                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
+                .mergeWith(workerWithSubtitleEvent)
+                .subscribeOn(Schedulers.io());
+    }
+
+
 
 
 
@@ -208,78 +268,6 @@ public class SubtitleController extends AbstractRepo {
 
 
     // ------------------------------------------------------------------------------------ INTERNAL
-
-    // TODO ovo realno ne valja, sta ako mi uleti neko drugi i ugasi loading? ili pokrene duplo?
-    // mozda da je ovo odvojen observable? Ili da ima otkazivanja observablea?
-    // Mozda bi switchMap mogao da se koristi? Posto on radi neko satro otkazivanje?
-    // tipa da izmedju observablea i funnela ima switch map tako da svaki novi task
-    // mzoe da svicuje stari. A da se subtajtl fajl snima tek nakon switch mapa tako da jednom
-    // kad svicujes, onaj stari task i da se odradi ne utice na stanje
-
-    // Npr: observable koji generise INTENT, ACTION ili tako nesto
-    // i onda na njega zakacis switch map koji svicuje drugi observable na osnovu toga
-    // (taj drugi dobija npr pozivom getCreateNewObservable, sto vraca ovaj kod ispod)
-    // i onda na to zakacis funnel (koji ti i ne treba ovakav kakav je jer ces stalno da svicujes)
-    // u funnelu imas snimac trenutnog stanja tek sinhronizovan
-
-    // Ili Schedulers.single() pa da su svi poslovi na istom threadu todo
-    // Sto je sasvim ok, ako ne mozes da cancelujes a bar da obezbedis redosled izvrsavanja pa nek cekaju
-    // a u kombinaciji sa switchom i ne moraju da cekaju... tj. moraju, cak i da swicujes, ako su
-    // i svicovani i novi na istom threadu, dzabe, cekaces onaj da se zavrsi, zar ne?
-
-    @NonNull
-    private Observable<SubtitleEvent> createNewSubtitleAction() {
-        Observable<SubtitleEvent> work = Observable.fromCallable(() -> {
-            Thread.sleep(5000); // TODO temp
-            SubtitleFile subtitleFile = new SubtitleFile(false, null, null, null,
-                    new SubtitleContent(new ArrayList<>(), new HashMap<>()), true, true);
-            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true); // TODO pristupas spolja stvarima?
-            subtitleContentDao.clearSubtitle();
-            return subtitleFile;
-        }).map(subtitleFile -> new SubtitleEvent(subtitleFile, SubtitleEventType.FULL_LOAD));
-
-        return Observable
-                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
-                .mergeWith(work)
-                .subscribeOn(Schedulers.io());
-    }
-
-    @NonNull
-    private ObservableSource<SubtitleEvent> reloadSubtitleAction() {
-        Observable<SubtitleEvent> work = Observable.fromCallable(() -> {
-            Thread.sleep(5000); // TODO temp
-
-            boolean subtitleStored = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_STORED, false);
-            if(!subtitleStored) { // Shouldn't happen - always ask controller if subtitle is stored first
-                logger.w("Performing reload subtitle file but no file stored! Creating a new file.");
-
-                storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
-                subtitleContentDao.clearSubtitle(); // just in case
-            }
-
-            String name = storageHelper.getString(STORAGE_KEY_SUBTITLE_NAME, null);
-            String extension = storageHelper.getString(STORAGE_KEY_SUBTITLE_EXTENSION, null);
-            String uriString = storageHelper.getString(STORAGE_KEY_SUBTITLE_URI, null);
-            Uri uriPath = uriString == null? null : Uri.parse(uriString);
-            boolean currentSubtitleEdited = storageHelper.getBoolean(STORAGE_KEY_SUBTITLE_EDITED, false);
-
-            SubtitleContent subtitleContent = subtitleContentDao.loadSubtitleContent();
-            return new SubtitleFile(
-                    currentSubtitleEdited, uriPath, name, extension, subtitleContent, true, true);
-
-        }).map(subtitleFile -> new SubtitleEvent(currentSubtitleFile, SubtitleEventType.FULL_LOAD));
-
-        return Observable
-                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
-                .mergeWith(work)
-                .subscribeOn(Schedulers.io());
-    }
-
-
-
-
-
-
 
     @WorkerThread
     private void _parseSubtitle(@NonNull Uri subtitlePath) {
