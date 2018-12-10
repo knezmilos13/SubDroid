@@ -84,6 +84,8 @@ public class SubtitleController extends AbstractRepo {
         currentSubtitleFile = new SubtitleFile();
     }
 
+    // TODO sta bude ako ga iseces novim pozivom
+
 
     // ------------------------------------------------------------------ GLOBAL SUBTITLE FILE STATE
 
@@ -109,8 +111,7 @@ public class SubtitleController extends AbstractRepo {
                     else
                         throw new RuntimeException("Invalid SubtitleAction: " + subtitleAction.toString());
                     })
-                .concatWith(Observable.just(
-                        new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))) // todo obrnuto? prvo ovaj
+                .startWith(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
                 .replay(1);
 
         subtitleFileEventObservable.connect();
@@ -233,12 +234,9 @@ public class SubtitleController extends AbstractRepo {
 
     @NonNull
     private Observable<SubtitleEvent> fullLoadObservable(Observable<SubtitleFile> worker) {
-        Observable<SubtitleEvent> workerWithSubtitleEvent = worker.map(
-                subtitleFile -> new SubtitleEvent(subtitleFile, SubtitleEventType.FULL_LOAD));
-
-        return Observable
-                .just(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
-                .mergeWith(workerWithSubtitleEvent)
+        return worker
+                .map(subtitleFile -> new SubtitleEvent(subtitleFile, SubtitleEventType.FULL_LOAD))
+                .startWith(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
                 .subscribeOn(Schedulers.io());
     }
 
