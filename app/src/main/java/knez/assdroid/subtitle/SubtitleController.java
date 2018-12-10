@@ -52,8 +52,6 @@ public class SubtitleController extends AbstractRepo {
     private static final String STORAGE_KEY_SUBTITLE_EDITED =
             SubtitleController.class.getCanonicalName() + ".subtitle_edited";
 
-    enum SubtitleAction { NEW_SUBTITLE, RELOAD_SUBTITLE}
-
     @NonNull private final SubtitleHandlerRepository subtitleHandlerRepository;
     @NonNull private final FileHandler fileHandler;
     @NonNull private final SubtitleContentDao subtitleContentDao;
@@ -66,7 +64,7 @@ public class SubtitleController extends AbstractRepo {
     @NonNull private final Object currentSubtitleFileLock = new Object();
 
     private Subject<SubtitleAction> subtitleFileActionInput;
-    private ConnectableObservable<SubtitleEvent> subtitleEventObservable;
+    private ConnectableObservable<SubtitleEvent> subtitleFileEventObservable;
 
     public SubtitleController(@NonNull SubtitleHandlerRepository subtitleHandlerRepository,
                               @NonNull FileHandler fileHandler,
@@ -92,32 +90,43 @@ public class SubtitleController extends AbstractRepo {
     @NonNull
     public Observable<SubtitleEvent> getSubtitleObservable() {
         // TODO synchronized
-        if(subtitleEventObservable == null) initializeSubtitleFileObservables();
-        return subtitleEventObservable;
+        if(subtitleFileEventObservable == null) initializeSubtitleFileObservables();
+        return subtitleFileEventObservable;
     }
 
     private void initializeSubtitleFileObservables() {
         subtitleFileActionInput = PublishSubject.<SubtitleAction>create().toSerialized();
 
-        subtitleEventObservable = subtitleFileActionInput
+        subtitleFileEventObservable = subtitleFileActionInput
                 .switchMap((Function<SubtitleAction, ObservableSource<SubtitleEvent>>) subtitleAction -> {
-                    if (subtitleAction.equals(SubtitleAction.NEW_SUBTITLE))
+                    if (subtitleAction.subtitleActionType.equals(SubtitleActionType.NEW_SUBTITLE))
                         return createNewSubtitleEventObservable();
-                    else
+                    else if(subtitleAction.subtitleActionType.equals(SubtitleActionType.RELOAD_SUBTITLE))
                         return reloadSubtitleEventObservable();
+                    else if(subtitleAction.subtitleActionType.equals(SubtitleActionType.LOAD_SUBTITLE)
+                            && subtitleAction.data instanceof Uri)
+                        return loadSubtitleEventObservable((Uri) subtitleAction.data);
+                    else
+                        throw new RuntimeException("Invalid SubtitleAction: " + subtitleAction.toString());
                     })
                 .concatWith(Observable.just(
-                        new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING)))
+                        new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))) // todo obrnuto? prvo ovaj
                 .replay(1);
 
-        subtitleEventObservable.connect();
+        subtitleFileEventObservable.connect();
 
         subtitleFileActionInput.onNext(hasStoredSubtitle()?
-                SubtitleAction.RELOAD_SUBTITLE : SubtitleAction.NEW_SUBTITLE);
+                new SubtitleAction(SubtitleActionType.RELOAD_SUBTITLE)
+                : new SubtitleAction(SubtitleActionType.NEW_SUBTITLE));
     }
 
     public void createNewSubtitle() {
-        subtitleFileActionInput.onNext(SubtitleAction.NEW_SUBTITLE);
+        subtitleFileActionInput.onNext(new SubtitleAction(SubtitleActionType.NEW_SUBTITLE));
+    }
+
+    public void loadSubtitleFile(@NonNull Uri subtitlePath) {
+        subtitleFileActionInput.onNext(
+                new SubtitleAction(SubtitleActionType.LOAD_SUBTITLE, subtitlePath));
     }
 
     private boolean hasStoredSubtitle() {
@@ -172,6 +181,57 @@ public class SubtitleController extends AbstractRepo {
     }
 
     @NonNull
+    private ObservableSource<SubtitleEvent> loadSubtitleEventObservable(@NonNull Uri subtitlePath) {
+        return fullLoadObservable(loadSubtitleObservable(subtitlePath));
+    }
+
+    @WorkerThread
+    private Observable<SubtitleFile> loadSubtitleObservable(@NonNull Uri subtitlePath) {
+        return Observable.fromCallable(() -> {
+
+            String subtitleFilename = fileHandler.getFileNameFromUri(subtitlePath);
+            String subtitleExtension = FilenameUtils.getExtension(subtitleFilename);
+
+            SubtitleParser subtitleParser =
+                    subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
+            if(subtitleParser == null) {
+//            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForLoading(subtitleFilename),
+//                    mainThreader);
+                return null; // TODO sta ciniti
+                // TODO jednostavno ovaj ne moze da vrati SubtitleFile nego ceo SubtitleEvent
+                // a kad je tako, onda bi i ostali mogli tako...
+            }
+
+            List<String> fileContent;
+            try {
+                fileContent = fileHandler.readFileContent(subtitlePath);
+            } catch (IOException e) {
+                logger.e(e);
+//            fireCallbacks(callbacks, callback -> callback.onFileReadingFailed(subtitleFilename),
+//                    mainThreader);
+                return null; // TODO sta ciniti
+            }
+
+            Pair<SubtitleContent, List<ParsingError>> result = subtitleParser.parseSubtitle(fileContent);
+            SubtitleContent subtitleContent = result.first;
+            List<ParsingError> parsingErrors = result.second;
+
+            // Filename should be kept without the extension since the app itself is format-neutral
+            String subtitleName = FilenameUtils.getName(subtitleFilename);
+
+            SubtitleFile subtitleFile = new SubtitleFile(
+                    false, subtitlePath, subtitleName, subtitleExtension, result.first, true, true);
+
+            subtitleContentDao.storeSubtitleContent(subtitleContent);
+
+            storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
+            storeSubtitleFileValues(subtitleFile);
+
+            return subtitleFile;
+        });
+    }
+
+    @NonNull
     private Observable<SubtitleEvent> fullLoadObservable(Observable<SubtitleFile> worker) {
         Observable<SubtitleEvent> workerWithSubtitleEvent = worker.map(
                 subtitleFile -> new SubtitleEvent(subtitleFile, SubtitleEventType.FULL_LOAD));
@@ -181,6 +241,14 @@ public class SubtitleController extends AbstractRepo {
                 .mergeWith(workerWithSubtitleEvent)
                 .subscribeOn(Schedulers.io());
     }
+
+
+
+
+
+
+
+
 
 
 
@@ -211,11 +279,6 @@ public class SubtitleController extends AbstractRepo {
             logger.e("Requested tag prettifier for an unknown subtitle format - %s", extension);
             return null;
         }
-    }
-
-    public void parseSubtitle(@NonNull Uri subtitlePath) {
-//        isLoadingFile = true;
-        executorService.execute(() -> _parseSubtitle(subtitlePath));
     }
 
     public void writeSubtitle(@NonNull Uri uri) {
@@ -269,50 +332,7 @@ public class SubtitleController extends AbstractRepo {
 
     // ------------------------------------------------------------------------------------ INTERNAL
 
-    @WorkerThread
-    private void _parseSubtitle(@NonNull Uri subtitlePath) {
-        String subtitleFilename = fileHandler.getFileNameFromUri(subtitlePath);
-        String subtitleExtension = FilenameUtils.getExtension(subtitleFilename);
 
-        SubtitleParser subtitleParser = subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
-        if(subtitleParser == null) {
-//            isLoadingFile = false;
-//            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForLoading(subtitleFilename),
-//                    mainThreader);
-            return;
-        }
-
-        List<String> fileContent;
-        try {
-            fileContent = fileHandler.readFileContent(subtitlePath);
-        } catch (IOException e) {
-//            isLoadingFile = false;
-            logger.e(e);
-//            fireCallbacks(callbacks, callback -> callback.onFileReadingFailed(subtitleFilename),
-//                    mainThreader);
-            return;
-        }
-
-        Pair<SubtitleContent, List<ParsingError>> result = subtitleParser.parseSubtitle(fileContent);
-        SubtitleContent subtitleContent = result.first;
-        List<ParsingError> parsingErrors = result.second;
-
-        // Filename should be kept without the extension since the app itself is format-neutral
-        String subtitleName = FilenameUtils.getName(subtitleFilename);
-
-        currentSubtitleFile = new SubtitleFile(
-                false, subtitlePath, subtitleName, subtitleExtension, result.first, true, true);
-
-        subtitleContentDao.storeSubtitleContent(subtitleContent);
-
-        storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
-        storeSubtitleFileValues(currentSubtitleFile);
-
-//        isLoadingFile = false;
-//        fireCallbacks(callbacks,
-//				callback -> callback.onSubtitleFileParsed(currentSubtitleFile, parsingErrors),
-//				mainThreader);
-    }
 
     @WorkerThread
     private void _writeSubtitle(@NonNull Uri destPath) {
@@ -375,6 +395,24 @@ public class SubtitleController extends AbstractRepo {
 
 
     // ------------------------------------------------------------------------------------- CLASSES
+
+    enum SubtitleActionType { NEW_SUBTITLE, RELOAD_SUBTITLE, LOAD_SUBTITLE }
+
+    private static class SubtitleAction {
+        @NonNull final SubtitleActionType subtitleActionType;
+        @Nullable final Object data;
+        private SubtitleAction(SubtitleActionType subtitleActionType, Object data) {
+            this.subtitleActionType = subtitleActionType;
+            this.data = data;
+        }
+        private SubtitleAction(SubtitleActionType subtitleActionType) {
+            this(subtitleActionType, null);
+        }
+        @NonNull @Override
+        public String toString() {
+            return "SubtitleActionType: " + subtitleActionType.name() + ", data: " + data.toString();
+        }
+    }
 
     public enum SubtitleEventType {
         /** The subtitle file has been loaded/reloaded and all of the data has changed. */

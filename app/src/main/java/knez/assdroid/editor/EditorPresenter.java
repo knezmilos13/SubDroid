@@ -215,7 +215,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
         fileHandler.takePermissionForUri(uri);
 
         viewInterface.showProgressLoadingFile();
-        subtitleController.parseSubtitle(uri);
+        subtitleController.loadSubtitleFile(uri);
     }
 
     @Override
