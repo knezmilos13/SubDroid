@@ -100,7 +100,7 @@ public class SubtitleController extends AbstractRepo {
         subtitleFileActionInput = PublishSubject.<SubtitleAction>create().toSerialized();
 
         subtitleFileEventObservable = subtitleFileActionInput
-                .switchMap((Function<SubtitleAction, ObservableSource<SubtitleEvent>>) subtitleAction -> {
+                .switchMap(subtitleAction -> {
                     if (subtitleAction.subtitleActionType.equals(SubtitleActionType.NEW_SUBTITLE))
                         return createNewSubtitleEventObservable();
                     else if(subtitleAction.subtitleActionType.equals(SubtitleActionType.RELOAD_SUBTITLE))
@@ -111,8 +111,10 @@ public class SubtitleController extends AbstractRepo {
                     else
                         throw new RuntimeException("Invalid SubtitleAction: " + subtitleAction.toString());
                     })
-                .startWith(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
+                .startWith(new BasicSubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
                 .replay(1);
+
+        // TODO: a gde snimas subtitle file trenutni?
 
         subtitleFileEventObservable.connect();
 
@@ -135,7 +137,7 @@ public class SubtitleController extends AbstractRepo {
     }
 
     @NonNull
-    private Observable<SubtitleEvent> createNewSubtitleEventObservable() {
+    private Observable<? extends SubtitleEvent> createNewSubtitleEventObservable() {
         return fullLoadObservable(createNewSubtitleObservable());
     }
 
@@ -152,7 +154,7 @@ public class SubtitleController extends AbstractRepo {
     }
 
     @NonNull
-    private ObservableSource<SubtitleEvent> reloadSubtitleEventObservable() {
+    private ObservableSource<? extends SubtitleEvent> reloadSubtitleEventObservable() {
         return fullLoadObservable(reloadSubtitleObservable());
     }
 
@@ -183,34 +185,34 @@ public class SubtitleController extends AbstractRepo {
 
     @NonNull
     private ObservableSource<SubtitleEvent> loadSubtitleEventObservable(@NonNull Uri subtitlePath) {
-        return fullLoadObservable(loadSubtitleObservable(subtitlePath));
+        return loadSubtitleObservable(subtitlePath)
+                .startWith(new BasicSubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
+                .subscribeOn(Schedulers.io());
     }
 
     @WorkerThread
-    private Observable<SubtitleFile> loadSubtitleObservable(@NonNull Uri subtitlePath) {
+    private Observable<SubtitleEvent> loadSubtitleObservable(@NonNull Uri subtitlePath) {
         return Observable.fromCallable(() -> {
 
             String subtitleFilename = fileHandler.getFileNameFromUri(subtitlePath);
             String subtitleExtension = FilenameUtils.getExtension(subtitleFilename);
 
+            // TODO: super je sve ovo sto si smislio da vratis gresku kroz drugu podklasu eventa
+            // aaaaaaaaaaaliiii ideja je bila i da tako mozes da imas zadnju vrednost eventa uvek
+            // snimljenu kroz observable, i sta ako ti vrati ovaj slogirani event? I posle svi koji se
+            // zakace dobiju tipa event "loading failed"
+
             SubtitleParser subtitleParser =
                     subtitleHandlerRepository.getParserForSubtitleExtension(subtitleExtension);
-            if(subtitleParser == null) {
-//            fireCallbacks(callbacks, callback -> callback.onInvalidSubtitleFormatForLoading(subtitleFilename),
-//                    mainThreader);
-                return null; // TODO sta ciniti
-                // TODO jednostavno ovaj ne moze da vrati SubtitleFile nego ceo SubtitleEvent
-                // a kad je tako, onda bi i ostali mogli tako...
-            }
+            if(subtitleParser == null)
+                return new LoadingFailedEvent(subtitleFilename, true, false);
 
             List<String> fileContent;
             try {
                 fileContent = fileHandler.readFileContent(subtitlePath);
             } catch (IOException e) {
                 logger.e(e);
-//            fireCallbacks(callbacks, callback -> callback.onFileReadingFailed(subtitleFilename),
-//                    mainThreader);
-                return null; // TODO sta ciniti
+                return new LoadingFailedEvent(subtitleFilename, false, true);
             }
 
             Pair<SubtitleContent, List<ParsingError>> result = subtitleParser.parseSubtitle(fileContent);
@@ -228,15 +230,15 @@ public class SubtitleController extends AbstractRepo {
             storageHelper.putBoolean(STORAGE_KEY_SUBTITLE_STORED, true);
             storeSubtitleFileValues(subtitleFile);
 
-            return subtitleFile;
+            return new BasicSubtitleEvent(subtitleFile, SubtitleEventType.LOAD);
         });
     }
 
     @NonNull
-    private Observable<SubtitleEvent> fullLoadObservable(Observable<SubtitleFile> worker) {
+    private Observable<? extends SubtitleEvent> fullLoadObservable(Observable<SubtitleFile> worker) {
         return worker
-                .map(subtitleFile -> new SubtitleEvent(subtitleFile, SubtitleEventType.FULL_LOAD))
-                .startWith(new SubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
+                .map(subtitleFile -> new BasicSubtitleEvent(subtitleFile, SubtitleEventType.LOAD))
+                .startWith(new BasicSubtitleEvent(currentSubtitleFile, SubtitleEventType.LOADING))
                 .subscribeOn(Schedulers.io());
     }
 
@@ -414,29 +416,37 @@ public class SubtitleController extends AbstractRepo {
 
     public enum SubtitleEventType {
         /** The subtitle file has been loaded/reloaded and all of the data has changed. */
-        FULL_LOAD, LOADING
+        LOAD, LOADING // TODO da napravis sve klasama?
     }
 
-    public static class SubtitleEvent {
+    public interface SubtitleEvent { };
 
+    public static class BasicSubtitleEvent implements SubtitleEvent {
         public final SubtitleFile subtitleFile; // todo dal je nullable?
         @NonNull public final SubtitleEventType subtitleEventType;
 
-        public SubtitleEvent(SubtitleFile subtitleFile, SubtitleEventType subtitleEventType) {
+        public BasicSubtitleEvent(SubtitleFile subtitleFile, SubtitleEventType subtitleEventType) {
             this.subtitleFile = subtitleFile;
             this.subtitleEventType = subtitleEventType;
         }
     }
 
+    public static class LoadingFailedEvent implements SubtitleEvent {
+        @NonNull public final String subtitleFileName;
+        public final boolean isInvalidFileFormat;
+        public final boolean hadParsingError;
+        public LoadingFailedEvent(@NonNull String subtitleFileName, boolean isInvalidFileFormat, boolean hadParsingError) {
+            this.subtitleFileName = subtitleFileName;
+            this.isInvalidFileFormat = isInvalidFileFormat; // todo nemoj ovako ruzno sa dva booleana
+            this.hadParsingError = hadParsingError;
+        }
+    }
+
     @UiThread
     public interface Callback {
-        // TODO kako ces da javljas ove errore?
         default void onInvalidSubtitleFormatForWriting(@NonNull String subtitleFilename) { }
-        default void onInvalidSubtitleFormatForLoading(@NonNull String subtitleFilename) { }
-        default void onFileReadingFailed(@NonNull String subtitleFilename) { }
         default void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
                                           @NonNull List<ParsingError> parsingErrors) { }
-        default void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) { }
         default void onFileWritingFailed(@NonNull String destFilename) { }
         default void onSubtitleFileSaved(@NonNull SubtitleFile subtitleFile) { }
     }

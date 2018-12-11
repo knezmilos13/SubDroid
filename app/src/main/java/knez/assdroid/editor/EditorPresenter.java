@@ -297,25 +297,41 @@ public class EditorPresenter extends CommonSubtitlePresenter
             new DisposableObserver<SubtitleEvent>() {
                 @Override
                 public void onNext(SubtitleEvent subtitleEvent) {
-                    Timber.e("WTF - Dobio konacni event: %s", subtitleEvent.subtitleEventType.name());
-
-                    if(subtitleEvent.subtitleEventType.equals(SubtitleEventType.LOADING)) {
+                    if(subtitleEvent instanceof BasicSubtitleEvent &&
+                            ((BasicSubtitleEvent) subtitleEvent).subtitleEventType
+                                    .equals(SubtitleEventType.LOADING)) {
                         if(viewInterface != null) viewInterface.showProgressLoadingFile();
                         return;
                     }
 
-                    if(subtitleEvent.subtitleEventType.equals(SubtitleEventType.FULL_LOAD)) {
+                    if(subtitleEvent instanceof BasicSubtitleEvent &&
+                            ((BasicSubtitleEvent) subtitleEvent).subtitleEventType
+                                    .equals(SubtitleEventType.LOAD)) {
                         clearActiveSearchResult();
 
-                        showSubtitleTitle(subtitleEvent.subtitleFile);
+                        showSubtitleTitle(((BasicSubtitleEvent) subtitleEvent).subtitleFile);
 
-                        SubtitleContent content = subtitleEvent.subtitleFile.getSubtitleContent();
+                        SubtitleContent content = ((BasicSubtitleEvent) subtitleEvent)
+                                .subtitleFile.getSubtitleContent();
                         List<SubtitleLine> lines =
                                 content == null ? new ArrayList<>() : content.getSubtitleLines();
                         asyncCreateAllVsos(lines);
 
                         if(viewInterface != null) viewInterface.hideProgress();
                         return;
+                    }
+
+                    if(subtitleEvent instanceof LoadingFailedEvent) {
+                        if(viewInterface == null) return;
+
+                        viewInterface.hideProgress();
+
+                        if(((LoadingFailedEvent) subtitleEvent).isInvalidFileFormat)
+                            viewInterface.showErrorLoadingSubtitleInvalidFormat(
+                                    ((LoadingFailedEvent) subtitleEvent).subtitleFileName);
+                        else if(((LoadingFailedEvent) subtitleEvent).hadParsingError)
+                            viewInterface.showErrorLoadingFailed(
+                                    ((LoadingFailedEvent) subtitleEvent).subtitleFileName);
                     }
                 }
 
@@ -327,6 +343,7 @@ public class EditorPresenter extends CommonSubtitlePresenter
 
                 @Override
                 public void onError(Throwable e) {
+                    Timber.e("WTF - POZVAN ON ONERROR");
                     // TODO sta ako se ovo desi? Ne zelim ovo ikad... Mada mogu uvek da zovem opet da se subscribujem ili ono auto ima nesto
                 }
 
@@ -335,21 +352,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
                     // TODO ne zelim ovo ikad, jel ima neka varijanta bez ovoga
                 }
             };
-
-
-    @Override @Deprecated
-    public void onInvalidSubtitleFormatForLoading(@NonNull String subtitleFilename) {
-        if(viewInterface == null) return;
-        viewInterface.showErrorLoadingSubtitleInvalidFormat(subtitleFilename);
-        viewInterface.hideProgress();
-    }
-
-    @Override @Deprecated
-    public void onFileReadingFailed(@NonNull String subtitleFilename) {
-        if(viewInterface == null) return;
-        viewInterface.hideProgress();
-        viewInterface.showErrorLoadingFailed(subtitleFilename);
-    }
 
     @Override @Deprecated
     public void onSubtitleFileParsed(@NonNull SubtitleFile subtitleFile,
@@ -368,12 +370,6 @@ public class EditorPresenter extends CommonSubtitlePresenter
             viewInterface.hideProgress();
         }
 
-        asyncCreateAllVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
-    }
-
-    @Override @Deprecated
-    public void onSubtitleFileReloaded(@NonNull SubtitleFile subtitleFile) {
-        showSubtitleTitle(subtitleFile);
         asyncCreateAllVsos(subtitleFile.getSubtitleContent().getSubtitleLines());
     }
 
